@@ -1,6 +1,6 @@
 {
   "name": "datastore-core",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Wrapper implmentation for interface-datastore",
   "main": "src/index.js",
   "scripts": {
@@ -10,11 +10,12 @@
     "flow": "flow",
     "test:node": "aegir-test --env node",
     "test:browser": "aegir-test --env browser",
-    "release": "aegir-release",
-    "release-minor": "aegir-release --type minor",
-    "release-major": "aegir-release --type major",
+    "release": "aegir-release --docs",
+    "release-minor": "aegir-release --type minor --docs",
+    "release-major": "aegir-release --type major --docs",
     "coverage": "aegir-coverage",
-    "coverage-publish": "aegir-coverage publish"
+    "coverage-publish": "aegir-coverage publish",
+    "docs": "aegir-docs"
   },
   "repository": {
     "type": "git",
@@ -39,6 +40,7 @@
   },
   "dependencies": {
     "async": "^2.1.5",
+    "interface-datastore": "^0.1.0",
     "left-pad": "^1.1.3",
     "pull-many": "^1.0.8",
     "pull-stream": "^3.5.0"

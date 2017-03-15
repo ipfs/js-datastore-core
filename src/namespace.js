@@ -15,6 +15,7 @@ import type {Callback, Datastore, Query, QueryResult} from 'interface-datastore'
  * For example, if the prefix is `new Key(/hello)` a call
  * to `store.put(new Key('/world'), mydata)` would store the data under
  * `/hello/world`.
+ *
  */
 class NamespaceDatastore/* :: <Value> */ extends KeytransformDatastore /* :: <Value> */ {
   /* :: prefix: Key */
