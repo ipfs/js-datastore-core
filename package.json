@@ -48,5 +48,8 @@
   "engines": {
     "node": ">=4.0.0",
     "npm": ">=3.0.0"
-  }
+  },
+  "contributors": [
+    "Friedel Ziegelmayer <dignifiedquire@gmail.com>"
+  ]
 }
