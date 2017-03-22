@@ -36,6 +36,10 @@ class ShardingDatastore {
     this.shard = shard
   }
 
+  open (callback /* : Callback<void> */) /* : void */ {
+    this.child.open(callback)
+  }
+
   _convertKey (key/* : Key */)/* : Key */ {
     const s = key.toString()
     if (s === shardKey.toString() || s === shardReadmeKey.toString()) {
@@ -65,9 +69,12 @@ class ShardingDatastore {
   }
 
   static open (store /* : Datastore<Buffer> */, callback /* : Callback<ShardingDatastore> */) /* : void */ {
-    waterfall([cb => sh.readShardFun('/', store, cb), (shard, cb) => {
-      cb(null, new ShardingDatastore(store, shard))
-    }], callback)
+    waterfall([
+      (cb) => sh.readShardFun('/', store, cb),
+      (shard, cb) => {
+        cb(null, new ShardingDatastore(store, shard))
+      }
+    ], callback)
   }
 
   static create (store /* : Datastore<Buffer> */, shard /* : ShardV1 */, callback /* : Callback<void> */) /* : void */ {

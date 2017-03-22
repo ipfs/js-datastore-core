@@ -22,6 +22,12 @@ class TieredDatastore /* :: <Value> */ {
     this.stores = stores.slice()
   }
 
+  open (callback /* : Callback<void> */) /* : void */ {
+    each(this.stores, (store, cb) => {
+      store.open(cb)
+    }, callback)
+  }
+
   put (key /* : Key */, value /* : Value */, callback /* : Callback<void> */) /* : void */ {
     each(this.stores, (store, cb) => {
       store.put(key, value, cb)

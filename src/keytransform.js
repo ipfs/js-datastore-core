@@ -4,7 +4,7 @@
 const pull = require('pull-stream')
 
 /* ::
-import type {Key, Datastore, Batch, Query, QueryResult} from 'interface-datastore'
+import type {Key, Datastore, Batch, Query, QueryResult, Callback} from 'interface-datastore'
 */
 
 /**
@@ -38,19 +38,23 @@ class KeyTransformDatastore /* :: <Value> */ {
     this.transform = transform
   }
 
-  put (key /* : Key */, val /* : Value */, callback /* : (?Error) => void */) /* : void */ {
+  open (callback /* : Callback<void> */) /* : void */ {
+    this.child.open(callback)
+  }
+
+  put (key /* : Key */, val /* : Value */, callback /* : Callback<void> */) /* : void */ {
     this.child.put(this.transform.convert(key), val, callback)
   }
 
-  get (key /* : Key */, callback /* : (?Error, ?Value) => void */) /* : void */ {
+  get (key /* : Key */, callback /* : Callback<Value> */) /* : void */ {
     this.child.get(this.transform.convert(key), callback)
   }
 
-  has (key /* : Key */, callback /* : (?Error, ?bool) => void */) /* : void */ {
+  has (key /* : Key */, callback /* : Callback<bool> */) /* : void */ {
     this.child.has(this.transform.convert(key), callback)
   }
 
-  delete (key /* : Key */, callback /* : (?Error) => void */) /* : void */ {
+  delete (key /* : Key */, callback /* : Callback<void> */) /* : void */ {
     this.child.delete(this.transform.convert(key), callback)
   }
 
@@ -63,7 +67,7 @@ class KeyTransformDatastore /* :: <Value> */ {
       delete: (key /* : Key */) /* : void */ => {
         b.delete(this.transform.convert(key))
       },
-      commit: (callback /* : (err: ?Error) => void */) => {
+      commit: (callback /* : Callback<void> */) /* : void */ => {
         b.commit(callback)
       }
     }
@@ -79,7 +83,7 @@ class KeyTransformDatastore /* :: <Value> */ {
     )
   }
 
-  close (callback /* : (err: ?Error) => void */) /* : void */ {
+  close (callback /* : Callback<void> */) /* : void */ {
     this.child.close(callback)
   }
 }

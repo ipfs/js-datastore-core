@@ -2,7 +2,9 @@
 /* eslint-env mocha */
 'use strict'
 
-const expect = require('chai').expect
+const chai = require('chai')
+chai.use(require('dirty-chai'))
+const expect = chai.expect
 const series = require('async/series')
 const each = require('async/each')
 const map = require('async/map')
@@ -52,7 +54,7 @@ describe('KeyTransformDatastore', () => {
           mStore.get(new Key('abc').child(k), cb)
         }, cb)
       ], (err, res) => {
-        expect(err).to.not.exist
+        expect(err).to.not.exist()
         expect(res[0]).to.eql(res[1])
         cb()
       }),
@@ -60,7 +62,7 @@ describe('KeyTransformDatastore', () => {
         (cb) => pull(mStore.query({}), pull.collect(cb)),
         (cb) => pull(kStore.query({}), pull.collect(cb))
       ], (err, res) => {
-        expect(err).to.not.exist
+        expect(err).to.not.exist()
         expect(res[0]).to.have.length(res[1].length)
 
         res[0].forEach((a, i) => {

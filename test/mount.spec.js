@@ -3,8 +3,10 @@
 /* eslint max-nested-callbacks: ["error", 8] */
 'use strict'
 
+const chai = require('chai')
+chai.use(require('dirty-chai'))
+const expect = chai.expect
 const pull = require('pull-stream')
-const expect = require('chai').expect
 const series = require('async/series')
 
 const Key = require('interface-datastore').Key
@@ -45,7 +47,7 @@ describe('MountStore', () => {
     series([
       (cb) => m.put(new Key('/cool/hello'), val, cb),
       (cb) => mds.get(new Key('/hello'), (err, res) => {
-        expect(err).to.not.exist
+        expect(err).to.not.exist()
         expect(res).to.eql(val)
         cb()
       })
@@ -63,7 +65,7 @@ describe('MountStore', () => {
     series([
       (cb) => mds.put(new Key('/hello'), val, cb),
       (cb) => m.get(new Key('/cool/hello'), (err, res) => {
-        expect(err).to.not.exist
+        expect(err).to.not.exist()
         expect(res).to.eql(val)
         cb()
       })
@@ -81,7 +83,7 @@ describe('MountStore', () => {
     series([
       (cb) => mds.put(new Key('/hello'), val, cb),
       (cb) => m.has(new Key('/cool/hello'), (err, exists) => {
-        expect(err).to.not.exist
+        expect(err).to.not.exist()
         expect(exists).to.eql(true)
         cb()
       })
@@ -100,12 +102,12 @@ describe('MountStore', () => {
       (cb) => m.put(new Key('/cool/hello'), val, cb),
       (cb) => m.delete(new Key('/cool/hello'), cb),
       (cb) => m.has(new Key('/cool/hello'), (err, exists) => {
-        expect(err).to.not.exist
+        expect(err).to.not.exist()
         expect(exists).to.eql(false)
         cb()
       }),
       (cb) => mds.has(new Key('/hello'), (err, exists) => {
-        expect(err).to.not.exist
+        expect(err).to.not.exist()
         expect(exists).to.eql(false)
         cb()
       })
@@ -126,7 +128,7 @@ describe('MountStore', () => {
         pull(
           m.query({prefix: '/cool'}),
           pull.collect((err, res) => {
-            expect(err).to.not.exist
+            expect(err).to.not.exist()
             expect(res).to.eql([{
               key: new Key('/cool/hello'),
               value: val
