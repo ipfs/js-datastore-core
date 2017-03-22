@@ -33,6 +33,12 @@ class MountDatastore /* :: <Value> */ {
     this.mounts = mounts.slice()
   }
 
+  open (callback /* : Callback<void> */) /* : void */ {
+    each(this.mounts, (m, cb) => {
+      m.datastore.open(cb)
+    }, callback)
+  }
+
   /**
    * Lookup the matching datastore for the given key.
    *

@@ -3,7 +3,9 @@
 /* eslint max-nested-callbacks: ["error", 8] */
 'use strict'
 
-const expect = require('chai').expect
+const chai = require('chai')
+chai.use(require('dirty-chai'))
+const expect = chai.expect
 const series = require('async/series')
 const parallel = require('async/parallel')
 const waterfall = require('async/waterfall')
@@ -45,8 +47,8 @@ describe('ShardingStore', () => {
     const ms = new MemoryStore()
 
     ShardingStore.open(ms, (err, ss) => {
-      expect(err).to.exist
-      expect(ss).to.not.exist
+      expect(err).to.exist()
+      expect(ss).to.not.exist()
       done()
     })
   })
@@ -65,7 +67,7 @@ describe('ShardingStore', () => {
     const ms = new MemoryStore()
     const shard = new sh.NextToLast(2)
     ShardingStore.createOrOpen(ms, shard, (err, ss) => {
-      expect(err).to.not.exist
+      expect(err).to.not.exist()
       if (ss == null) {
         return done(new Error('missing store'))
       }
@@ -74,7 +76,7 @@ describe('ShardingStore', () => {
       series([
         (cb) => store.put(new Key('hello'), new Buffer('test'), cb),
         (cb) => ms.get(new Key('ll').child(new Key('hello')), (err, res) => {
-          expect(err).to.not.exist
+          expect(err).to.not.exist()
           expect(res).to.eql(new Buffer('test'))
           cb()
         })
