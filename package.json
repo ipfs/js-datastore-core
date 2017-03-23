@@ -51,6 +51,7 @@
     "npm": ">=3.0.0"
   },
   "contributors": [
+    "David Dias <daviddias.p@gmail.com>",
     "Friedel Ziegelmayer <dignifiedquire@gmail.com>"
   ]
 }
