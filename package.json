@@ -42,7 +42,6 @@
   "dependencies": {
     "async": "^2.5.0",
     "interface-datastore": "^0.3.0",
-    "interface-datastore": "github:richardschneider/interface-datastore#os-agnostic",
     "left-pad": "^1.1.3",
     "pull-many": "^1.0.8",
     "pull-stream": "^3.6.0"
