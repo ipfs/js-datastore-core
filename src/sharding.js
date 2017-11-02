@@ -154,12 +154,14 @@ class ShardingDatastore {
 
     if (q.orders != null) {
       tq.orders = q.orders.map((o) => (res, cb) => {
-        const m = res.map((e) => {
-          return Object.assign({}, e, {
-            key: this._invertKey(e.key)
-          })
+        res.forEach((e) => e.key = this._invertKey(e.key))
+        o(res, (err, ordered) => {
+          if (err) {
+            return cb(err);
+          }
+          ordered.forEach((e) => e.key = this._convertKey(e.key))
+          cb(null, ordered)
         })
-        o(m, cb)
       })
     }
 
