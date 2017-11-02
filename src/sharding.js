@@ -129,7 +129,13 @@ class ShardingDatastore {
 
   query (q /* : Query<Buffer> */) /* : QueryResult<Buffer> */ {
     const tq/* : Query<Buffer> */ = {
-      keysOnly: q.keysOnly
+      keysOnly: q.keysOnly,
+      offset: q.offset,
+      limit: q.limit,
+      filters: [
+        (e, cb) => cb(null, e.key.toString() !== shardKey.toString()),
+        (e, cb) => cb(null, e.key.toString() !== shardReadmeKey.toString())
+      ]
     }
 
     if (q.prefix != null) {
@@ -138,11 +144,11 @@ class ShardingDatastore {
     }
 
     if (q.filters != null) {
-      tq.filters = q.filters.map((f) => (e, cb) => {
+      tq.filters.concat(q.filters.map((f) => (e, cb) => {
         f(Object.assign({}, e, {
           key: this._invertKey(e.key)
         }), cb)
-      })
+      }))
     }
 
     if (q.orders != null) {
@@ -156,24 +162,7 @@ class ShardingDatastore {
       })
     }
 
-    if (q.offset != null) {
-      tq.offset = q.offset + 2
-    }
-
-    if (q.limit != null) {
-      tq.limit = q.limit + 2
-    }
-
-    return pull(
-      this.child.query(tq),
-      pull.filter((e) => {
-        if (e.key.toString() === shardKey.toString() ||
-            e.key.toString() === shardReadmeKey.toString()) {
-          return false
-        }
-        return true
-      })
-    )
+    return this.child.query(tq)
   }
 
   close (callback /* : Callback<void> */) /* : void */ {
