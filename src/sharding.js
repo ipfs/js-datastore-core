@@ -128,7 +128,7 @@ class ShardingDatastore {
   }
 
   query (q /* : Query<Buffer> */) /* : QueryResult<Buffer> */ {
-    const tq/* : Query<Buffer> */ = {
+    let tq/* : Query<Buffer> */ = {
       keysOnly: q.keysOnly,
       offset: q.offset,
       limit: q.limit,
@@ -144,11 +144,12 @@ class ShardingDatastore {
     }
 
     if (q.filters != null) {
-      tq.filters.concat(q.filters.map((f) => (e, cb) => {
+      let filters = q.filters.map((f) => (e, cb) => {
         f(Object.assign({}, e, {
           key: this._invertKey(e.key)
         }), cb)
-      }))
+      })
+      tq.filters.push(...filters)
     }
 
     if (q.orders != null) {
