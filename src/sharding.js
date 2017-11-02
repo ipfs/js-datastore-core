@@ -3,7 +3,6 @@
 
 const waterfall = require('async/waterfall')
 const parallel = require('async/parallel')
-const pull = require('pull-stream')
 const Key = require('interface-datastore').Key
 
 const sh = require('./shard')
@@ -155,12 +154,12 @@ class ShardingDatastore {
 
     if (q.orders != null) {
       tq.orders = q.orders.map((o) => (res, cb) => {
-        res.forEach((e) => e.key = this._invertKey(e.key))
+        res.forEach((e) => { e.key = this._invertKey(e.key) })
         o(res, (err, ordered) => {
           if (err) {
-            return cb(err);
+            return cb(err)
           }
-          ordered.forEach((e) => e.key = this._convertKey(e.key))
+          ordered.forEach((e) => { e.key = this._convertKey(e.key) })
           cb(null, ordered)
         })
       })
