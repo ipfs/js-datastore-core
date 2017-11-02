@@ -139,7 +139,9 @@ class ShardingDatastore {
     }
 
     if (q.prefix != null) {
-      tq.filters.push((e, cb) => cb(null, this._convertKey(e.key).toString().startsWith(q.prefix)))
+      tq.filters.push((e, cb) => {
+        cb(null, this._invertKey(e.key).toString().startsWith(q.prefix))
+      })
     }
 
     if (q.filters != null) {
