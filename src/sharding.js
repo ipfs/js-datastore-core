@@ -150,7 +150,7 @@ class ShardingDatastore {
           key: this._invertKey(e.key)
         }), cb)
       })
-      tq.filters.push(...filters)
+      tq.filters = tq.filters.concat(filters)
     }
 
     if (q.orders != null) {
