@@ -26,7 +26,7 @@ describe('Tiered', () => {
 
     it('put', (done) => {
       const k = new Key('hello')
-      const v = new Buffer('world')
+      const v = Buffer.from('world')
       series([
         (cb) => store.put(k, v, cb),
         (cb) => parallel([
@@ -44,7 +44,7 @@ describe('Tiered', () => {
 
     it('get and has, where available', (done) => {
       const k = new Key('hello')
-      const v = new Buffer('world')
+      const v = Buffer.from('world')
 
       series([
         (cb) => ms[1].put(k, v, cb),
@@ -63,7 +63,7 @@ describe('Tiered', () => {
 
     it('has and delete', (done) => {
       const k = new Key('hello')
-      const v = new Buffer('world')
+      const v = Buffer.from('world')
       series([
         (cb) => store.put(k, v, cb),
         (cb) => parallel([

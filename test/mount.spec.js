@@ -18,7 +18,7 @@ describe('MountStore', () => {
   it('put - no mount', (done) => {
     const m = new MountStore([])
 
-    m.put(new Key('hello'), new Buffer('foo'), (err) => {
+    m.put(new Key('hello'), Buffer.from('foo'), (err) => {
       expect(err).to.be.an('Error')
       done()
     })
@@ -30,7 +30,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
 
-    m.put(new Key('/fail/hello'), new Buffer('foo'), (err) => {
+    m.put(new Key('/fail/hello'), Buffer.from('foo'), (err) => {
       expect(err).to.be.an('Error')
       done()
     })
@@ -43,7 +43,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
 
-    const val = new Buffer('hello')
+    const val = Buffer.from('hello')
     series([
       (cb) => m.put(new Key('/cool/hello'), val, cb),
       (cb) => mds.get(new Key('/hello'), (err, res) => {
@@ -61,7 +61,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
 
-    const val = new Buffer('hello')
+    const val = Buffer.from('hello')
     series([
       (cb) => mds.put(new Key('/hello'), val, cb),
       (cb) => m.get(new Key('/cool/hello'), (err, res) => {
@@ -79,7 +79,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
 
-    const val = new Buffer('hello')
+    const val = Buffer.from('hello')
     series([
       (cb) => mds.put(new Key('/hello'), val, cb),
       (cb) => m.has(new Key('/cool/hello'), (err, exists) => {
@@ -97,7 +97,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
 
-    const val = new Buffer('hello')
+    const val = Buffer.from('hello')
     series([
       (cb) => m.put(new Key('/cool/hello'), val, cb),
       (cb) => m.delete(new Key('/cool/hello'), cb),
@@ -121,7 +121,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
 
-    const val = new Buffer('hello')
+    const val = Buffer.from('hello')
     series([
       (cb) => m.put(new Key('/cool/hello'), val, cb),
       (cb) => {
