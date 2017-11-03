@@ -84,8 +84,7 @@ describe('ShardingStore', () => {
     })
   })
 
-  // TODO: fix query prefix and orders
-  describe.skip('interface-datastore', () => {
+  describe('interface-datastore', () => {
     require('interface-datastore/src/tests')({
       setup (callback) {
         const shard = new sh.NextToLast(2)
