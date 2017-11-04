@@ -36,7 +36,7 @@ describe('KeyTransformDatastore', () => {
 
     series([
       (cb) => each(keys, (k, cb) => {
-        store.put(k, new Buffer(k.toString()), cb)
+        store.put(k, Buffer.from(k.toString()), cb)
       }, cb),
       (cb) => parallel([
         (cb) => map(keys, (k, cb) => {

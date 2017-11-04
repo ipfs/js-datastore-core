@@ -3,7 +3,6 @@
 
 const waterfall = require('async/waterfall')
 const parallel = require('async/parallel')
-const pull = require('pull-stream')
 const Key = require('interface-datastore').Key
 
 const sh = require('./shard')
@@ -86,8 +85,8 @@ class ShardingDatastore {
       if (!exists) {
         const put = typeof store.putRaw === 'function' ? store.putRaw.bind(store) : store.put.bind(store)
         return parallel([
-          (cb) => put(shardKey, new Buffer(shard.toString() + '\n'), cb),
-          (cb) => put(shardReadmeKey, new Buffer(sh.readme), cb)
+          (cb) => put(shardKey, Buffer.from(shard.toString() + '\n'), cb),
+          (cb) => put(shardReadmeKey, Buffer.from(sh.readme), cb)
         ], err => callback(err))
       }
 
@@ -129,51 +128,44 @@ class ShardingDatastore {
 
   query (q /* : Query<Buffer> */) /* : QueryResult<Buffer> */ {
     const tq/* : Query<Buffer> */ = {
-      keysOnly: q.keysOnly
+      keysOnly: q.keysOnly,
+      offset: q.offset,
+      limit: q.limit,
+      filters: [
+        (e, cb) => cb(null, e.key.toString() !== shardKey.toString()),
+        (e, cb) => cb(null, e.key.toString() !== shardReadmeKey.toString())
+      ]
     }
 
     if (q.prefix != null) {
-      // TODO: transform
-      tq.prefix = q.prefix
+      tq.filters.push((e, cb) => {
+        cb(null, this._invertKey(e.key).toString().startsWith(q.prefix))
+      })
     }
 
     if (q.filters != null) {
-      tq.filters = q.filters.map((f) => (e, cb) => {
+      const filters = q.filters.map((f) => (e, cb) => {
         f(Object.assign({}, e, {
           key: this._invertKey(e.key)
         }), cb)
       })
+      tq.filters = tq.filters.concat(filters)
     }
 
     if (q.orders != null) {
       tq.orders = q.orders.map((o) => (res, cb) => {
-        const m = res.map((e) => {
-          return Object.assign({}, e, {
-            key: this._invertKey(e.key)
-          })
+        res.forEach((e) => { e.key = this._invertKey(e.key) })
+        o(res, (err, ordered) => {
+          if (err) {
+            return cb(err)
+          }
+          ordered.forEach((e) => { e.key = this._convertKey(e.key) })
+          cb(null, ordered)
         })
-        o(m, cb)
       })
     }
 
-    if (q.offset != null) {
-      tq.offset = q.offset + 2
-    }
-
-    if (q.limit != null) {
-      tq.limit = q.limit + 2
-    }
-
-    return pull(
-      this.child.query(tq),
-      pull.filter((e) => {
-        if (e.key.toString() === shardKey.toString() ||
-            e.key.toString() === shardReadmeKey.toString()) {
-          return false
-        }
-        return true
-      })
-    )
+    return this.child.query(tq)
   }
 
   close (callback /* : Callback<void> */) /* : void */ {

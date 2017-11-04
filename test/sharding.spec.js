@@ -74,18 +74,17 @@ describe('ShardingStore', () => {
       const store = ss
 
       series([
-        (cb) => store.put(new Key('hello'), new Buffer('test'), cb),
+        (cb) => store.put(new Key('hello'), Buffer.from('test'), cb),
         (cb) => ms.get(new Key('ll').child(new Key('hello')), (err, res) => {
           expect(err).to.not.exist()
-          expect(res).to.eql(new Buffer('test'))
+          expect(res).to.eql(Buffer.from('test'))
           cb()
         })
       ], done)
     })
   })
 
-  // TODO: fix query prefix and orders
-  describe.skip('interface-datastore', () => {
+  describe('interface-datastore', () => {
     require('interface-datastore/src/tests')({
       setup (callback) {
         const shard = new sh.NextToLast(2)
