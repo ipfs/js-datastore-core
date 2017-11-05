@@ -176,7 +176,6 @@ class MountDatastore /* :: <Value> */ {
 
     if (q.offset != null) {
       let i = 0
-      // $FlowFixMe
       tasks.push(pull.filter(() => i++ >= q.offset))
     }
 
