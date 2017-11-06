@@ -68,9 +68,7 @@ describe('ShardingStore', () => {
     const shard = new sh.NextToLast(2)
     ShardingStore.createOrOpen(ms, shard, (err, ss) => {
       expect(err).to.not.exist()
-      if (ss == null) {
-        return done(new Error('missing store'))
-      }
+      expect(ss).to.exist()
       const store = ss
 
       series([
