@@ -1,8 +1,10 @@
+# Warning: This file is automatically synced from https://github.com/ipfs/ci-sync so if you want to change it, please change it there and ask someone to sync all repositories.
 version: "{build}"
 
 environment:
   matrix:
     - nodejs_version: "6"
+    - nodejs_version: "8"
 
 matrix:
   fast_finish: true
@@ -22,6 +24,6 @@ install:
   - npm install
 
 test_script:
-  - npm run test
+  - npm run test:node
 
 build: off
