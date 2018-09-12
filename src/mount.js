@@ -6,6 +6,7 @@ const many = require('pull-many')
 const pull = require('pull-stream')
 
 const Key = require('interface-datastore').Key
+const Errors = require('interface-datastore').Errors
 const utils = require('interface-datastore').utils
 const asyncFilter = utils.asyncFilter
 const asyncSort = utils.asyncSort
@@ -62,8 +63,9 @@ class MountDatastore /* :: <Value> */ {
   put (key /* : Key */, value /* : Value */, callback /* : Callback<void> */) /* : void */ {
     const match = this._lookup(key)
     if (match == null) {
-      callback(new Error('No datastore mounted for this key'))
-      return
+      return callback(
+        Errors.dbWriteFailedError(new Error('No datastore mounted for this key'))
+      )
     }
 
     match.datastore.put(match.rest, value, callback)
@@ -72,8 +74,9 @@ class MountDatastore /* :: <Value> */ {
   get (key /* : Key */, callback /* : Callback<Value> */) /* : void */ {
     const match = this._lookup(key)
     if (match == null) {
-      callback(new Error('No datastore mounted for this key'))
-      return
+      return callback(
+        Errors.notFoundError(new Error('No datastore mounted for this key'))
+      )
     }
 
     match.datastore.get(match.rest, callback)
@@ -92,8 +95,9 @@ class MountDatastore /* :: <Value> */ {
   delete (key /* : Key */, callback /* : Callback<void> */) /* : void */ {
     const match = this._lookup(key)
     if (match == null) {
-      callback(new Error('No datastore mounted for this key'))
-      return
+      return callback(
+        Errors.dbDeleteFailedError(new Error('No datastore mounted for this key'))
+      )
     }
 
     match.datastore.delete(match.rest, callback)
