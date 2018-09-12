@@ -3,6 +3,7 @@
 
 const each = require('async/each')
 const whilst = require('async/whilst')
+const Errors = require('interface-datastore').Errors
 
 /* ::
 import type {Key, Datastore, Callback, Batch, Query, QueryResult} from 'interface-datastore'
@@ -25,13 +26,23 @@ class TieredDatastore /* :: <Value> */ {
   open (callback /* : Callback<void> */) /* : void */ {
     each(this.stores, (store, cb) => {
       store.open(cb)
-    }, callback)
+    }, (err) => {
+      if (err) {
+        return callback(Errors.dbOpenFailedError())
+      }
+      callback()
+    })
   }
 
   put (key /* : Key */, value /* : Value */, callback /* : Callback<void> */) /* : void */ {
     each(this.stores, (store, cb) => {
       store.put(key, value, cb)
-    }, callback)
+    }, (err) => {
+      if (err) {
+        return callback(Errors.dbWriteFailedError())
+      }
+      callback()
+    })
   }
 
   get (key /* : Key */, callback /* : Callback<Value> */) /* : void */ {
@@ -47,7 +58,12 @@ class TieredDatastore /* :: <Value> */ {
         }
         cb()
       })
-    }, callback)
+    }, (err, res) => {
+      if (err || !res) {
+        return callback(Errors.notFoundError())
+      }
+      callback(null, res)
+    })
   }
 
   has (key /* : Key */, callback /* : Callback<bool> */) /* : void */ {
@@ -69,7 +85,12 @@ class TieredDatastore /* :: <Value> */ {
   delete (key /* : Key */, callback /* : Callback<void> */) /* : void */ {
     each(this.stores, (store, cb) => {
       store.delete(key, cb)
-    }, callback)
+    }, (err) => {
+      if (err) {
+        return callback(Errors.dbDeleteFailedError())
+      }
+      callback()
+    })
   }
 
   close (callback /* : Callback<void> */) /* : void */ {
