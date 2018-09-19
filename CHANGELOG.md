@@ -1,3 +1,18 @@
+<a name="0.5.0"></a>
+# [0.5.0](https://github.com/ipfs/js-datastore-core/compare/v0.4.0...v0.5.0) (2018-09-19)
+
+
+### Bug Fixes
+
+* **ci:** build on appveyor ([#9](https://github.com/ipfs/js-datastore-core/issues/9)) ([687314b](https://github.com/ipfs/js-datastore-core/commit/687314b))
+
+
+### Features
+
+* add basic error codes ([bf79768](https://github.com/ipfs/js-datastore-core/commit/bf79768))
+
+
+
 <a name="0.4.0"></a>
 # [0.4.0](https://github.com/ipfs/js-datastore-core/compare/v0.3.0...v0.4.0) (2017-11-04)
 
