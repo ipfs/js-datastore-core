@@ -34,10 +34,10 @@
   },
   "homepage": "https://github.com/ipfs/js-datastore-core#readme",
   "devDependencies": {
-    "aegir": "^15.3.0",
+    "aegir": "^15.3.1",
     "chai": "^4.2.0",
     "dirty-chai": "^2.0.1",
-    "flow-bin": "~0.81.0"
+    "flow-bin": "~0.83.0"
   },
   "dependencies": {
     "async": "^2.6.1",
