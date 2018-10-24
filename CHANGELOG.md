@@ -1,3 +1,8 @@
+<a name="0.6.0"></a>
+# [0.6.0](https://github.com/ipfs/js-datastore-core/compare/v0.5.0...v0.6.0) (2018-10-24)
+
+
+
 <a name="0.5.0"></a>
 # [0.5.0](https://github.com/ipfs/js-datastore-core/compare/v0.4.0...v0.5.0) (2018-09-19)
 
