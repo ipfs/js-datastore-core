@@ -10,8 +10,11 @@
 ![](https://img.shields.io/badge/npm-%3E%3D3.0.0-orange.svg?style=flat-square)
 ![](https://img.shields.io/badge/Node.js-%3E%3D4.0.0-orange.svg?style=flat-square)
 
-> Wrapping implmentations for [interface-datastore](https://github.com/ipfs/interface-datastore).
+> Wrapping implementations for [interface-datastore](https://github.com/ipfs/interface-datastore).
 
+## Lead Maintainer
+
+[Pedro Teixeira](https://github.com/pgte)
 
 ## Table of Contents
 
