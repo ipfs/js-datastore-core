@@ -1,7 +1,8 @@
 /* @flow */
 'use strict'
 
-const pull = require('pull-stream')
+const utils = require('interface-datastore').utils
+const map = utils.map
 
 /* ::
 import type {Key, Datastore, Batch, Query, QueryResult, Callback} from 'interface-datastore'
@@ -38,24 +39,24 @@ class KeyTransformDatastore /* :: <Value> */ {
     this.transform = transform
   }
 
-  open (callback /* : Callback<void> */) /* : void */ {
-    this.child.open(callback)
+  open () /* : Promise<void> */ {
+    return this.child.open()
   }
 
-  put (key /* : Key */, val /* : Value */, callback /* : Callback<void> */) /* : void */ {
-    this.child.put(this.transform.convert(key), val, callback)
+  async put (key /* : Key */, val /* : Value */) /* : Promise<void> */ {
+    return this.child.put(this.transform.convert(key), val)
   }
 
-  get (key /* : Key */, callback /* : Callback<Value> */) /* : void */ {
-    this.child.get(this.transform.convert(key), callback)
+  async get (key /* : Key */) /* : Promise<Value> */ {
+    return this.child.get(this.transform.convert(key))
   }
 
-  has (key /* : Key */, callback /* : Callback<bool> */) /* : void */ {
-    this.child.has(this.transform.convert(key), callback)
+  async has (key /* : Key */) /* : Promise<bool> */ {
+    return this.child.has(this.transform.convert(key))
   }
 
-  delete (key /* : Key */, callback /* : Callback<void> */) /* : void */ {
-    this.child.delete(this.transform.convert(key), callback)
+  async delete (key /* : Key */) /* : Promise<void> */ {
+    return this.child.delete(this.transform.convert(key))
   }
 
   batch () /* : Batch<Value> */ {
@@ -67,24 +68,21 @@ class KeyTransformDatastore /* :: <Value> */ {
       delete: (key /* : Key */) /* : void */ => {
         b.delete(this.transform.convert(key))
       },
-      commit: (callback /* : Callback<void> */) /* : void */ => {
-        b.commit(callback)
+      commit: async () /* : Promise<void> */ => {
+        return b.commit()
       }
     }
   }
 
-  query (q /* : Query<Value> */) /* : QueryResult<Value> */ {
-    return pull(
-      this.child.query(q),
-      pull.map(e => {
-        e.key = this.transform.invert(e.key)
-        return e
-      })
-    )
+  query (q /* : Query<Value> */) /* : Iterator */ {
+    return map(this.child.query(q), e => {
+      e.key = this.transform.invert(e.key)
+      return e
+    })
   }
 
-  close (callback /* : Callback<void> */) /* : void */ {
-    this.child.close(callback)
+  async close () /* : Promise<void> */ {
+    return this.child.close()
   }
 }
 

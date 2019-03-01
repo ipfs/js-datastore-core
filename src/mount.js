@@ -1,15 +1,12 @@
 /* @flow */
 'use strict'
 
-const each = require('async/each')
-const many = require('pull-many')
-const pull = require('pull-stream')
-
 const Key = require('interface-datastore').Key
 const Errors = require('interface-datastore').Errors
 const utils = require('interface-datastore').utils
-const asyncFilter = utils.asyncFilter
-const asyncSort = utils.asyncSort
+const filter = utils.filter
+const take = utils.take
+const sortAll = utils.sortAll
 const replaceStartWith = utils.replaceStartWith
 
 const Keytransform = require('./keytransform')
@@ -34,10 +31,8 @@ class MountDatastore /* :: <Value> */ {
     this.mounts = mounts.slice()
   }
 
-  open (callback /* : Callback<void> */) /* : void */ {
-    each(this.mounts, (m, cb) => {
-      m.datastore.open(cb)
-    }, callback)
+  async open () /* : Promise<void> */ {
+    return Promise.all(this.mounts.map((m) => m.datastore.open()))
   }
 
   /**
@@ -60,53 +55,44 @@ class MountDatastore /* :: <Value> */ {
     }
   }
 
-  put (key /* : Key */, value /* : Value */, callback /* : Callback<void> */) /* : void */ {
+  async put (key /* : Key */, value /* : Value */) /* : Promise<void> */ {
     const match = this._lookup(key)
     if (match == null) {
-      return callback(
-        Errors.dbWriteFailedError(new Error('No datastore mounted for this key'))
-      )
+      throw Errors.dbWriteFailedError(new Error('No datastore mounted for this key'))
     }
 
-    match.datastore.put(match.rest, value, callback)
+    return match.datastore.put(match.rest, value)
   }
 
-  get (key /* : Key */, callback /* : Callback<Value> */) /* : void */ {
+  async get (key /* : Key */) /* : Promise<Value> */ {
     const match = this._lookup(key)
     if (match == null) {
-      return callback(
-        Errors.notFoundError(new Error('No datastore mounted for this key'))
-      )
+      throw Errors.notFoundError(new Error('No datastore mounted for this key'))
     }
-
-    match.datastore.get(match.rest, callback)
+    return match.datastore.get(match.rest)
   }
 
-  has (key /* : Key */, callback /* : Callback<bool> */) /* : void */ {
+  async has (key /* : Key */) /* : Promise<bool> */ {
     const match = this._lookup(key)
     if (match == null) {
-      callback(null, false)
-      return
+      return false
     }
-
-    match.datastore.has(match.rest, callback)
+    return match.datastore.has(match.rest)
   }
 
-  delete (key /* : Key */, callback /* : Callback<void> */) /* : void */ {
+  async delete (key /* : Key */) /* : Promise<void> */ {
     const match = this._lookup(key)
     if (match == null) {
-      return callback(
-        Errors.dbDeleteFailedError(new Error('No datastore mounted for this key'))
-      )
+      throw Errors.dbDeleteFailedError(new Error('No datastore mounted for this key'))
     }
 
-    match.datastore.delete(match.rest, callback)
+    return match.datastore.delete(match.rest)
   }
 
-  close (callback /* : Callback<void> */) /* : void */ {
-    each(this.mounts, (m, cb) => {
-      m.datastore.close(cb)
-    }, callback)
+  async close () /* : Promise<void> */ {
+    return Promise.all(this.mounts.map((m) => {
+      return m.datastore.close()
+    }))
   }
 
   batch () /* : Batch<Value> */ {
@@ -137,10 +123,8 @@ class MountDatastore /* :: <Value> */ {
         const match = lookup(key)
         match.batch.delete(match.rest)
       },
-      commit: (callback /* : Callback<void> */) /* : void */ => {
-        each(Object.keys(batchMounts), (p, cb) => {
-          batchMounts[p].commit(cb)
-        }, callback)
+      commit: async () /* : Promise<void> */ => {
+        return Promise.all(Object.keys(batchMounts).map(p => batchMounts[p].commit()))
       }
     }
   }
@@ -168,27 +152,33 @@ class MountDatastore /* :: <Value> */ {
       })
     })
 
-    let tasks = [many(qs)]
-
-    if (q.filters != null) {
-      tasks = tasks.concat(q.filters.map(f => asyncFilter(f)))
-    }
-
-    if (q.orders != null) {
-      tasks = tasks.concat(q.orders.map(o => asyncSort(o)))
-    }
-
+    let it = _many(qs)
+    if (q.filters) q.filters.forEach(f => { it = filter(it, f) })
+    if (q.orders) q.orders.forEach(o => { it = sortAll(it, o) })
     if (q.offset != null) {
       let i = 0
-      tasks.push(pull.filter(() => i++ >= q.offset))
+      it = filter(it, () => i++ >= q.offset)
     }
+    if (q.limit != null) it = take(it, q.limit)
 
-    if (q.limit != null) {
-      tasks.push(pull.take(q.limit))
-    }
-
-    return pull.apply(null, tasks)
+    return it
   }
+}
+
+function _many (iterable) {
+  return (async function * () {
+    let completed = iterable.map(() => false)
+    while (!completed.every(Boolean)) {
+      for (const [idx, itr] of iterable.entries()) {
+        const it = await itr.next()
+        if (it.done) {
+          completed[idx] = true
+          continue
+        }
+        yield it.value
+      }
+    }
+  })()
 }
 
 module.exports = MountDatastore

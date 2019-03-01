@@ -1,8 +1,6 @@
 /* @flow */
 'use strict'
 
-const each = require('async/each')
-const whilst = require('async/whilst')
 const Errors = require('interface-datastore').Errors
 
 /* ::
@@ -23,80 +21,50 @@ class TieredDatastore /* :: <Value> */ {
     this.stores = stores.slice()
   }
 
-  open (callback /* : Callback<void> */) /* : void */ {
-    each(this.stores, (store, cb) => {
-      store.open(cb)
-    }, (err) => {
-      if (err) {
-        return callback(Errors.dbOpenFailedError())
-      }
-      callback()
-    })
+  async open () /* : void */ {
+    try {
+      await (this.stores.map((store) => store.open()))
+    } catch (err) {
+      throw Errors.dbOpenFailedError()
+    }
   }
 
-  put (key /* : Key */, value /* : Value */, callback /* : Callback<void> */) /* : void */ {
-    each(this.stores, (store, cb) => {
-      store.put(key, value, cb)
-    }, (err) => {
-      if (err) {
-        return callback(Errors.dbWriteFailedError())
-      }
-      callback()
-    })
+  async put (key /* : Key */, value /* : Value */) /* : void */ {
+    try {
+      await Promise.all(this.stores.map(store => store.put(key, value)))
+    } catch (err) {
+      throw Errors.dbWriteFailedError()
+    }
   }
 
-  get (key /* : Key */, callback /* : Callback<Value> */) /* : void */ {
-    const storeLength = this.stores.length
-    let done = false
-    let i = 0
-    whilst(() => !done && i < storeLength, cb => {
-      const store = this.stores[i++]
-      store.get(key, (err, res) => {
-        if (err == null) {
-          done = true
-          return cb(null, res)
-        }
-        cb()
-      })
-    }, (err, res) => {
-      if (err || !res) {
-        return callback(Errors.notFoundError())
-      }
-      callback(null, res)
-    })
+  async get (key /* : Key */) /* : Promise<Value> */ {
+    for (const store of this.stores) {
+      try {
+        const res = await store.get(key)
+        if (res) return res
+      } catch (err) {}
+    }
+    throw Errors.notFoundError()
   }
 
-  has (key /* : Key */, callback /* : Callback<bool> */) /* : void */ {
-    const storeLength = this.stores.length
-    let done = false
-    let i = 0
-    whilst(() => !done && i < storeLength, cb => {
-      const store = this.stores[i++]
-      store.has(key, (err, exists) => {
-        if (err == null) {
-          done = true
-          return cb(null, exists)
-        }
-        cb()
-      })
-    }, callback)
+  async has (key /* : Key */) /* : Promise<bool> */ {
+    for (const store of this.stores) {
+      const exists = await store.has(key)
+      if (exists) return true
+    }
+    return false
   }
 
-  delete (key /* : Key */, callback /* : Callback<void> */) /* : void */ {
-    each(this.stores, (store, cb) => {
-      store.delete(key, cb)
-    }, (err) => {
-      if (err) {
-        return callback(Errors.dbDeleteFailedError())
-      }
-      callback()
-    })
+  async delete (key /* : Key */) /* : Promise<void> */ {
+    try {
+      await Promise.all(this.stores.map(store => store.delete(key)))
+    } catch (err) {
+      throw Errors.dbDeleteFailedError()
+    }
   }
 
-  close (callback /* : Callback<void> */) /* : void */ {
-    each(this.stores, (store, cb) => {
-      store.close(cb)
-    }, callback)
+  async close () /* : Promise<void> */ {
+    await Promise.all(this.stores.map(store => store.close()))
   }
 
   batch () /* : Batch<Value> */ {
@@ -109,15 +77,15 @@ class TieredDatastore /* :: <Value> */ {
       delete: (key /* : Key */) /* : void */ => {
         batches.forEach(b => b.delete(key))
       },
-      commit: (callback /* : Callback<void> */) /* : void */ => {
-        each(batches, (b, cb) => {
-          b.commit(cb)
-        }, callback)
+      commit: async () /* : Promise<void> */ => {
+        for (const batch of batches) {
+          await batch.commit()
+        }
       }
     }
   }
 
-  query (q /* : Query<Value> */) /* : QueryResult<Value> */ {
+  query (q /* : Query<Value> */) /* : Iterator */ {
     return this.stores[this.stores.length - 1].query(q)
   }
 }

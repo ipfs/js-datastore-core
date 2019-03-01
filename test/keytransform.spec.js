@@ -5,18 +5,14 @@
 const chai = require('chai')
 chai.use(require('dirty-chai'))
 const expect = chai.expect
-const series = require('async/series')
-const each = require('async/each')
-const map = require('async/map')
-const parallel = require('async/parallel')
-const pull = require('pull-stream')
 const Memory = require('interface-datastore').MemoryDatastore
 const Key = require('interface-datastore').Key
+const collect = require('./util').collect
 
 const KeytransformStore = require('../src/').KeytransformDatastore
 
 describe('KeyTransformDatastore', () => {
-  it('basic', (done) => {
+  it('basic', async () => {
     const mStore = new Memory()
     const transform = {
       convert (key) {
@@ -41,40 +37,22 @@ describe('KeyTransformDatastore', () => {
       'foo/bar/bazb',
       'foo/bar/baz/barb'
     ].map((s) => new Key(s))
+    await Promise.all(keys.map((key) => kStore.put(key, Buffer.from(key.toString()))))
+    let kResults = Promise.all(keys.map((key) => kStore.get(key)))
+    let mResults = Promise.all(keys.map((key) => mStore.get(new Key('abc').child(key))))
+    let results = await Promise.all([kResults, mResults])
+    expect(results[0]).to.eql(results[1])
 
-    series([
-      (cb) => each(keys, (k, cb) => {
-        kStore.put(k, Buffer.from(k.toString()), cb)
-      }, cb),
-      (cb) => parallel([
-        (cb) => map(keys, (k, cb) => {
-          kStore.get(k, cb)
-        }, cb),
-        (cb) => map(keys, (k, cb) => {
-          mStore.get(new Key('abc').child(k), cb)
-        }, cb)
-      ], (err, res) => {
-        expect(err).to.not.exist()
-        expect(res[0]).to.eql(res[1])
-        cb()
-      }),
-      (cb) => parallel([
-        (cb) => pull(mStore.query({}), pull.collect(cb)),
-        (cb) => pull(kStore.query({}), pull.collect(cb))
-      ], (err, res) => {
-        expect(err).to.not.exist()
-        expect(res[0]).to.have.length(res[1].length)
+    const mRes = await collect(mStore.query({}))
+    const kRes = await collect(kStore.query({}))
+    expect(kRes).to.have.length(mRes.length)
 
-        res[0].forEach((a, i) => {
-          const kA = a.key
-          const kB = res[1][i].key
-          expect(transform.invert(kA)).to.eql(kB)
-          expect(kA).to.eql(transform.convert(kB))
-        })
-
-        cb()
-      }),
-      (cb) => kStore.close(cb)
-    ], done)
+    mRes.forEach((a, i) => {
+      const kA = a.key
+      const kB = kRes[i].key
+      expect(transform.invert(kA)).to.eql(kB)
+      expect(kA).to.eql(transform.convert(kB))
+    })
+    await kStore.close()
   })
 })
