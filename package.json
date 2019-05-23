@@ -18,6 +18,10 @@
     "coverage-publish": "aegir coverage --provider codecov",
     "docs": "aegir docs"
   },
+  "files": [
+    "src",
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ipfs/js-datastore-core.git"
@@ -35,15 +39,14 @@
   },
   "homepage": "https://github.com/ipfs/js-datastore-core#readme",
   "devDependencies": {
-    "aegir": "^15.3.1",
+    "aegir": "^18.2.2",
     "chai": "^4.2.0",
     "dirty-chai": "^2.0.1",
-    "flow-bin": "~0.83.0"
+    "flow-bin": "~0.98.1"
   },
   "dependencies": {
     "async": "^2.6.1",
     "interface-datastore": "~0.6.0",
-    "left-pad": "^1.3.0",
     "pull-many": "^1.0.8",
     "pull-stream": "^3.6.9"
   },

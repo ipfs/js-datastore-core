@@ -1,7 +1,6 @@
 /* @flow */
 'use strict'
 
-const leftPad = require('left-pad')
 const Key = require('interface-datastore').Key
 
 const readme = require('./shard-readme')
@@ -42,7 +41,7 @@ class Shard {
 class Prefix extends Shard {
   constructor (prefixLen /* : number */) {
     super(prefixLen)
-    this._padding = leftPad('', prefixLen, '_')
+    this._padding = ''.padStart(prefixLen, '_')
     this.name = 'prefix'
   }
 
@@ -54,7 +53,7 @@ class Prefix extends Shard {
 class Suffix extends Shard {
   constructor (suffixLen /* : number */) {
     super(suffixLen)
-    this._padding = leftPad('', suffixLen, '_')
+    this._padding = ''.padStart(suffixLen, '_')
     this.name = 'suffix'
   }
 
@@ -67,7 +66,7 @@ class Suffix extends Shard {
 class NextToLast extends Shard {
   constructor (suffixLen /* : number */) {
     super(suffixLen)
-    this._padding = leftPad('', suffixLen + 1, '_')
+    this._padding = ''.padStart(suffixLen + 1, '_')
     this.name = 'next-to-last'
   }
 

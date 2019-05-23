@@ -126,7 +126,7 @@ describe('MountStore', () => {
       (cb) => m.put(new Key('/cool/hello'), val, cb),
       (cb) => {
         pull(
-          m.query({prefix: '/cool'}),
+          m.query({ prefix: '/cool' }),
           pull.collect((err, res) => {
             expect(err).to.not.exist()
             expect(res).to.eql([{
