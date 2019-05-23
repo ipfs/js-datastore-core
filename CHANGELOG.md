@@ -1,3 +1,13 @@
+<a name="0.6.1"></a>
+## [0.6.1](https://github.com/ipfs/js-datastore-core/compare/v0.6.0...v0.6.1) (2019-05-23)
+
+
+### Bug Fixes
+
+* remove leftpad and cleanup ([8558fcd](https://github.com/ipfs/js-datastore-core/commit/8558fcd))
+
+
+
 <a name="0.6.0"></a>
 # [0.6.0](https://github.com/ipfs/js-datastore-core/compare/v0.5.0...v0.6.0) (2018-10-24)
 
