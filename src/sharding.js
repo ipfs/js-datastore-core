@@ -94,7 +94,7 @@ class ShardingDatastore {
     return this.child.batch()
   }
 
-  query (q)  {
+  query (q) {
     const tq = {
       keysOnly: q.keysOnly,
       offset: q.offset,

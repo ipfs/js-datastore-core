@@ -62,39 +62,39 @@ describe('shard', () => {
       '/repo/flatfs/shard/v1/next-to-last/2'
     )
   })
+})
 
-  describe('parsesShardFun', () => {
-    it('errors', () => {
-      const errors = [
-        '',
-        'shard/v1/next-to-last/2',
-        '/repo/flatfs/shard/v2/next-to-last/2',
-        '/repo/flatfs/shard/v1/other/2',
-        '/repo/flatfs/shard/v1/next-to-last/'
-      ]
+describe('parsesShardFun', () => {
+  it('errors', () => {
+    const errors = [
+      '',
+      'shard/v1/next-to-last/2',
+      '/repo/flatfs/shard/v2/next-to-last/2',
+      '/repo/flatfs/shard/v1/other/2',
+      '/repo/flatfs/shard/v1/next-to-last/'
+    ]
 
-      errors.forEach((input) => {
-        expect(
-          () => shard.parseShardFun(input)
-        ).to.throw()
-      })
+    errors.forEach((input) => {
+      expect(
+        () => shard.parseShardFun(input)
+      ).to.throw()
     })
+  })
 
-    it('success', () => {
-      const success = [
-        'prefix',
-        'suffix',
-        'next-to-last'
-      ]
+  it('success', () => {
+    const success = [
+      'prefix',
+      'suffix',
+      'next-to-last'
+    ]
 
-      success.forEach((name) => {
-        const n = Math.floor(Math.random() * 100)
-        expect(
-          shard.parseShardFun(
-            `/repo/flatfs/shard/v1/${name}/${n}`
-          ).name
-        ).to.eql(name)
-      })
+    success.forEach((name) => {
+      const n = Math.floor(Math.random() * 100)
+      expect(
+        shard.parseShardFun(
+          `/repo/flatfs/shard/v1/${name}/${n}`
+        ).name
+      ).to.eql(name)
     })
   })
 })

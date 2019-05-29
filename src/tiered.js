@@ -87,7 +87,7 @@ class TieredDatastore {
     }
   }
 
-  query (q)  {
+  query (q) {
     return this.stores[this.stores.length - 1].query(q)
   }
 }
