@@ -11,27 +11,16 @@ const replaceStartWith = utils.replaceStartWith
 
 const Keytransform = require('./keytransform')
 
-/* ::
-import type {Datastore, Callback, Batch, Query, QueryResult} from 'interface-datastore'
-
-type Mount<Value> = {
-  prefix: Key,
-  datastore: Datastore<Value>
-}
-*/
-
 /**
  * A datastore that can combine multiple stores inside various
  * key prefixs.
  */
-class MountDatastore /* :: <Value> */ {
-  /* :: mounts: Array<Mount<Value>> */
-
-  constructor (mounts /* : Array<Mount<Value>> */) {
+class MountDatastore {
+  constructor (mounts) {
     this.mounts = mounts.slice()
   }
 
-  open () /* : Promise<void> */ {
+  open () {
     return Promise.all(this.mounts.map((m) => m.datastore.open()))
   }
 
@@ -42,7 +31,7 @@ class MountDatastore /* :: <Value> */ {
    * @param {Key} key
    * @returns {{Datastore, Key, Key}}
    */
-  _lookup (key /* : Key */) /* : ?{datastore: Datastore<Value>, mountpoint: Key, rest: Key} */ {
+  _lookup (key) {
     for (let mount of this.mounts) {
       if (mount.prefix.toString() === key.toString() || mount.prefix.isAncestorOf(key)) {
         const s = replaceStartWith(key.toString(), mount.prefix.toString())
@@ -55,7 +44,7 @@ class MountDatastore /* :: <Value> */ {
     }
   }
 
-  put (key /* : Key */, value /* : Value */) /* : Promise<void> */ {
+  put (key, value) {
     const match = this._lookup(key)
     if (match == null) {
       throw Errors.dbWriteFailedError(new Error('No datastore mounted for this key'))
@@ -64,7 +53,7 @@ class MountDatastore /* :: <Value> */ {
     return match.datastore.put(match.rest, value)
   }
 
-  get (key /* : Key */) /* : Promise<Value> */ {
+  get (key) {
     const match = this._lookup(key)
     if (match == null) {
       throw Errors.notFoundError(new Error('No datastore mounted for this key'))
@@ -72,7 +61,7 @@ class MountDatastore /* :: <Value> */ {
     return match.datastore.get(match.rest)
   }
 
-  has (key /* : Key */) /* : Promise<bool> */ {
+  has (key) {
     const match = this._lookup(key)
     if (match == null) {
       return false
@@ -80,7 +69,7 @@ class MountDatastore /* :: <Value> */ {
     return match.datastore.has(match.rest)
   }
 
-  delete (key /* : Key */) /* : Promise<void> */ {
+  delete (key) {
     const match = this._lookup(key)
     if (match == null) {
       throw Errors.dbDeleteFailedError(new Error('No datastore mounted for this key'))
@@ -89,15 +78,15 @@ class MountDatastore /* :: <Value> */ {
     return match.datastore.delete(match.rest)
   }
 
-  close () /* : Promise<void> */ {
+  close () {
     return Promise.all(this.mounts.map((m) => {
       return m.datastore.close()
     }))
   }
 
-  batch () /* : Batch<Value> */ {
+  batch () {
     const batchMounts = {}
-    const lookup = (key /* : Key */) /* : {batch: Batch<Value>, rest: Key} */ => {
+    const lookup = (key) => {
       const match = this._lookup(key)
       if (match == null) {
         throw new Error('No datastore mounted for this key')
@@ -115,27 +104,27 @@ class MountDatastore /* :: <Value> */ {
     }
 
     return {
-      put: (key /* : Key */, value /* : Value */) /* : void */ => {
+      put: (key, value) => {
         const match = lookup(key)
         match.batch.put(match.rest, value)
       },
-      delete: (key /* : Key */) /* : void */ => {
+      delete: (key) => {
         const match = lookup(key)
         match.batch.delete(match.rest)
       },
-      commit: () /* : Promise<void> */ => {
+      commit: () => {
         return Promise.all(Object.keys(batchMounts).map(p => batchMounts[p].commit()))
       }
     }
   }
 
-  query (q /* : Query<Value> */) /* : QueryResult<Value> */ {
+  query (q) {
     const qs = this.mounts.map(m => {
       const ks = new Keytransform(m.datastore, {
-        convert: (key /* : Key */) /* : Key */ => {
+        convert: (key) => {
           throw new Error('should never be called')
         },
-        invert: (key /* : Key */) /* : Key */ => {
+        invert: (key) => {
           return m.prefix.child(key)
         }
       })

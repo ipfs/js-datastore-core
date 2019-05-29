@@ -1,6 +1,4 @@
-/* @flow */
 /* eslint-env mocha */
-/* eslint max-nested-callbacks: ["error", 8] */
 'use strict'
 
 const chai = require('chai')

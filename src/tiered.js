@@ -1,12 +1,7 @@
-/* @flow */
 'use strict'
 
 const Errors = require('interface-datastore').Errors
 const log = require('debug')('datastore:core:tiered')
-
-/* ::
-import type {Key, Datastore, Callback, Batch, Query, QueryResult} from 'interface-datastore'
-*/
 
 /**
  * A datastore that can combine multiple stores. Puts and deletes
@@ -15,14 +10,12 @@ import type {Key, Datastore, Callback, Batch, Query, QueryResult} from 'interfac
  * last one first.
  *
  */
-class TieredDatastore /* :: <Value> */ {
-  /* :: stores: Array<Datastore<Value>> */
-
-  constructor (stores /* : Array<Datastore<Value>> */) {
+class TieredDatastore {
+  constructor (stores) {
     this.stores = stores.slice()
   }
 
-  async open () /* : void */ {
+  async open () {
     try {
       await (this.stores.map((store) => store.open()))
     } catch (err) {
@@ -30,7 +23,7 @@ class TieredDatastore /* :: <Value> */ {
     }
   }
 
-  async put (key /* : Key */, value /* : Value */) /* : void */ {
+  async put (key, value) {
     try {
       await Promise.all(this.stores.map(store => store.put(key, value)))
     } catch (err) {
@@ -38,7 +31,7 @@ class TieredDatastore /* :: <Value> */ {
     }
   }
 
-  async get (key /* : Key */) /* : Promise<Value> */ {
+  async get (key) {
     for (const store of this.stores) {
       try {
         const res = await store.get(key)
@@ -50,7 +43,7 @@ class TieredDatastore /* :: <Value> */ {
     throw Errors.notFoundError()
   }
 
-  has (key /* : Key */) /* : Promise<bool> */ {
+  has (key) {
     return new Promise(async (resolve) => {
       await Promise.all(this.stores.map(async (store) => {
         const has = await store.has(key)
@@ -64,7 +57,7 @@ class TieredDatastore /* :: <Value> */ {
     })
   }
 
-  async delete (key /* : Key */) /* : Promise<void> */ {
+  async delete (key) {
     try {
       await Promise.all(this.stores.map(store => store.delete(key)))
     } catch (err) {
@@ -72,21 +65,21 @@ class TieredDatastore /* :: <Value> */ {
     }
   }
 
-  async close () /* : Promise<void> */ {
+  async close () {
     await Promise.all(this.stores.map(store => store.close()))
   }
 
-  batch () /* : Batch<Value> */ {
+  batch () {
     const batches = this.stores.map(store => store.batch())
 
     return {
-      put: (key /* : Key */, value /* : Value */) /* : void */ => {
+      put: (key, value) => {
         batches.forEach(b => b.put(key, value))
       },
-      delete: (key /* : Key */) /* : void */ => {
+      delete: (key) => {
         batches.forEach(b => b.delete(key))
       },
-      commit: async () /* : Promise<void> */ => {
+      commit: async () => {
         for (const batch of batches) {
           await batch.commit()
         }
@@ -94,7 +87,7 @@ class TieredDatastore /* :: <Value> */ {
     }
   }
 
-  query (q /* : Query<Value> */) /* : Iterator */ {
+  query (q)  {
     return this.stores[this.stores.length - 1].query(q)
   }
 }
