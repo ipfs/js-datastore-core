@@ -4,11 +4,12 @@
 [![](https://img.shields.io/badge/project-IPFS-blue.svg?style=flat-square)](http://ipfs.io/)
 [![](https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square)](http://webchat.freenode.net/?channels=%23ipfs)
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
-[![Build Status](https://travis-ci.org/ipfs/js-datastore-core.svg)](https://travis-ci.org/ipfs/js-datastore-core) [![Circle CI](https://circleci.com/gh/ipfs/js-datastore-core.svg?style=svg)](https://circleci.com/gh/ipfs/js-datastore-core)
-[![Coverage Status](https://coveralls.io/repos/github/ipfs/js-datastore-core/badge.svg?branch=master)](https://coveralls.io/github/ipfs/js-datastore-core?branch=master) [![Dependency Status](https://david-dm.org/diasdavid/js-peer-id.svg?style=flat-square)](https://david-dm.org/ipfs/js-datastore-core)
+[![Build Status](https://flat.badgen.net/travis/ipfs/js-datastore-core)](https://travis-ci.com/ipfs/js-datastore-core)
+[![Codecov](https://codecov.io/gh/ipfs/js-datastore-core/branch/master/graph/badge.svg)](https://codecov.io/gh/ipfs/js-datastore-core)
+[![Dependency Status](https://david-dm.org/ipfs/js-datastore-core.svg?style=flat-square)](https://david-dm.org/ipfs/js-datastore-core)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard)
 ![](https://img.shields.io/badge/npm-%3E%3D3.0.0-orange.svg?style=flat-square)
-![](https://img.shields.io/badge/Node.js-%3E%3D4.0.0-orange.svg?style=flat-square)
+![](https://img.shields.io/badge/Node.js-%3E%3D8.0.0-orange.svg?style=flat-square)
 
 > Wrapping implementations for [interface-datastore](https://github.com/ipfs/interface-datastore).
 
@@ -18,12 +19,15 @@
 
 ## Table of Contents
 
-- [Implementations](#implementations)
-- [Install](#install)
-- [Usage](#usage)
-- [Api](#api)
-- [Contribute](#contribute)
-- [License](#license)
+- [js-datastore-core](#js-datastore-core)
+  - [Lead Maintainer](#lead-maintainer)
+  - [Table of Contents](#table-of-contents)
+  - [Implementations](#implementations)
+  - [Install](#install)
+  - [Usage](#usage)
+    - [Wrapping Stores](#wrapping-stores)
+  - [Contribute](#contribute)
+  - [License](#license)
 
 ## Implementations
 
@@ -54,10 +58,13 @@ const store = new MountStore({prefix: new Key('/a'), datastore: new MemoryStore(
 
 ## Contribute
 
-PRs accepted.
+Feel free to join in. All welcome. Open an [issue](https://github.com/ipfs/js-ipfs-unixfs-importer/issues)!
 
-Small note: If editing the Readme, please conform to the [standard-readme](https://github.com/RichardLitt/standard-readme) specification.
+This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/community/blob/master/code-of-conduct.md).
+
+[![](https://cdn.rawgit.com/jbenet/contribute-ipfs-gif/master/img/contribute.gif)](https://github.com/ipfs/community/blob/master/contributing.md)
 
 ## License
 
-MIT 2017 © IPFS
+[MIT](LICENSE)
+
