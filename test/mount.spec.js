@@ -5,9 +5,9 @@
 
 const chai = require('chai')
 chai.use(require('dirty-chai'))
+const assert = chai.assert
 const expect = chai.expect
-const pull = require('pull-stream')
-const series = require('async/series')
+const collect = require('./util').collect
 
 const Key = require('interface-datastore').Key
 const MemoryStore = require('interface-datastore').MemoryDatastore
@@ -15,28 +15,30 @@ const MemoryStore = require('interface-datastore').MemoryDatastore
 const MountStore = require('../src').MountDatastore
 
 describe('MountStore', () => {
-  it('put - no mount', (done) => {
+  it('put - no mount', async () => {
     const m = new MountStore([])
-
-    m.put(new Key('hello'), Buffer.from('foo'), (err) => {
+    try {
+      await m.put(new Key('hello'), Buffer.from('foo'))
+      assert(false, 'Failed to throw error on no mount')
+    } catch (err) {
       expect(err).to.be.an('Error')
-      done()
-    })
+    }
   })
 
-  it('put - wrong mount', (done) => {
+  it('put - wrong mount', async () => {
     const m = new MountStore([{
       datastore: new MemoryStore(),
       prefix: new Key('cool')
     }])
-
-    m.put(new Key('/fail/hello'), Buffer.from('foo'), (err) => {
+    try {
+      await m.put(new Key('/fail/hello'), Buffer.from('foo'))
+      assert(false, 'Failed to throw error on wrong mount')
+    } catch (err) {
       expect(err).to.be.an('Error')
-      done()
-    })
+    }
   })
 
-  it('put', (done) => {
+  it('put', async () => {
     const mds = new MemoryStore()
     const m = new MountStore([{
       datastore: mds,
@@ -44,17 +46,12 @@ describe('MountStore', () => {
     }])
 
     const val = Buffer.from('hello')
-    series([
-      (cb) => m.put(new Key('/cool/hello'), val, cb),
-      (cb) => mds.get(new Key('/hello'), (err, res) => {
-        expect(err).to.not.exist()
-        expect(res).to.eql(val)
-        cb()
-      })
-    ], done)
+    await m.put(new Key('/cool/hello'), val)
+    const res = await mds.get(new Key('/hello'))
+    expect(res).to.eql(val)
   })
 
-  it('get', (done) => {
+  it('get', async () => {
     const mds = new MemoryStore()
     const m = new MountStore([{
       datastore: mds,
@@ -62,17 +59,12 @@ describe('MountStore', () => {
     }])
 
     const val = Buffer.from('hello')
-    series([
-      (cb) => mds.put(new Key('/hello'), val, cb),
-      (cb) => m.get(new Key('/cool/hello'), (err, res) => {
-        expect(err).to.not.exist()
-        expect(res).to.eql(val)
-        cb()
-      })
-    ], done)
+    await mds.put(new Key('/hello'), val)
+    const res = await m.get(new Key('/cool/hello'))
+    expect(res).to.eql(val)
   })
 
-  it('has', (done) => {
+  it('has', async () => {
     const mds = new MemoryStore()
     const m = new MountStore([{
       datastore: mds,
@@ -80,17 +72,12 @@ describe('MountStore', () => {
     }])
 
     const val = Buffer.from('hello')
-    series([
-      (cb) => mds.put(new Key('/hello'), val, cb),
-      (cb) => m.has(new Key('/cool/hello'), (err, exists) => {
-        expect(err).to.not.exist()
-        expect(exists).to.eql(true)
-        cb()
-      })
-    ], done)
+    await mds.put(new Key('/hello'), val)
+    const exists = await m.has(new Key('/cool/hello'))
+    expect(exists).to.eql(true)
   })
 
-  it('delete', (done) => {
+  it('delete', async () => {
     const mds = new MemoryStore()
     const m = new MountStore([{
       datastore: mds,
@@ -98,23 +85,15 @@ describe('MountStore', () => {
     }])
 
     const val = Buffer.from('hello')
-    series([
-      (cb) => m.put(new Key('/cool/hello'), val, cb),
-      (cb) => m.delete(new Key('/cool/hello'), cb),
-      (cb) => m.has(new Key('/cool/hello'), (err, exists) => {
-        expect(err).to.not.exist()
-        expect(exists).to.eql(false)
-        cb()
-      }),
-      (cb) => mds.has(new Key('/hello'), (err, exists) => {
-        expect(err).to.not.exist()
-        expect(exists).to.eql(false)
-        cb()
-      })
-    ], done)
+    await m.put(new Key('/cool/hello'), val)
+    await m.delete(new Key('/cool/hello'))
+    let exists = await m.has(new Key('/cool/hello'))
+    expect(exists).to.eql(false)
+    exists = await mds.has(new Key('/hello'))
+    expect(exists).to.eql(false)
   })
 
-  it('query simple', (done) => {
+  it('query simple', async () => {
     const mds = new MemoryStore()
     const m = new MountStore([{
       datastore: mds,
@@ -122,28 +101,15 @@ describe('MountStore', () => {
     }])
 
     const val = Buffer.from('hello')
-    series([
-      (cb) => m.put(new Key('/cool/hello'), val, cb),
-      (cb) => {
-        pull(
-          m.query({ prefix: '/cool' }),
-          pull.collect((err, res) => {
-            expect(err).to.not.exist()
-            expect(res).to.eql([{
-              key: new Key('/cool/hello'),
-              value: val
-            }])
-            cb()
-          })
-        )
-      }
-    ], done)
+    await m.put(new Key('/cool/hello'), val)
+    const res = await collect(m.query({ prefix: '/cool' }))
+    expect(res).to.eql([{ key: new Key('/cool/hello'), value: val }])
   })
 
   describe('interface-datastore', () => {
     require('interface-datastore/src/tests')({
-      setup (callback) {
-        callback(null, new MountStore([{
+      async setup () {
+        return new MountStore([{
           prefix: new Key('/a'),
           datastore: new MemoryStore()
         }, {
@@ -152,11 +118,9 @@ describe('MountStore', () => {
         }, {
           prefix: new Key('/q'),
           datastore: new MemoryStore()
-        }]))
+        }])
       },
-      teardown (callback) {
-        callback()
-      }
+      async teardown () { }
     })
   })
 })

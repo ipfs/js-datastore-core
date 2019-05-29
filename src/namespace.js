@@ -41,7 +41,7 @@ class NamespaceDatastore/* :: <Value> */ extends KeytransformDatastore /* :: <Va
     this.prefix = prefix
   }
 
-  query (q /* : Query<Value> */)/* : QueryResult<Value> */ {
+  query (q /* : Query<Value> */)/* : Iterator */ {
     if (q.prefix && this.prefix.toString() !== '/') {
       return super.query(Object.assign({}, q, {
         prefix: this.prefix.child(new Key(q.prefix)).toString()

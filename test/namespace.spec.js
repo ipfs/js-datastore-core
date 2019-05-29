@@ -5,23 +5,19 @@
 const chai = require('chai')
 chai.use(require('dirty-chai'))
 const expect = chai.expect
-const series = require('async/series')
-const each = require('async/each')
-const map = require('async/map')
-const parallel = require('async/parallel')
-const pull = require('pull-stream')
 
 const Key = require('interface-datastore').Key
 const MemoryStore = require('interface-datastore').MemoryDatastore
 
 const NamespaceStore = require('../src/').NamespaceDatastore
+const collect = require('./util').collect
 
 describe('KeyTransformDatastore', () => {
   const prefixes = [
     'abc',
     ''
   ]
-  prefixes.forEach((prefix) => it(`basic '${prefix}'`, (done) => {
+  prefixes.forEach((prefix) => it(`basic '${prefix}'`, async () => {
     const mStore = new MemoryStore()
     const store = new NamespaceStore(mStore, new Key(prefix))
 
@@ -34,51 +30,33 @@ describe('KeyTransformDatastore', () => {
       'foo/bar/baz/barb'
     ].map((s) => new Key(s))
 
-    series([
-      (cb) => each(keys, (k, cb) => {
-        store.put(k, Buffer.from(k.toString()), cb)
-      }, cb),
-      (cb) => parallel([
-        (cb) => map(keys, (k, cb) => {
-          store.get(k, cb)
-        }, cb),
-        (cb) => map(keys, (k, cb) => {
-          mStore.get(new Key(prefix).child(k), cb)
-        }, cb)
-      ], (err, res) => {
-        expect(err).to.not.exist()
-        expect(res[0]).to.eql(res[1])
-        cb()
-      }),
-      (cb) => parallel([
-        (cb) => pull(mStore.query({}), pull.collect(cb)),
-        (cb) => pull(store.query({}), pull.collect(cb))
-      ], (err, res) => {
-        expect(err).to.not.exist()
-        expect(res[0]).to.have.length(res[1].length)
+    await Promise.all(keys.map(key => store.put(key, Buffer.from(key.toString()))))
+    let nResults = Promise.all(keys.map((key) => store.get(key)))
+    let mResults = Promise.all(keys.map((key) => mStore.get(new Key(prefix).child(key))))
+    let results = await Promise.all([nResults, mResults])
+    const mRes = await collect(mStore.query({}))
+    const nRes = await collect(store.query({}))
 
-        res[0].forEach((a, i) => {
-          const kA = a.key
-          const kB = res[1][i].key
-          expect(store.transform.invert(kA)).to.eql(kB)
-          expect(kA).to.eql(store.transform.convert(kB))
-        })
+    expect(nRes).to.have.length(mRes.length)
 
-        cb()
-      }),
-      (cb) => store.close(cb)
-    ], done)
+    mRes.forEach((a, i) => {
+      const kA = a.key
+      const kB = nRes[i].key
+      expect(store.transform.invert(kA)).to.eql(kB)
+      expect(kA).to.eql(store.transform.convert(kB))
+    })
+    await store.close()
+
+    expect(results[0]).to.eql(results[1])
   }))
 
   prefixes.forEach((prefix) => {
     describe(`interface-datastore: '${prefix}'`, () => {
       require('interface-datastore/src/tests')({
-        setup (callback) {
-          callback(null, new NamespaceStore(new MemoryStore(), new Key(prefix)))
+        async setup () {
+          return new NamespaceStore(new MemoryStore(), new Key(prefix))
         },
-        teardown (callback) {
-          callback()
-        }
+        async teardown () { }
       })
     })
   })
