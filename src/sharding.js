@@ -1,4 +1,3 @@
-/* @flow */
 'use strict'
 
 const Key = require('interface-datastore').Key
@@ -9,12 +8,6 @@ const KeytransformStore = require('./keytransform')
 const shardKey = new Key(sh.SHARDING_FN)
 const shardReadmeKey = new Key(sh.README_FN)
 
-/* ::
-import type {Datastore, Batch, Query, QueryResult} from 'interface-datastore'
-
-import type {ShardV1} from './shard'
-*/
-
 /**
  * Backend independent abstraction of go-ds-flatfs.
  *
@@ -22,10 +15,7 @@ import type {ShardV1} from './shard'
  * sharded according to the given sharding function.
  */
 class ShardingDatastore {
-  /* :: shard: ShardV1 */
-  /* :: child: Datastore<Buffer> */
-
-  constructor (store /* : Datastore<Buffer> */, shard /* : ShardV1 */) {
+  constructor (store, shard) {
     this.child = new KeytransformStore(store, {
       convert: this._convertKey.bind(this),
       invert: this._invertKey.bind(this)
@@ -33,11 +23,11 @@ class ShardingDatastore {
     this.shard = shard
   }
 
-  open () /* : Promise<void> */ {
+  open () {
     return this.child.open()
   }
 
-  _convertKey (key/* : Key */)/* : Key */ {
+  _convertKey (key) {
     const s = key.toString()
     if (s === shardKey.toString() || s === shardReadmeKey.toString()) {
       return key
@@ -47,7 +37,7 @@ class ShardingDatastore {
     return parent.child(key)
   }
 
-  _invertKey (key/* : Key */)/* : Key */ {
+  _invertKey (key) {
     const s = key.toString()
     if (s === shardKey.toString() || s === shardReadmeKey.toString()) {
       return key
@@ -55,7 +45,7 @@ class ShardingDatastore {
     return Key.withNamespaces(key.list().slice(1))
   }
 
-  static async createOrOpen (store /* : Datastore<Buffer> */, shard /* : ShardV1 */) /* : Promise<ShardingDatastore> */ {
+  static async createOrOpen (store, shard) {
     try {
       await ShardingDatastore.create(store, shard)
     } catch (err) {
@@ -64,12 +54,12 @@ class ShardingDatastore {
     return ShardingDatastore.open(store)
   }
 
-  static async open (store /* : Datastore<Buffer> */) /* : Promise<ShardingDatastore> */ {
+  static async open (store) {
     const shard = await sh.readShardFun('/', store)
     return new ShardingDatastore(store, shard)
   }
 
-  static async create (store /* : Datastore<Buffer> */, shard /* : ShardV1 */) /* : Promise<void> */ {
+  static async create (store, shard) {
     const exists = await store.has(shardKey)
     if (!exists) {
       const put = typeof store.putRaw === 'function' ? store.putRaw.bind(store) : store.put.bind(store)
@@ -84,28 +74,28 @@ class ShardingDatastore {
     throw new Error('datastore exists')
   }
 
-  put (key /* : Key */, val /* : Buffer */) /* : Promise<void> */ {
+  put (key, val) {
     return this.child.put(key, val)
   }
 
-  get (key /* : Key */) /* : Promise<Buffer> */ {
+  get (key) {
     return this.child.get(key)
   }
 
-  has (key /* : Key */) /* : Promise<bool> */ {
+  has (key) {
     return this.child.has(key)
   }
 
-  delete (key /* : Key */) /* : Promise<void> */ {
+  delete (key) {
     return this.child.delete(key)
   }
 
-  batch () /* : Batch<Buffer> */ {
+  batch () {
     return this.child.batch()
   }
 
-  query (q /* : Query<Buffer> */) /* : Iterator */ {
-    const tq/* : Query<Buffer> */ = {
+  query (q)  {
+    const tq = {
       keysOnly: q.keysOnly,
       offset: q.offset,
       limit: q.limit,
@@ -142,7 +132,7 @@ class ShardingDatastore {
     return this.child.query(tq)
   }
 
-  close () /* : Promise<void> */ {
+  close () {
     return this.child.close()
   }
 }

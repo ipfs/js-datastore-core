@@ -1,12 +1,7 @@
-/* @flow */
 'use strict'
 
 const Key = require('interface-datastore').Key
 const KeytransformDatastore = require('./keytransform')
-
-/* ::
-import type {Callback, Datastore, Query, QueryResult} from 'interface-datastore'
-*/
 
 /**
  * Wraps a given datastore into a keytransform which
@@ -17,15 +12,13 @@ import type {Callback, Datastore, Query, QueryResult} from 'interface-datastore'
  * `/hello/world`.
  *
  */
-class NamespaceDatastore/* :: <Value> */ extends KeytransformDatastore /* :: <Value> */ {
-  /* :: prefix: Key */
-
-  constructor (child/* : Datastore<Value> */, prefix/* : Key */) {
+class NamespaceDatastore extends KeytransformDatastore {
+  constructor (child, prefix) {
     super(child, {
-      convert (key/* : Key */)/* : Key */ {
+      convert (key) {
         return prefix.child(key)
       },
-      invert (key/* : Key */)/* : Key */ {
+      invert (key) {
         if (prefix.toString() === '/') {
           return key
         }
@@ -41,7 +34,7 @@ class NamespaceDatastore/* :: <Value> */ extends KeytransformDatastore /* :: <Va
     this.prefix = prefix
   }
 
-  query (q /* : Query<Value> */)/* : Iterator */ {
+  query (q) {
     if (q.prefix && this.prefix.toString() !== '/') {
       return super.query(Object.assign({}, q, {
         prefix: this.prefix.child(new Key(q.prefix)).toString()

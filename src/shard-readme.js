@@ -1,4 +1,3 @@
-/* @flow */
 'use strict'
 
 module.exports = `This is a repository of IPLD objects. Each IPLD object is in a single file,

@@ -1,87 +1,62 @@
-/* @flow */
 'use strict'
 
 const utils = require('interface-datastore').utils
 const map = utils.map
-
-/* ::
-import type {Key, Datastore, Batch, Query, QueryResult, Callback} from 'interface-datastore'
-*/
-
-/**
- * An object with a pair of functions for (invertibly) transforming keys
- */
-/* ::
-type KeyTransform = {
-  convert: KeyMapping,
-  invert: KeyMapping
-}
-*/
-
-/**
- * Map one key onto another key.
- */
-/* ::
-type KeyMapping = (Key) => Key
-*/
 
 /**
  * A datastore shim, that wraps around a given datastore, changing
  * the way keys look to the user, for example namespacing
  * keys, reversing them, etc.
  */
-class KeyTransformDatastore /* :: <Value> */ {
-  /* :: child: Datastore<Value> */
-  /* :: transform: KeyTransform */
-
-  constructor (child /* : Datastore<Value> */, transform /* : KeyTransform */) {
+class KeyTransformDatastore {
+  constructor (child, transform) {
     this.child = child
     this.transform = transform
   }
 
-  open () /* : Promise<void> */ {
+  open () {
     return this.child.open()
   }
 
-  put (key /* : Key */, val /* : Value */) /* : Promise<void> */ {
+  put (key, val) {
     return this.child.put(this.transform.convert(key), val)
   }
 
-  get (key /* : Key */) /* : Promise<Value> */ {
+  get (key) {
     return this.child.get(this.transform.convert(key))
   }
 
-  has (key /* : Key */) /* : Promise<bool> */ {
+  has (key) {
     return this.child.has(this.transform.convert(key))
   }
 
-  delete (key /* : Key */) /* : Promise<void> */ {
+  delete (key) {
     return this.child.delete(this.transform.convert(key))
   }
 
-  batch () /* : Batch<Value> */ {
+  batch () {
     const b = this.child.batch()
     return {
-      put: (key /* : Key */, value /* : Value */) /* : void */ => {
+      put: (key, value) => {
         b.put(this.transform.convert(key), value)
       },
-      delete: (key /* : Key */) /* : void */ => {
+      delete: (key) => {
         b.delete(this.transform.convert(key))
       },
-      commit: () /* : Promise<void> */ => {
+      commit: () => {
         return b.commit()
       }
     }
   }
 
-  query (q /* : Query<Value> */) /* : Iterator */ {
+  query (q) {
     return map(this.child.query(q), e => {
       e.key = this.transform.invert(e.key)
       return e
     })
   }
 
-  close () /* : Promise<void> */ {
+  close () {
     return this.child.close()
   }
 }

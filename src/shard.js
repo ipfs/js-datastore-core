@@ -83,7 +83,7 @@ class NextToLast extends Shard {
  * @param {string} str
  * @returns {ShardV1}
  */
-function parseShardFun (str /* : string */) /* : ShardV1 */ {
+function parseShardFun (str /* : string */) {
   str = str.trim()
 
   if (str.length === 0) {
@@ -121,7 +121,7 @@ function parseShardFun (str /* : string */) /* : ShardV1 */ {
   }
 }
 
-exports.readShardFun = async (path /* : string */, store /* : Datastore<Buffer> */) /* : Promise<ShardV1> */ => {
+exports.readShardFun = async (path /* : string */, store) /* : Promise<ShardV1> */ => {
   const key = new Key(path).child(new Key(SHARDING_FN))
   const get = typeof store.getRaw === 'function' ? store.getRaw.bind(store) : store.get.bind(store)
   const res = await get(key)
