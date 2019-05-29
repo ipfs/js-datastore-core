@@ -6,9 +6,7 @@
 const chai = require('chai')
 chai.use(require('dirty-chai'))
 const expect = chai.expect
-const series = require('async/series')
-const parallel = require('async/parallel')
-const waterfall = require('async/waterfall')
+const assert = chai.expect
 
 const Key = require('interface-datastore').Key
 const MemoryStore = require('interface-datastore').MemoryDatastore
@@ -17,80 +15,51 @@ const ShardingStore = require('../src').ShardingDatastore
 const sh = require('../src').shard
 
 describe('ShardingStore', () => {
-  it('create', (done) => {
+  it('create', async () => {
+    const ms = new MemoryStore()
+    const shard = new sh.NextToLast(2)
+    await ShardingStore.create(ms, shard)
+    const res = await Promise.all([ms.get(new Key(sh.SHARDING_FN)), ms.get(new Key(sh.README_FN))])
+    expect(res[0].toString()).to.eql(shard.toString() + '\n')
+    expect(res[1].toString()).to.eql(sh.readme)
+  })
+
+  it('open - empty', async () => {
+    const ms = new MemoryStore()
+    try {
+      await ShardingStore.open(ms)
+      assert(false, 'Failed to throw error on ShardStore.open')
+    } catch (err) {
+      expect(err.code).to.equal('ERR_NOT_FOUND')
+    }
+  })
+
+  it('open - existing', async () => {
     const ms = new MemoryStore()
     const shard = new sh.NextToLast(2)
 
-    waterfall([
-      (cb) => ShardingStore.create(ms, shard, cb),
-      (cb) => parallel([
-        (cb) => ms.get(new Key(sh.SHARDING_FN), cb),
-        (cb) => ms.get(new Key(sh.README_FN), cb)
-      ], cb),
-      (res, cb) => {
-        expect(
-          res[0].toString()
-        ).to.eql(
-          shard.toString() + '\n'
-        )
-        expect(
-          res[1].toString()
-        ).to.eql(
-          sh.readme
-        )
-        cb()
-      }
-    ], done)
+    await ShardingStore.create(ms, shard)
+    await ShardingStore.open(ms)
   })
 
-  it('open - empty', (done) => {
-    const ms = new MemoryStore()
-
-    ShardingStore.open(ms, (err, ss) => {
-      expect(err).to.exist()
-      expect(ss).to.not.exist()
-      done()
-    })
-  })
-
-  it('open - existing', (done) => {
+  it('basics', async () => {
     const ms = new MemoryStore()
     const shard = new sh.NextToLast(2)
-
-    waterfall([
-      (cb) => ShardingStore.create(ms, shard, cb),
-      (cb) => ShardingStore.open(ms, cb)
-    ], done)
-  })
-
-  it('basics', (done) => {
-    const ms = new MemoryStore()
-    const shard = new sh.NextToLast(2)
-    ShardingStore.createOrOpen(ms, shard, (err, ss) => {
-      expect(err).to.not.exist()
-      expect(ss).to.exist()
-      const store = ss
-
-      series([
-        (cb) => store.put(new Key('hello'), Buffer.from('test'), cb),
-        (cb) => ms.get(new Key('ll').child(new Key('hello')), (err, res) => {
-          expect(err).to.not.exist()
-          expect(res).to.eql(Buffer.from('test'))
-          cb()
-        })
-      ], done)
-    })
+    const store = await ShardingStore.createOrOpen(ms, shard)
+    expect(store).to.exist()
+    await ShardingStore.createOrOpen(ms, shard)
+    await store.put(new Key('hello'), Buffer.from('test'))
+    const res = await ms.get(new Key('ll').child(new Key('hello')))
+    expect(res).to.eql(Buffer.from('test'))
   })
 
   describe('interface-datastore', () => {
     require('interface-datastore/src/tests')({
-      setup (callback) {
+      setup () {
         const shard = new sh.NextToLast(2)
-        ShardingStore.createOrOpen(new MemoryStore(), shard, callback)
+        return ShardingStore.createOrOpen(new MemoryStore(), shard)
       },
-      teardown (callback) {
-        callback()
-      }
+      teardown () { }
     })
   })
 })

@@ -121,24 +121,11 @@ function parseShardFun (str /* : string */) /* : ShardV1 */ {
   }
 }
 
-exports.readShardFun = (path /* : string */, store /* : Datastore<Buffer> */, callback /* : Callback<ShardV1> */) /* : void */ => {
+exports.readShardFun = async (path /* : string */, store /* : Datastore<Buffer> */) /* : Promise<ShardV1> */ => {
   const key = new Key(path).child(new Key(SHARDING_FN))
   const get = typeof store.getRaw === 'function' ? store.getRaw.bind(store) : store.get.bind(store)
-
-  get(key, (err, res) => {
-    if (err) {
-      return callback(err)
-    }
-
-    let shard
-    try {
-      shard = parseShardFun((res || '').toString().trim())
-    } catch (err) {
-      return callback(err)
-    }
-
-    callback(null, shard)
-  })
+  const res = await get(key)
+  return parseShardFun((res || '').toString().trim())
 }
 
 exports.readme = readme
