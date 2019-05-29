@@ -10,7 +10,7 @@ const Key = require('interface-datastore').Key
 const MemoryStore = require('interface-datastore').MemoryDatastore
 
 const NamespaceStore = require('../src/').NamespaceDatastore
-const collect = require('./util').collect
+const all = require('async-iterator-all')
 
 describe('KeyTransformDatastore', () => {
   const prefixes = [
@@ -34,8 +34,8 @@ describe('KeyTransformDatastore', () => {
     let nResults = Promise.all(keys.map((key) => store.get(key)))
     let mResults = Promise.all(keys.map((key) => mStore.get(new Key(prefix).child(key))))
     let results = await Promise.all([nResults, mResults])
-    const mRes = await collect(mStore.query({}))
-    const nRes = await collect(store.query({}))
+    const mRes = await all(mStore.query({}))
+    const nRes = await all(store.query({}))
 
     expect(nRes).to.have.length(mRes.length)
 
@@ -53,7 +53,7 @@ describe('KeyTransformDatastore', () => {
   prefixes.forEach((prefix) => {
     describe(`interface-datastore: '${prefix}'`, () => {
       require('interface-datastore/src/tests')({
-        async setup () {
+        setup () {
           return new NamespaceStore(new MemoryStore(), new Key(prefix))
         },
         async teardown () { }

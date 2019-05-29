@@ -43,19 +43,19 @@ class KeyTransformDatastore /* :: <Value> */ {
     return this.child.open()
   }
 
-  async put (key /* : Key */, val /* : Value */) /* : Promise<void> */ {
+  put (key /* : Key */, val /* : Value */) /* : Promise<void> */ {
     return this.child.put(this.transform.convert(key), val)
   }
 
-  async get (key /* : Key */) /* : Promise<Value> */ {
+  get (key /* : Key */) /* : Promise<Value> */ {
     return this.child.get(this.transform.convert(key))
   }
 
-  async has (key /* : Key */) /* : Promise<bool> */ {
+  has (key /* : Key */) /* : Promise<bool> */ {
     return this.child.has(this.transform.convert(key))
   }
 
-  async delete (key /* : Key */) /* : Promise<void> */ {
+  delete (key /* : Key */) /* : Promise<void> */ {
     return this.child.delete(this.transform.convert(key))
   }
 
@@ -68,7 +68,7 @@ class KeyTransformDatastore /* :: <Value> */ {
       delete: (key /* : Key */) /* : void */ => {
         b.delete(this.transform.convert(key))
       },
-      commit: async () /* : Promise<void> */ => {
+      commit: () /* : Promise<void> */ => {
         return b.commit()
       }
     }
@@ -81,7 +81,7 @@ class KeyTransformDatastore /* :: <Value> */ {
     })
   }
 
-  async close () /* : Promise<void> */ {
+  close () /* : Promise<void> */ {
     return this.child.close()
   }
 }

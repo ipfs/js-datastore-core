@@ -2,6 +2,7 @@
 'use strict'
 
 const Errors = require('interface-datastore').Errors
+const log = require('debug')('datastore:core:tiered')
 
 /* ::
 import type {Key, Datastore, Callback, Batch, Query, QueryResult} from 'interface-datastore'
@@ -42,17 +43,25 @@ class TieredDatastore /* :: <Value> */ {
       try {
         const res = await store.get(key)
         if (res) return res
-      } catch (err) {}
+      } catch (err) {
+        log(err)
+      }
     }
     throw Errors.notFoundError()
   }
 
-  async has (key /* : Key */) /* : Promise<bool> */ {
-    for (const store of this.stores) {
-      const exists = await store.has(key)
-      if (exists) return true
-    }
-    return false
+  has (key /* : Key */) /* : Promise<bool> */ {
+    return new Promise(async (resolve) => {
+      await Promise.all(this.stores.map(async (store) => {
+        const has = await store.has(key)
+
+        if (has) {
+          resolve(true)
+        }
+      }))
+
+      resolve(false)
+    })
   }
 
   async delete (key /* : Key */) /* : Promise<void> */ {

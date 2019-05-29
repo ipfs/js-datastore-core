@@ -29,7 +29,9 @@ describe('ShardingStore', () => {
     try {
       await ShardingStore.open(ms)
       assert(false, 'Failed to throw error on ShardStore.open')
-    } catch (err) {}
+    } catch (err) {
+      expect(err.code).to.equal('ERR_NOT_FOUND')
+    }
   })
 
   it('open - existing', async () => {

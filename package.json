@@ -5,18 +5,17 @@
   "leadMaintainer": "Pedro Teixeira <pedro@protocol.ai>",
   "main": "src/index.js",
   "scripts": {
-    "lint": "aegir lint",
-    "build": "aegir build",
     "test": "aegir test",
-    "flow": "flow",
-    "test:node": "aegir test --target node",
-    "test:browser": "aegir test --target browser",
-    "release": "aegir release --docs",
-    "release-minor": "aegir release --type minor --docs",
-    "release-major": "aegir release --type major --docs",
-    "coverage": "aegir coverage",
-    "coverage-publish": "aegir coverage --provider codecov",
-    "docs": "aegir docs"
+    "test:node": "aegir test -t node",
+    "test:browser": "aegir test -t browser",
+    "test:webworker": "aegir test -t webworker",
+    "build": "aegir build",
+    "lint": "aegir lint",
+    "release": "aegir release",
+    "release-minor": "aegir release --type minor",
+    "release-major": "aegir release --type major",
+    "coverage": "nyc -s npm run test:node && nyc report --reporter=html",
+    "dep-check": "aegir dep-check"
   },
   "files": [
     "src",
@@ -39,12 +38,13 @@
   },
   "homepage": "https://github.com/ipfs/js-datastore-core#readme",
   "devDependencies": {
-    "aegir": "^v18.2.0",
+    "aegir": "^19.0.3",
+    "async-iterator-all": "^1.0.0",
     "chai": "^4.2.0",
-    "dirty-chai": "^2.0.1",
-    "flow-bin": "~0.83.0"
+    "dirty-chai": "^2.0.1"
   },
   "dependencies": {
+    "debug": "^4.1.1",
     "interface-datastore": "~0.7.0"
   },
   "engines": {

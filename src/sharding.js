@@ -33,7 +33,7 @@ class ShardingDatastore {
     this.shard = shard
   }
 
-  async open () /* : Promise<void> */ {
+  open () /* : Promise<void> */ {
     return this.child.open()
   }
 
@@ -84,19 +84,19 @@ class ShardingDatastore {
     throw new Error('datastore exists')
   }
 
-  async put (key /* : Key */, val /* : Buffer */) /* : Promise<void> */ {
+  put (key /* : Key */, val /* : Buffer */) /* : Promise<void> */ {
     return this.child.put(key, val)
   }
 
-  async get (key /* : Key */) /* : Promise<Buffer> */ {
+  get (key /* : Key */) /* : Promise<Buffer> */ {
     return this.child.get(key)
   }
 
-  async has (key /* : Key */) /* : Promise<bool> */ {
+  has (key /* : Key */) /* : Promise<bool> */ {
     return this.child.has(key)
   }
 
-  async delete (key /* : Key */) /* : Promise<void> */ {
+  delete (key /* : Key */) /* : Promise<void> */ {
     return this.child.delete(key)
   }
 
@@ -142,7 +142,7 @@ class ShardingDatastore {
     return this.child.query(tq)
   }
 
-  async close () /* : Promise<void> */ {
+  close () /* : Promise<void> */ {
     return this.child.close()
   }
 }

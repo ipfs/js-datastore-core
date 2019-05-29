@@ -7,7 +7,7 @@ chai.use(require('dirty-chai'))
 const expect = chai.expect
 const Memory = require('interface-datastore').MemoryDatastore
 const Key = require('interface-datastore').Key
-const collect = require('./util').collect
+const all = require('async-iterator-all')
 
 const KeytransformStore = require('../src/').KeytransformDatastore
 
@@ -43,8 +43,8 @@ describe('KeyTransformDatastore', () => {
     let results = await Promise.all([kResults, mResults])
     expect(results[0]).to.eql(results[1])
 
-    const mRes = await collect(mStore.query({}))
-    const kRes = await collect(kStore.query({}))
+    const mRes = await all(mStore.query({}))
+    const kRes = await all(kStore.query({}))
     expect(kRes).to.have.length(mRes.length)
 
     mRes.forEach((a, i) => {

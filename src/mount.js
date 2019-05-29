@@ -31,7 +31,7 @@ class MountDatastore /* :: <Value> */ {
     this.mounts = mounts.slice()
   }
 
-  async open () /* : Promise<void> */ {
+  open () /* : Promise<void> */ {
     return Promise.all(this.mounts.map((m) => m.datastore.open()))
   }
 
@@ -55,7 +55,7 @@ class MountDatastore /* :: <Value> */ {
     }
   }
 
-  async put (key /* : Key */, value /* : Value */) /* : Promise<void> */ {
+  put (key /* : Key */, value /* : Value */) /* : Promise<void> */ {
     const match = this._lookup(key)
     if (match == null) {
       throw Errors.dbWriteFailedError(new Error('No datastore mounted for this key'))
@@ -64,7 +64,7 @@ class MountDatastore /* :: <Value> */ {
     return match.datastore.put(match.rest, value)
   }
 
-  async get (key /* : Key */) /* : Promise<Value> */ {
+  get (key /* : Key */) /* : Promise<Value> */ {
     const match = this._lookup(key)
     if (match == null) {
       throw Errors.notFoundError(new Error('No datastore mounted for this key'))
@@ -72,7 +72,7 @@ class MountDatastore /* :: <Value> */ {
     return match.datastore.get(match.rest)
   }
 
-  async has (key /* : Key */) /* : Promise<bool> */ {
+  has (key /* : Key */) /* : Promise<bool> */ {
     const match = this._lookup(key)
     if (match == null) {
       return false
@@ -80,7 +80,7 @@ class MountDatastore /* :: <Value> */ {
     return match.datastore.has(match.rest)
   }
 
-  async delete (key /* : Key */) /* : Promise<void> */ {
+  delete (key /* : Key */) /* : Promise<void> */ {
     const match = this._lookup(key)
     if (match == null) {
       throw Errors.dbDeleteFailedError(new Error('No datastore mounted for this key'))
@@ -89,7 +89,7 @@ class MountDatastore /* :: <Value> */ {
     return match.datastore.delete(match.rest)
   }
 
-  async close () /* : Promise<void> */ {
+  close () /* : Promise<void> */ {
     return Promise.all(this.mounts.map((m) => {
       return m.datastore.close()
     }))
@@ -123,7 +123,7 @@ class MountDatastore /* :: <Value> */ {
         const match = lookup(key)
         match.batch.delete(match.rest)
       },
-      commit: async () /* : Promise<void> */ => {
+      commit: () /* : Promise<void> */ => {
         return Promise.all(Object.keys(batchMounts).map(p => batchMounts[p].commit()))
       }
     }

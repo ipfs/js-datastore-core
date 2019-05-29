@@ -7,7 +7,7 @@ const chai = require('chai')
 chai.use(require('dirty-chai'))
 const assert = chai.assert
 const expect = chai.expect
-const collect = require('./util').collect
+const all = require('async-iterator-all')
 
 const Key = require('interface-datastore').Key
 const MemoryStore = require('interface-datastore').MemoryDatastore
@@ -102,13 +102,13 @@ describe('MountStore', () => {
 
     const val = Buffer.from('hello')
     await m.put(new Key('/cool/hello'), val)
-    const res = await collect(m.query({ prefix: '/cool' }))
+    const res = await all(m.query({ prefix: '/cool' }))
     expect(res).to.eql([{ key: new Key('/cool/hello'), value: val }])
   })
 
   describe('interface-datastore', () => {
     require('interface-datastore/src/tests')({
-      async setup () {
+      setup () {
         return new MountStore([{
           prefix: new Key('/a'),
           datastore: new MemoryStore()
@@ -120,7 +120,7 @@ describe('MountStore', () => {
           datastore: new MemoryStore()
         }])
       },
-      async teardown () { }
+      teardown () { }
     })
   })
 })
