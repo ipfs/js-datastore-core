@@ -38,14 +38,15 @@
   },
   "homepage": "https://github.com/ipfs/js-datastore-core#readme",
   "devDependencies": {
-    "aegir": "^19.0.3",
+    "aegir": "^21.4.5",
     "async-iterator-all": "^1.0.0",
     "chai": "^4.2.0",
     "dirty-chai": "^2.0.1"
   },
   "dependencies": {
+    "buffer": "^5.5.0",
     "debug": "^4.1.1",
-    "interface-datastore": "~0.7.0"
+    "interface-datastore": "ipfs/interface-datastore#fix/remove-node-globals"
   },
   "engines": {
     "node": ">=6.0.0",

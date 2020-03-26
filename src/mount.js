@@ -32,7 +32,7 @@ class MountDatastore {
    * @returns {{Datastore, Key, Key}}
    */
   _lookup (key) {
-    for (let mount of this.mounts) {
+    for (const mount of this.mounts) {
       if (mount.prefix.toString() === key.toString() || mount.prefix.isAncestorOf(key)) {
         const s = replaceStartWith(key.toString(), mount.prefix.toString())
         return {
@@ -156,7 +156,7 @@ class MountDatastore {
 
 function _many (iterable) {
   return (async function * () {
-    let completed = iterable.map(() => false)
+    const completed = iterable.map(() => false)
     while (!completed.every(Boolean)) {
       for (const [idx, itr] of iterable.entries()) {
         const it = await itr.next()
