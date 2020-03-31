@@ -156,15 +156,9 @@ class MountDatastore {
 
 function _many (iterable) {
   return (async function * () {
-    const completed = iterable.map(() => false)
-    while (!completed.every(Boolean)) {
-      for (const [idx, itr] of iterable.entries()) {
-        const it = await itr.next()
-        if (it.done) {
-          completed[idx] = true
-          continue
-        }
-        yield it.value
+    for (let i = 0; i < iterable.length; i++) {
+      for await (const v of iterable[i]) {
+        yield v
       }
     }
   })()
