@@ -46,7 +46,7 @@
   "dependencies": {
     "buffer": "^5.5.0",
     "debug": "^4.1.1",
-    "interface-datastore": "ipfs/interface-datastore#fix/remove-node-globals"
+    "interface-datastore": "^0.8.2"
   },
   "engines": {
     "node": ">=6.0.0",
