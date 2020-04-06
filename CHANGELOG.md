@@ -1,3 +1,13 @@
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/ipfs/js-datastore-core/compare/v0.7.0...v1.0.0) (2020-04-06)
+
+
+### Bug Fixes
+
+* add buffer and cleanup ([#22](https://github.com/ipfs/js-datastore-core/issues/22)) ([f0f64a9](https://github.com/ipfs/js-datastore-core/commit/f0f64a9))
+
+
+
 <a name="0.7.0"></a>
 # [0.7.0](https://github.com/ipfs/js-datastore-core/compare/v0.6.1...v0.7.0) (2019-05-29)
 
