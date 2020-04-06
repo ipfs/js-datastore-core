@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 'use strict'
 
+const { Buffer } = require('buffer')
 const chai = require('chai')
 chai.use(require('dirty-chai'))
 const expect = chai.expect
@@ -12,7 +13,7 @@ const TieredStore = require('../src').TieredDatastore
 
 describe('Tiered', () => {
   describe('all stores', () => {
-    let ms = []
+    const ms = []
     let store
     beforeEach(() => {
       ms.push(new MemoryStore())
@@ -38,6 +39,10 @@ describe('Tiered', () => {
       expect(val).to.be.eql(v)
       const exists = await store.has(k)
       expect(exists).to.be.eql(true)
+    })
+
+    it('has - key not found', async () => {
+      expect(await store.has(new Key('hello1'))).to.be.eql(false)
     })
 
     it('has and delete', async () => {

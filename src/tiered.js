@@ -17,7 +17,7 @@ class TieredDatastore {
 
   async open () {
     try {
-      await (this.stores.map((store) => store.open()))
+      await Promise.all(this.stores.map((store) => store.open()))
     } catch (err) {
       throw Errors.dbOpenFailedError()
     }
@@ -43,18 +43,14 @@ class TieredDatastore {
     throw Errors.notFoundError()
   }
 
-  has (key) {
-    return new Promise(async (resolve) => {
-      await Promise.all(this.stores.map(async (store) => {
-        const has = await store.has(key)
+  async has (key) {
+    for (const s of this.stores) {
+      if (await s.has(key)) {
+        return true
+      }
+    }
 
-        if (has) {
-          resolve(true)
-        }
-      }))
-
-      resolve(false)
-    })
+    return false
   }
 
   async delete (key) {
