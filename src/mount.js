@@ -1,13 +1,12 @@
 /* @flow */
 'use strict'
 
-const Key = require('interface-datastore').Key
-const Errors = require('interface-datastore').Errors
-const utils = require('interface-datastore').utils
-const filter = utils.filter
-const take = utils.take
-const sortAll = utils.sortAll
-const replaceStartWith = utils.replaceStartWith
+const { Adapter, Key, Errors, utils: {
+  filter,
+  take,
+  sortAll,
+  replaceStartWith
+} } = require('interface-datastore')
 
 const Keytransform = require('./keytransform')
 
@@ -15,8 +14,10 @@ const Keytransform = require('./keytransform')
  * A datastore that can combine multiple stores inside various
  * key prefixs.
  */
-class MountDatastore {
+class MountDatastore extends Adapter {
   constructor (mounts) {
+    super()
+
     this.mounts = mounts.slice()
   }
 
@@ -44,38 +45,38 @@ class MountDatastore {
     }
   }
 
-  put (key, value) {
+  put (key, value, options) {
     const match = this._lookup(key)
     if (match == null) {
       throw Errors.dbWriteFailedError(new Error('No datastore mounted for this key'))
     }
 
-    return match.datastore.put(match.rest, value)
+    return match.datastore.put(match.rest, value, options)
   }
 
-  get (key) {
+  get (key, options) {
     const match = this._lookup(key)
     if (match == null) {
       throw Errors.notFoundError(new Error('No datastore mounted for this key'))
     }
-    return match.datastore.get(match.rest)
+    return match.datastore.get(match.rest, options)
   }
 
-  has (key) {
+  has (key, options) {
     const match = this._lookup(key)
     if (match == null) {
       return false
     }
-    return match.datastore.has(match.rest)
+    return match.datastore.has(match.rest, options)
   }
 
-  delete (key) {
+  delete (key, options) {
     const match = this._lookup(key)
     if (match == null) {
       throw Errors.dbDeleteFailedError(new Error('No datastore mounted for this key'))
     }
 
-    return match.datastore.delete(match.rest)
+    return match.datastore.delete(match.rest, options)
   }
 
   close () {
@@ -112,13 +113,13 @@ class MountDatastore {
         const match = lookup(key)
         match.batch.delete(match.rest)
       },
-      commit: () => {
-        return Promise.all(Object.keys(batchMounts).map(p => batchMounts[p].commit()))
+      commit: (options) => {
+        return Promise.all(Object.keys(batchMounts).map(p => batchMounts[p].commit()), options)
       }
     }
   }
 
-  query (q) {
+  query (q, options) {
     const qs = this.mounts.map(m => {
       const ks = new Keytransform(m.datastore, {
         convert: (key) => {
@@ -138,7 +139,7 @@ class MountDatastore {
         prefix: prefix,
         filters: q.filters,
         keysOnly: q.keysOnly
-      })
+      }, options)
     })
 
     let it = _many(qs)

@@ -1,6 +1,6 @@
 'use strict'
 
-const Errors = require('interface-datastore').Errors
+const { Adapter, Errors } = require('interface-datastore')
 const log = require('debug')('datastore:core:tiered')
 
 /**
@@ -10,8 +10,10 @@ const log = require('debug')('datastore:core:tiered')
  * last one first.
  *
  */
-class TieredDatastore {
+class TieredDatastore extends Adapter {
   constructor (stores) {
+    super()
+
     this.stores = stores.slice()
   }
 
@@ -31,10 +33,10 @@ class TieredDatastore {
     }
   }
 
-  async get (key) {
+  async get (key, options) {
     for (const store of this.stores) {
       try {
-        const res = await store.get(key)
+        const res = await store.get(key, options)
         if (res) return res
       } catch (err) {
         log(err)
@@ -43,9 +45,9 @@ class TieredDatastore {
     throw Errors.notFoundError()
   }
 
-  async has (key) {
+  async has (key, options) {
     for (const s of this.stores) {
-      if (await s.has(key)) {
+      if (await s.has(key, options)) {
         return true
       }
     }
@@ -53,9 +55,9 @@ class TieredDatastore {
     return false
   }
 
-  async delete (key) {
+  async delete (key, options) {
     try {
-      await Promise.all(this.stores.map(store => store.delete(key)))
+      await Promise.all(this.stores.map(store => store.delete(key, options)))
     } catch (err) {
       throw Errors.dbDeleteFailedError()
     }
@@ -75,16 +77,16 @@ class TieredDatastore {
       delete: (key) => {
         batches.forEach(b => b.delete(key))
       },
-      commit: async () => {
+      commit: async (options) => {
         for (const batch of batches) {
-          await batch.commit()
+          await batch.commit(options)
         }
       }
     }
   }
 
-  query (q) {
-    return this.stores[this.stores.length - 1].query(q)
+  query (q, options) {
+    return this.stores[this.stores.length - 1].query(q, options)
   }
 }
 
