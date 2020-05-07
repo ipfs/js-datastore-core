@@ -1,12 +1,14 @@
 /* @flow */
 'use strict'
 
-const { Adapter, Key, Errors, utils: {
-  filter,
-  take,
-  sortAll,
-  replaceStartWith
-} } = require('interface-datastore')
+const {
+  Adapter, Key, Errors, utils: {
+    filter,
+    take,
+    sortAll,
+    replaceStartWith
+  }
+} = require('interface-datastore')
 
 const Keytransform = require('./keytransform')
 
@@ -114,7 +116,7 @@ class MountDatastore extends Adapter {
         match.batch.delete(match.rest)
       },
       commit: (options) => {
-        return Promise.all(Object.keys(batchMounts).map(p => batchMounts[p].commit()), options)
+        return Promise.all(Object.keys(batchMounts).map(p => batchMounts[p].commit(options)))
       }
     }
   }
