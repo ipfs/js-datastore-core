@@ -1,6 +1,6 @@
 'use strict'
 
-const utils = require('interface-datastore').utils
+const { Adapter, utils } = require('interface-datastore')
 const map = utils.map
 
 /**
@@ -8,8 +8,10 @@ const map = utils.map
  * the way keys look to the user, for example namespacing
  * keys, reversing them, etc.
  */
-class KeyTransformDatastore {
+class KeyTransformDatastore extends Adapter {
   constructor (child, transform) {
+    super()
+
     this.child = child
     this.transform = transform
   }
@@ -18,20 +20,20 @@ class KeyTransformDatastore {
     return this.child.open()
   }
 
-  put (key, val) {
-    return this.child.put(this.transform.convert(key), val)
+  put (key, val, options) {
+    return this.child.put(this.transform.convert(key), val, options)
   }
 
-  get (key) {
-    return this.child.get(this.transform.convert(key))
+  get (key, options) {
+    return this.child.get(this.transform.convert(key), options)
   }
 
-  has (key) {
-    return this.child.has(this.transform.convert(key))
+  has (key, options) {
+    return this.child.has(this.transform.convert(key), options)
   }
 
-  delete (key) {
-    return this.child.delete(this.transform.convert(key))
+  delete (key, options) {
+    return this.child.delete(this.transform.convert(key), options)
   }
 
   batch () {
@@ -43,14 +45,14 @@ class KeyTransformDatastore {
       delete: (key) => {
         b.delete(this.transform.convert(key))
       },
-      commit: () => {
-        return b.commit()
+      commit: (options) => {
+        return b.commit(options)
       }
     }
   }
 
-  query (q) {
-    return map(this.child.query(q), e => {
+  query (q, options) {
+    return map(this.child.query(q, options), e => {
       e.key = this.transform.invert(e.key)
       return e
     })

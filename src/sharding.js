@@ -1,8 +1,7 @@
 'use strict'
 
 const { Buffer } = require('buffer')
-const Key = require('interface-datastore').Key
-
+const { Adapter, Key } = require('interface-datastore')
 const sh = require('./shard')
 const KeytransformStore = require('./keytransform')
 
@@ -15,8 +14,10 @@ const shardReadmeKey = new Key(sh.README_FN)
  * Wraps another datastore such that all values are stored
  * sharded according to the given sharding function.
  */
-class ShardingDatastore {
+class ShardingDatastore extends Adapter {
   constructor (store, shard) {
+    super()
+
     this.child = new KeytransformStore(store, {
       convert: this._convertKey.bind(this),
       invert: this._invertKey.bind(this)
@@ -75,27 +76,27 @@ class ShardingDatastore {
     throw new Error('datastore exists')
   }
 
-  put (key, val) {
-    return this.child.put(key, val)
+  put (key, val, options) {
+    return this.child.put(key, val, options)
   }
 
-  get (key) {
-    return this.child.get(key)
+  get (key, options) {
+    return this.child.get(key, options)
   }
 
-  has (key) {
-    return this.child.has(key)
+  has (key, options) {
+    return this.child.has(key, options)
   }
 
-  delete (key) {
-    return this.child.delete(key)
+  delete (key, options) {
+    return this.child.delete(key, options)
   }
 
   batch () {
     return this.child.batch()
   }
 
-  query (q) {
+  query (q, options) {
     const tq = {
       keysOnly: q.keysOnly,
       offset: q.offset,
@@ -130,7 +131,7 @@ class ShardingDatastore {
       })
     }
 
-    return this.child.query(tq)
+    return this.child.query(tq, options)
   }
 
   close () {
