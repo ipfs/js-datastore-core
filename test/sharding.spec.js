@@ -1,7 +1,6 @@
 /* eslint-env mocha */
 'use strict'
 
-const { Buffer } = require('buffer')
 const chai = require('chai')
 chai.use(require('dirty-chai'))
 const expect = chai.expect
@@ -12,6 +11,7 @@ const MemoryStore = require('interface-datastore').MemoryDatastore
 
 const ShardingStore = require('../src').ShardingDatastore
 const sh = require('../src').shard
+const { utf8Encoder, utf8Decoder } = require('../src/utils')
 
 describe('ShardingStore', () => {
   it('create', async () => {
@@ -19,8 +19,8 @@ describe('ShardingStore', () => {
     const shard = new sh.NextToLast(2)
     await ShardingStore.create(ms, shard)
     const res = await Promise.all([ms.get(new Key(sh.SHARDING_FN)), ms.get(new Key(sh.README_FN))])
-    expect(res[0].toString()).to.eql(shard.toString() + '\n')
-    expect(res[1].toString()).to.eql(sh.readme)
+    expect(utf8Decoder.decode(res[0])).to.eql(shard.toString() + '\n')
+    expect(utf8Decoder.decode(res[1])).to.eql(sh.readme)
   })
 
   it('open - empty', async () => {
@@ -47,9 +47,9 @@ describe('ShardingStore', () => {
     const store = await ShardingStore.createOrOpen(ms, shard)
     expect(store).to.exist()
     await ShardingStore.createOrOpen(ms, shard)
-    await store.put(new Key('hello'), Buffer.from('test'))
+    await store.put(new Key('hello'), utf8Encoder.encode('test'))
     const res = await ms.get(new Key('ll').child(new Key('hello')))
-    expect(res).to.eql(Buffer.from('test'))
+    expect(res).to.eql(utf8Encoder.encode('test'))
   })
 
   describe('interface-datastore', () => {

@@ -1,7 +1,6 @@
 /* eslint-env mocha */
 'use strict'
 
-const { Buffer } = require('buffer')
 const chai = require('chai')
 chai.use(require('dirty-chai'))
 const expect = chai.expect
@@ -37,7 +36,7 @@ describe('KeyTransformDatastore', () => {
       'foo/bar/bazb',
       'foo/bar/baz/barb'
     ].map((s) => new Key(s))
-    await Promise.all(keys.map((key) => kStore.put(key, Buffer.from(key.toString()))))
+    await Promise.all(keys.map((key) => kStore.put(key, key.toBuffer())))
     const kResults = Promise.all(keys.map((key) => kStore.get(key)))
     const mResults = Promise.all(keys.map((key) => mStore.get(new Key('abc').child(key))))
     const results = await Promise.all([kResults, mResults])

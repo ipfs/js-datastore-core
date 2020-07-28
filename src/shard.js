@@ -2,6 +2,7 @@
 'use strict'
 
 const Key = require('interface-datastore').Key
+const { utf8Decoder } = require('../src/utils')
 
 const readme = require('./shard-readme')
 
@@ -125,7 +126,7 @@ exports.readShardFun = async (path /* : string */, store) /* : Promise<ShardV1> 
   const key = new Key(path).child(new Key(SHARDING_FN))
   const get = typeof store.getRaw === 'function' ? store.getRaw.bind(store) : store.get.bind(store)
   const res = await get(key)
-  return parseShardFun((res || '').toString().trim())
+  return parseShardFun(utf8Decoder.decode(res || '').trim())
 }
 
 exports.readme = readme

@@ -1,7 +1,6 @@
 /* eslint-env mocha */
 'use strict'
 
-const { Buffer } = require('buffer')
 const chai = require('chai')
 chai.use(require('dirty-chai'))
 const expect = chai.expect
@@ -11,6 +10,7 @@ const MemoryStore = require('interface-datastore').MemoryDatastore
 
 const NamespaceStore = require('../src/').NamespaceDatastore
 const all = require('async-iterator-all')
+const { utf8Encoder } = require('../src/utils')
 
 describe('KeyTransformDatastore', () => {
   const prefixes = [
@@ -30,7 +30,7 @@ describe('KeyTransformDatastore', () => {
       'foo/bar/baz/barb'
     ].map((s) => new Key(s))
 
-    await Promise.all(keys.map(key => store.put(key, Buffer.from(key.toString()))))
+    await Promise.all(keys.map(key => store.put(key, utf8Encoder.encode(key.toString()))))
     const nResults = Promise.all(keys.map((key) => store.get(key)))
     const mResults = Promise.all(keys.map((key) => mStore.get(new Key(prefix).child(key))))
     const results = await Promise.all([nResults, mResults])

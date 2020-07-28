@@ -1,7 +1,6 @@
 /* eslint-env mocha */
 'use strict'
 
-const { Buffer } = require('buffer')
 const chai = require('chai')
 chai.use(require('dirty-chai'))
 const expect = chai.expect
@@ -10,6 +9,7 @@ const Key = require('interface-datastore').Key
 const MemoryStore = require('interface-datastore').MemoryDatastore
 
 const TieredStore = require('../src').TieredDatastore
+const { utf8Encoder } = require('../src/utils')
 
 describe('Tiered', () => {
   describe('all stores', () => {
@@ -23,7 +23,7 @@ describe('Tiered', () => {
 
     it('put', async () => {
       const k = new Key('hello')
-      const v = Buffer.from('world')
+      const v = utf8Encoder.encode('world')
       await store.put(k, v)
       const res = await Promise.all([ms[0].get(k), ms[1].get(k)])
       res.forEach((val) => {
@@ -33,7 +33,7 @@ describe('Tiered', () => {
 
     it('get and has, where available', async () => {
       const k = new Key('hello')
-      const v = Buffer.from('world')
+      const v = utf8Encoder.encode('world')
       await ms[1].put(k, v)
       const val = await store.get(k)
       expect(val).to.be.eql(v)
@@ -47,7 +47,7 @@ describe('Tiered', () => {
 
     it('has and delete', async () => {
       const k = new Key('hello')
-      const v = Buffer.from('world')
+      const v = utf8Encoder.encode('world')
       await store.put(k, v)
       let res = await Promise.all([ms[0].has(k), ms[1].has(k)])
       expect(res).to.be.eql([true, true])
