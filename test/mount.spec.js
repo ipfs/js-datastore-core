@@ -2,12 +2,12 @@
 /* eslint max-nested-callbacks: ["error", 8] */
 'use strict'
 
-const { Buffer } = require('buffer')
 const chai = require('chai')
 chai.use(require('dirty-chai'))
 const assert = chai.assert
 const expect = chai.expect
 const all = require('async-iterator-all')
+const { utf8Encoder } = require('../src/utils')
 
 const Key = require('interface-datastore').Key
 const MemoryStore = require('interface-datastore').MemoryDatastore
@@ -18,7 +18,7 @@ describe('MountStore', () => {
   it('put - no mount', async () => {
     const m = new MountStore([])
     try {
-      await m.put(new Key('hello'), Buffer.from('foo'))
+      await m.put(new Key('hello'), utf8Encoder.encode('foo'))
       assert(false, 'Failed to throw error on no mount')
     } catch (err) {
       expect(err).to.be.an('Error')
@@ -31,7 +31,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
     try {
-      await m.put(new Key('/fail/hello'), Buffer.from('foo'))
+      await m.put(new Key('/fail/hello'), utf8Encoder.encode('foo'))
       assert(false, 'Failed to throw error on wrong mount')
     } catch (err) {
       expect(err).to.be.an('Error')
@@ -45,7 +45,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
 
-    const val = Buffer.from('hello')
+    const val = utf8Encoder.encode('hello')
     await m.put(new Key('/cool/hello'), val)
     const res = await mds.get(new Key('/hello'))
     expect(res).to.eql(val)
@@ -58,7 +58,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
 
-    const val = Buffer.from('hello')
+    const val = utf8Encoder.encode('hello')
     await mds.put(new Key('/hello'), val)
     const res = await m.get(new Key('/cool/hello'))
     expect(res).to.eql(val)
@@ -71,7 +71,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
 
-    const val = Buffer.from('hello')
+    const val = utf8Encoder.encode('hello')
     await mds.put(new Key('/hello'), val)
     const exists = await m.has(new Key('/cool/hello'))
     expect(exists).to.eql(true)
@@ -84,7 +84,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
 
-    const val = Buffer.from('hello')
+    const val = utf8Encoder.encode('hello')
     await m.put(new Key('/cool/hello'), val)
     await m.delete(new Key('/cool/hello'))
     let exists = await m.has(new Key('/cool/hello'))
@@ -100,7 +100,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
 
-    const val = Buffer.from('hello')
+    const val = utf8Encoder.encode('hello')
     await m.put(new Key('/cool/hello'), val)
     const res = await all(m.query({ prefix: '/cool' }))
     expect(res).to.eql([{ key: new Key('/cool/hello'), value: val }])

@@ -1,9 +1,9 @@
 'use strict'
 
-const { Buffer } = require('buffer')
 const { Adapter, Key } = require('interface-datastore')
 const sh = require('./shard')
 const KeytransformStore = require('./keytransform')
+const { utf8Encoder } = require('../src/utils')
 
 const shardKey = new Key(sh.SHARDING_FN)
 const shardReadmeKey = new Key(sh.README_FN)
@@ -65,8 +65,8 @@ class ShardingDatastore extends Adapter {
     const exists = await store.has(shardKey)
     if (!exists) {
       const put = typeof store.putRaw === 'function' ? store.putRaw.bind(store) : store.put.bind(store)
-      return Promise.all([put(shardKey, Buffer.from(shard.toString() + '\n')),
-        put(shardReadmeKey, Buffer.from(sh.readme))])
+      return Promise.all([put(shardKey, utf8Encoder.encode(shard.toString() + '\n')),
+        put(shardReadmeKey, utf8Encoder.encode(sh.readme))])
     }
 
     const diskShard = await sh.readShardFun('/', store)
