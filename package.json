@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "debug": "^4.1.1",
-    "interface-datastore": "ipfs/interface-datastore#fix/remove-node-buffer",
+    "interface-datastore": "^2.0.0",
     "ipfs-utils": "^2.3.1"
   },
   "engines": {
