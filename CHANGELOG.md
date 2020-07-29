@@ -1,3 +1,18 @@
+<a name="2.0.0"></a>
+# [2.0.0](https://github.com/ipfs/js-datastore-core/compare/v1.1.0...v2.0.0) (2020-07-29)
+
+
+### Bug Fixes
+
+* remove node buffers ([#27](https://github.com/ipfs/js-datastore-core/issues/27)) ([a9786b9](https://github.com/ipfs/js-datastore-core/commit/a9786b9))
+
+
+### BREAKING CHANGES
+
+* no longer uses node Buffers, only Uint8Arrays
+
+
+
 <a name="1.1.0"></a>
 # [1.1.0](https://github.com/ipfs/js-datastore-core/compare/v1.0.0...v1.1.0) (2020-05-07)
 
