@@ -1,6 +1,6 @@
 {
   "name": "datastore-core",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Wrapper implmentation for interface-datastore",
   "leadMaintainer": "Pedro Teixeira <pedro@protocol.ai>",
   "main": "src/index.js",
@@ -53,15 +53,16 @@
     "npm": ">=3.0.0"
   },
   "contributors": [
-    "David Dias <daviddias.p@gmail.com>",
     "achingbrain <alex@achingbrain.net>",
+    "David Dias <daviddias.p@gmail.com>",
     "Friedel Ziegelmayer <dignifiedquire@gmail.com>",
     "Hector Sanjuan <code@hector.link>",
     "Zane Starr <zcstarr@zaner.attlocal.net>",
-    "Jacob Heun <jacobheun@gmail.com>",
     "Hugo Dias <hugomrdias@gmail.com>",
+    "Jacob Heun <jacobheun@gmail.com>",
     "ᴠɪᴄᴛᴏʀ ʙᴊᴇʟᴋʜᴏʟᴍ <victorbjelkholm@gmail.com>",
     "Pedro Teixeira <i@pgte.me>",
+    "Bryan Stenson <bryan.stenson@gmail.com>",
     "Richard Schneider <makaretu@gmail.com>",
     "Vasco Santos <vasco.santos@moxy.studio>"
   ]
