@@ -46,7 +46,7 @@
   "dependencies": {
     "debug": "^4.1.1",
     "interface-datastore": "^2.0.0",
-    "ipfs-utils": "^2.3.1"
+    "ipfs-utils": "^4.0.0"
   },
   "engines": {
     "node": ">=6.0.0",
