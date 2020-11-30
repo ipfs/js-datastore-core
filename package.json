@@ -2,8 +2,17 @@
   "name": "datastore-core",
   "version": "2.0.1",
   "description": "Wrapper implmentation for interface-datastore",
-  "leadMaintainer": "Pedro Teixeira <pedro@protocol.ai>",
+  "leadMaintainer": "Alex Potsides <alex.potsides@protocol.ai>",
   "main": "src/index.js",
+  "types": "dist/src/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "src/*": [
+        "dist/src/*",
+        "dist/src/*/index"
+      ]
+    }
+  },
   "scripts": {
     "test": "aegir test",
     "test:node": "aegir test -t node",
@@ -38,19 +47,21 @@
   },
   "homepage": "https://github.com/ipfs/js-datastore-core#readme",
   "devDependencies": {
-    "aegir": "^28.1.0",
+    "aegir": "^29.2.0",
     "async-iterator-all": "^1.0.0",
     "chai": "^4.2.0",
     "dirty-chai": "^2.0.1"
   },
   "dependencies": {
     "debug": "^4.1.1",
-    "interface-datastore": "^2.0.0",
-    "ipfs-utils": "^4.0.1"
+    "interface-datastore": "ipfs/interface-datastore#feat/ts-types",
+    "ipfs-utils": "^5.0.1"
   },
   "engines": {
-    "node": ">=6.0.0",
-    "npm": ">=3.0.0"
+    "node": ">=12.0.0"
+  },
+  "eslintConfig": {
+    "extends": "ipfs"
   },
   "contributors": [
     "achingbrain <alex@achingbrain.net>",

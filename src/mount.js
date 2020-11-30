@@ -13,18 +13,28 @@ const {
 const Keytransform = require('./keytransform')
 
 /**
+ * @typedef {import('interface-datastore/src/types').IDatastore}IDatastore
+ * @typedef {import("interface-datastore/src/types").Options}Options
+ * @typedef {import('interface-datastore/src/key')} Key
+ */
+
+/**
  * A datastore that can combine multiple stores inside various
  * key prefixs.
  */
 class MountDatastore extends Adapter {
+  /**
+   *
+   * @param {Array<{prefix: Key, datastore: IDatastore}>} mounts
+   */
   constructor (mounts) {
     super()
 
     this.mounts = mounts.slice()
   }
 
-  open () {
-    return Promise.all(this.mounts.map((m) => m.datastore.open()))
+  async open () {
+    await Promise.all(this.mounts.map((m) => m.datastore.open()))
   }
 
   /**
@@ -32,7 +42,7 @@ class MountDatastore extends Adapter {
    *
    * @private
    * @param {Key} key
-   * @returns {{Datastore, Key, Key}}
+   * @returns {{datastore: IDatastore, mountpoint: Key, rest: Key} | undefined}
    */
   _lookup (key) {
     for (const mount of this.mounts) {
@@ -64,10 +74,14 @@ class MountDatastore extends Adapter {
     return match.datastore.get(match.rest, options)
   }
 
+  /**
+   * @param {Key} key
+   * @param {Options} [options]
+   */
   has (key, options) {
     const match = this._lookup(key)
     if (match == null) {
-      return false
+      return Promise.resolve(false)
     }
     return match.datastore.has(match.rest, options)
   }
@@ -81,8 +95,8 @@ class MountDatastore extends Adapter {
     return match.datastore.delete(match.rest, options)
   }
 
-  close () {
-    return Promise.all(this.mounts.map((m) => {
+  async close () {
+    await Promise.all(this.mounts.map((m) => {
       return m.datastore.close()
     }))
   }
@@ -115,8 +129,8 @@ class MountDatastore extends Adapter {
         const match = lookup(key)
         match.batch.delete(match.rest)
       },
-      commit: (options) => {
-        return Promise.all(Object.keys(batchMounts).map(p => batchMounts[p].commit(options)))
+      commit: async (options) => {
+        await Promise.all(Object.keys(batchMounts).map(p => batchMounts[p].commit(options)))
       }
     }
   }

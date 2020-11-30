@@ -1,77 +1,69 @@
-/* @flow */
 'use strict'
 
 const Key = require('interface-datastore').Key
 const { utf8Decoder } = require('../src/utils')
-
 const readme = require('./shard-readme')
 
-// eslint-disable-next-line
-/*:: import type {Datastore, Callback} from 'interface-datastore'
+/**
+ * @typedef {import('./types').IShard} IShard
+ */
 
-export interface ShardV1 {
-  name: string;
-  param: number;
-  fun(string): string;
-  toString(): string;
-}
-*/
+const PREFIX = '/repo/flatfs/shard/'
+const SHARDING_FN = 'SHARDING'
+const README_FN = '_README'
 
-const PREFIX = exports.PREFIX = '/repo/flatfs/shard/'
-const SHARDING_FN = exports.SHARDING_FN = 'SHARDING'
-exports.README_FN = '_README'
-
+/**
+ * @implements {IShard}
+ */
 class Shard {
-  /* :: name: string */
-  /* :: param: number */
-  /* :: _padding: string */
-
-  constructor (param /* : number */) {
+  constructor (param) {
     this.param = param
+    this.name = 'base'
+    this._padding = ''
   }
 
-  fun (str /* : string */) /* : string */ {
+  fun () {
     throw new Error('implement me')
   }
 
-  toString () /* : string */ {
+  toString () {
     return `${PREFIX}v1/${this.name}/${this.param}`
   }
 }
 
 class Prefix extends Shard {
-  constructor (prefixLen /* : number */) {
+  constructor (prefixLen) {
     super(prefixLen)
     this._padding = ''.padStart(prefixLen, '_')
     this.name = 'prefix'
   }
 
-  fun (noslash /* : string */) /* : string */ {
+  fun (noslash) {
     return (noslash + this._padding).slice(0, this.param)
   }
 }
 
 class Suffix extends Shard {
-  constructor (suffixLen /* : number */) {
+  constructor (suffixLen) {
     super(suffixLen)
     this._padding = ''.padStart(suffixLen, '_')
     this.name = 'suffix'
   }
 
-  fun (noslash /* : string */) /* : string */ {
+  fun (noslash) {
     const s = this._padding + noslash
     return s.slice(s.length - this.param)
   }
 }
 
 class NextToLast extends Shard {
-  constructor (suffixLen /* : number */) {
+  constructor (suffixLen) {
     super(suffixLen)
     this._padding = ''.padStart(suffixLen + 1, '_')
     this.name = 'next-to-last'
   }
 
-  fun (noslash /* : string */) /* : string */ {
+  fun (noslash) {
     const s = this._padding + noslash
     const offset = s.length - this.param - 1
     return s.slice(offset, offset + this.param)
@@ -82,9 +74,9 @@ class NextToLast extends Shard {
  * Convert a given string to the matching sharding function.
  *
  * @param {string} str
- * @returns {ShardV1}
+ * @returns {IShard}
  */
-function parseShardFun (str /* : string */) {
+function parseShardFun (str) {
   str = str.trim()
 
   if (str.length === 0) {
@@ -122,15 +114,21 @@ function parseShardFun (str /* : string */) {
   }
 }
 
-exports.readShardFun = async (path /* : string */, store) /* : Promise<ShardV1> */ => {
+const readShardFun = async (path, store) => {
   const key = new Key(path).child(new Key(SHARDING_FN))
   const get = typeof store.getRaw === 'function' ? store.getRaw.bind(store) : store.get.bind(store)
   const res = await get(key)
   return parseShardFun(utf8Decoder.decode(res || '').trim())
 }
 
-exports.readme = readme
-exports.parseShardFun = parseShardFun
-exports.Prefix = Prefix
-exports.Suffix = Suffix
-exports.NextToLast = NextToLast
+module.exports = {
+  readme,
+  parseShardFun,
+  readShardFun,
+  Prefix,
+  Suffix,
+  NextToLast,
+  README_FN,
+  SHARDING_FN,
+  PREFIX
+}
