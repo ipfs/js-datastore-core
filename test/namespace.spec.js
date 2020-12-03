@@ -1,16 +1,10 @@
 /* eslint-env mocha */
 'use strict'
 
-const chai = require('chai')
-chai.use(require('dirty-chai'))
-const expect = chai.expect
-
-const Key = require('interface-datastore').Key
-const MemoryStore = require('interface-datastore').MemoryDatastore
-
+const { expect } = require('aegir/utils/chai')
+const { Key, MemoryDatastore, utils: { utf8Encoder } } = require('interface-datastore')
 const NamespaceStore = require('../src/').NamespaceDatastore
 const all = require('async-iterator-all')
-const { utf8Encoder } = require('../src/utils')
 
 describe('KeyTransformDatastore', () => {
   const prefixes = [
@@ -18,7 +12,7 @@ describe('KeyTransformDatastore', () => {
     ''
   ]
   prefixes.forEach((prefix) => it(`basic '${prefix}'`, async () => {
-    const mStore = new MemoryStore()
+    const mStore = new MemoryDatastore()
     const store = new NamespaceStore(mStore, new Key(prefix))
 
     const keys = [
@@ -54,7 +48,7 @@ describe('KeyTransformDatastore', () => {
     describe(`interface-datastore: '${prefix}'`, () => {
       require('interface-datastore/src/tests')({
         setup () {
-          return new NamespaceStore(new MemoryStore(), new Key(prefix))
+          return new NamespaceStore(new MemoryDatastore(), new Key(prefix))
         },
         async teardown () { }
       })

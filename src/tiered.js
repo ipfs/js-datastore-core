@@ -2,6 +2,13 @@
 
 const { Adapter, Errors } = require('interface-datastore')
 const log = require('debug')('datastore:core:tiered')
+/**
+ * @typedef {import('interface-datastore/src/types').Datastore}Datastore
+ * @typedef {import("interface-datastore/src/types").Options}Options
+ * @typedef {import("interface-datastore/src/types").Batch} Batch
+ * @typedef {import('interface-datastore/src/key')} Key
+ * @typedef {import('interface-datastore/src/adapter').Query} Query
+ */
 
 /**
  * A datastore that can combine multiple stores. Puts and deletes
@@ -11,6 +18,9 @@ const log = require('debug')('datastore:core:tiered')
  *
  */
 class TieredDatastore extends Adapter {
+  /**
+   * @param {Datastore[]} stores
+   */
   constructor (stores) {
     super()
 
@@ -25,6 +35,10 @@ class TieredDatastore extends Adapter {
     }
   }
 
+  /**
+   * @param {Key} key
+   * @param {Uint8Array} value
+   */
   async put (key, value) {
     try {
       await Promise.all(this.stores.map(store => store.put(key, value)))
@@ -33,6 +47,10 @@ class TieredDatastore extends Adapter {
     }
   }
 
+  /**
+   * @param {Key} key
+   * @param {Options | undefined} [options]
+   */
   async get (key, options) {
     for (const store of this.stores) {
       try {
@@ -45,6 +63,10 @@ class TieredDatastore extends Adapter {
     throw Errors.notFoundError()
   }
 
+  /**
+   * @param {Key} key
+   * @param {Options | undefined} [options]
+   */
   async has (key, options) {
     for (const s of this.stores) {
       if (await s.has(key, options)) {
@@ -55,6 +77,10 @@ class TieredDatastore extends Adapter {
     return false
   }
 
+  /**
+   * @param {Key} key
+   * @param {Options | undefined} [options]
+   */
   async delete (key, options) {
     try {
       await Promise.all(this.stores.map(store => store.delete(key, options)))
@@ -67,14 +93,23 @@ class TieredDatastore extends Adapter {
     await Promise.all(this.stores.map(store => store.close()))
   }
 
+  /**
+   * @returns {Batch}
+   */
   batch () {
     const batches = this.stores.map(store => store.batch())
 
     return {
       put: (key, value) => {
+        /**
+         * @param {{ put: (arg0: any, arg1: any) => any; }} b
+         */
         batches.forEach(b => b.put(key, value))
       },
       delete: (key) => {
+        /**
+         * @param {{ delete: (arg0: any) => any; }} b
+         */
         batches.forEach(b => b.delete(key))
       },
       commit: async (options) => {
@@ -85,6 +120,10 @@ class TieredDatastore extends Adapter {
     }
   }
 
+  /**
+   * @param {Query} q
+   * @param {Options | undefined} [options]
+   */
   query (q, options) {
     return this.stores[this.stores.length - 1].query(q, options)
   }

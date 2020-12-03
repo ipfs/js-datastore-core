@@ -47,14 +47,12 @@
   },
   "homepage": "https://github.com/ipfs/js-datastore-core#readme",
   "devDependencies": {
-    "aegir": "^29.2.0",
-    "async-iterator-all": "^1.0.0",
-    "chai": "^4.2.0",
-    "dirty-chai": "^2.0.1"
+    "aegir": "^29.2.2",
+    "async-iterator-all": "^1.0.0"
   },
   "dependencies": {
     "debug": "^4.1.1",
-    "interface-datastore": "ipfs/interface-datastore#feat/ts-types",
+    "interface-datastore": "github:ipfs/interface-datastore#feat/ts-types",
     "ipfs-utils": "^5.0.1"
   },
   "engines": {

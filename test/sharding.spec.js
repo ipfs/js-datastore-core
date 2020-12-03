@@ -1,21 +1,15 @@
 /* eslint-env mocha */
 'use strict'
 
-const chai = require('chai')
-chai.use(require('dirty-chai'))
-const expect = chai.expect
-const assert = chai.expect
-
-const Key = require('interface-datastore').Key
-const MemoryStore = require('interface-datastore').MemoryDatastore
+const { expect, assert } = require('aegir/utils/chai')
+const { Key, MemoryDatastore, utils: { utf8Decoder, utf8Encoder } } = require('interface-datastore')
 
 const ShardingStore = require('../src').ShardingDatastore
 const sh = require('../src').shard
-const { utf8Encoder, utf8Decoder } = require('../src/utils')
 
 describe('ShardingStore', () => {
   it('create', async () => {
-    const ms = new MemoryStore()
+    const ms = new MemoryDatastore()
     const shard = new sh.NextToLast(2)
     await ShardingStore.create(ms, shard)
     const res = await Promise.all([ms.get(new Key(sh.SHARDING_FN)), ms.get(new Key(sh.README_FN))])
@@ -24,7 +18,7 @@ describe('ShardingStore', () => {
   })
 
   it('open - empty', async () => {
-    const ms = new MemoryStore()
+    const ms = new MemoryDatastore()
     try {
       await ShardingStore.open(ms)
       assert(false, 'Failed to throw error on ShardStore.open')
@@ -34,7 +28,7 @@ describe('ShardingStore', () => {
   })
 
   it('open - existing', async () => {
-    const ms = new MemoryStore()
+    const ms = new MemoryDatastore()
     const shard = new sh.NextToLast(2)
 
     await ShardingStore.create(ms, shard)
@@ -42,7 +36,7 @@ describe('ShardingStore', () => {
   })
 
   it('basics', async () => {
-    const ms = new MemoryStore()
+    const ms = new MemoryDatastore()
     const shard = new sh.NextToLast(2)
     const store = await ShardingStore.createOrOpen(ms, shard)
     expect(store).to.exist()
@@ -56,7 +50,7 @@ describe('ShardingStore', () => {
     require('interface-datastore/src/tests')({
       setup () {
         const shard = new sh.NextToLast(2)
-        return ShardingStore.createOrOpen(new MemoryStore(), shard)
+        return ShardingStore.createOrOpen(new MemoryDatastore(), shard)
       },
       teardown () { }
     })

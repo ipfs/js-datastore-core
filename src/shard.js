@@ -1,11 +1,11 @@
 'use strict'
 
-const Key = require('interface-datastore').Key
-const { utf8Decoder } = require('../src/utils')
+const { Key, utils: { utf8Decoder } } = require('interface-datastore')
 const readme = require('./shard-readme')
 
 /**
- * @typedef {import('./types').IShard} IShard
+ * @typedef {import('./types').Shard} Shard
+ * @typedef {import('interface-datastore/src/types').Datastore}Datastore
  */
 
 const PREFIX = '/repo/flatfs/shard/'
@@ -13,25 +13,27 @@ const SHARDING_FN = 'SHARDING'
 const README_FN = '_README'
 
 /**
- * @implements {IShard}
+ * @implements {Shard}
  */
-class Shard {
+class ShardBase {
   constructor (param) {
     this.param = param
     this.name = 'base'
     this._padding = ''
   }
 
-  fun () {
-    throw new Error('implement me')
+  fun (s) {
+    return 'implement me'
   }
 
   toString () {
     return `${PREFIX}v1/${this.name}/${this.param}`
   }
 }
-
-class Prefix extends Shard {
+/**
+ * @implements {Shard}
+ */
+class Prefix extends ShardBase {
   constructor (prefixLen) {
     super(prefixLen)
     this._padding = ''.padStart(prefixLen, '_')
@@ -43,7 +45,7 @@ class Prefix extends Shard {
   }
 }
 
-class Suffix extends Shard {
+class Suffix extends ShardBase {
   constructor (suffixLen) {
     super(suffixLen)
     this._padding = ''.padStart(suffixLen, '_')
@@ -56,7 +58,7 @@ class Suffix extends Shard {
   }
 }
 
-class NextToLast extends Shard {
+class NextToLast extends ShardBase {
   constructor (suffixLen) {
     super(suffixLen)
     this._padding = ''.padStart(suffixLen + 1, '_')
@@ -74,7 +76,7 @@ class NextToLast extends Shard {
  * Convert a given string to the matching sharding function.
  *
  * @param {string} str
- * @returns {IShard}
+ * @returns {Shard}
  */
 function parseShardFun (str) {
   str = str.trim()
@@ -114,8 +116,13 @@ function parseShardFun (str) {
   }
 }
 
+/**
+ * @param {string | Uint8Array} path
+ * @param {Datastore} store
+ */
 const readShardFun = async (path, store) => {
   const key = new Key(path).child(new Key(SHARDING_FN))
+  // @ts-ignore
   const get = typeof store.getRaw === 'function' ? store.getRaw.bind(store) : store.get.bind(store)
   const res = await get(key)
   return parseShardFun(utf8Decoder.decode(res || '').trim())

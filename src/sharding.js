@@ -1,12 +1,19 @@
 'use strict'
 
-const { Adapter, Key } = require('interface-datastore')
+const { Adapter, Key, utils: { utf8Encoder } } = require('interface-datastore')
 const sh = require('./shard')
 const KeytransformStore = require('./keytransform')
-const { utf8Encoder } = require('../src/utils')
 
 const shardKey = new Key(sh.SHARDING_FN)
 const shardReadmeKey = new Key(sh.README_FN)
+/**
+ * @typedef {import('interface-datastore/src/types').Datastore}Datastore
+ * @typedef {import("interface-datastore/src/types").Options}Options
+ * @typedef {import("interface-datastore/src/types").Batch} Batch
+ * @typedef {import('interface-datastore/src/key')} Key
+ * @typedef {import('interface-datastore/src/adapter').Query} Query
+ * @typedef {import('./types').Shard}Shard
+ */
 
 /**
  * Backend independent abstraction of go-ds-flatfs.
@@ -15,6 +22,10 @@ const shardReadmeKey = new Key(sh.README_FN)
  * sharded according to the given sharding function.
  */
 class ShardingDatastore extends Adapter {
+  /**
+   * @param {Datastore} store
+   * @param {Shard} shard
+   */
   constructor (store, shard) {
     super()
 
@@ -29,6 +40,9 @@ class ShardingDatastore extends Adapter {
     return this.child.open()
   }
 
+  /**
+   * @param {Key} key
+   */
   _convertKey (key) {
     const s = key.toString()
     if (s === shardKey.toString() || s === shardReadmeKey.toString()) {
@@ -39,6 +53,9 @@ class ShardingDatastore extends Adapter {
     return parent.child(key)
   }
 
+  /**
+   * @param {Key} key
+   */
   _invertKey (key) {
     const s = key.toString()
     if (s === shardKey.toString() || s === shardReadmeKey.toString()) {
@@ -47,6 +64,10 @@ class ShardingDatastore extends Adapter {
     return Key.withNamespaces(key.list().slice(1))
   }
 
+  /**
+   * @param {Datastore} store
+   * @param {Shard} shard
+   */
   static async createOrOpen (store, shard) {
     try {
       await ShardingDatastore.create(store, shard)
@@ -56,14 +77,22 @@ class ShardingDatastore extends Adapter {
     return ShardingDatastore.open(store)
   }
 
+  /**
+   * @param {Datastore} store
+   */
   static async open (store) {
     const shard = await sh.readShardFun('/', store)
     return new ShardingDatastore(store, shard)
   }
 
+  /**
+   * @param {Datastore} store
+   * @param {Shard} shard
+   */
   static async create (store, shard) {
     const exists = await store.has(shardKey)
     if (!exists) {
+      // @ts-ignore i have no idea what putRaw is or saw any implementation
       const put = typeof store.putRaw === 'function' ? store.putRaw.bind(store) : store.put.bind(store)
       return Promise.all([put(shardKey, utf8Encoder.encode(shard.toString() + '\n')),
         put(shardReadmeKey, utf8Encoder.encode(sh.readme))])
@@ -76,18 +105,35 @@ class ShardingDatastore extends Adapter {
     throw new Error('datastore exists')
   }
 
+  /**
+   * @param {Key} key
+   * @param {Uint8Array} val
+   * @param {Options | undefined} [options]
+   */
   put (key, val, options) {
     return this.child.put(key, val, options)
   }
 
+  /**
+   * @param {Key} key
+   * @param {Options | undefined} [options]
+   */
   get (key, options) {
     return this.child.get(key, options)
   }
 
+  /**
+   * @param {Key} key
+   * @param {Options | undefined} [options]
+   */
   has (key, options) {
     return this.child.has(key, options)
   }
 
+  /**
+   * @param {Key} key
+   * @param {Options | undefined} [options]
+   */
   delete (key, options) {
     return this.child.delete(key, options)
   }
@@ -96,6 +142,10 @@ class ShardingDatastore extends Adapter {
     return this.child.batch()
   }
 
+  /**
+   * @param {Query} q
+   * @param {Options | undefined} [options]
+   */
   query (q, options) {
     const tq = {
       keysOnly: q.keysOnly,
@@ -109,7 +159,7 @@ class ShardingDatastore extends Adapter {
 
     if (q.prefix != null) {
       tq.filters.push((e) => {
-        return this._invertKey(e.key).toString().startsWith(q.prefix)
+        return this._invertKey(e.key).toString().startsWith(q.prefix ? q.prefix : '')
       })
     }
 

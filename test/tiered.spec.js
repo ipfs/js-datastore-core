@@ -1,24 +1,18 @@
 /* eslint-env mocha */
 'use strict'
 
-const chai = require('chai')
-chai.use(require('dirty-chai'))
-const expect = chai.expect
-
-const Key = require('interface-datastore').Key
-const MemoryStore = require('interface-datastore').MemoryDatastore
-
-const TieredStore = require('../src').TieredDatastore
-const { utf8Encoder } = require('../src/utils')
+const { expect } = require('aegir/utils/chai')
+const { Key, MemoryDatastore, utils: { utf8Encoder } } = require('interface-datastore')
+const { TieredDatastore } = require('../src')
 
 describe('Tiered', () => {
   describe('all stores', () => {
     const ms = []
     let store
     beforeEach(() => {
-      ms.push(new MemoryStore())
-      ms.push(new MemoryStore())
-      store = new TieredStore(ms)
+      ms.push(new MemoryDatastore())
+      ms.push(new MemoryDatastore())
+      store = new TieredDatastore(ms)
     })
 
     it('put', async () => {
@@ -60,9 +54,9 @@ describe('Tiered', () => {
   describe('inteface-datastore-single', () => {
     require('interface-datastore/src/tests')({
       setup () {
-        return new TieredStore([
-          new MemoryStore(),
-          new MemoryStore()
+        return new TieredDatastore([
+          new MemoryDatastore(),
+          new MemoryDatastore()
         ])
       },
       teardown () { }

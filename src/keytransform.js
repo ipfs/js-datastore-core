@@ -2,13 +2,27 @@
 
 const { Adapter, utils } = require('interface-datastore')
 const map = utils.map
+/**
+ * @typedef {import('interface-datastore/src/types').Datastore}Datastore
+ * @typedef {import("interface-datastore/src/types").Options}Options
+ * @typedef {import("interface-datastore/src/types").Batch} Batch
+ * @typedef {import('interface-datastore/src/key')} Key
+ * @typedef {import('interface-datastore/src/adapter').Query} Query
+ * @typedef {import('./types').KeyTransform}KeyTransform
+ */
 
 /**
  * A datastore shim, that wraps around a given datastore, changing
  * the way keys look to the user, for example namespacing
  * keys, reversing them, etc.
+ *
+ * @implements {Datastore}
  */
 class KeyTransformDatastore extends Adapter {
+  /**
+   * @param {Datastore} child
+   * @param {KeyTransform} transform
+   */
   constructor (child, transform) {
     super()
 
@@ -20,22 +34,42 @@ class KeyTransformDatastore extends Adapter {
     return this.child.open()
   }
 
+  /**
+   * @param {Key} key
+   * @param {Uint8Array} val
+   * @param {Options | undefined} [options]
+   */
   put (key, val, options) {
     return this.child.put(this.transform.convert(key), val, options)
   }
 
+  /**
+   * @param {Key} key
+   * @param {Options | undefined} [options]
+   */
   get (key, options) {
     return this.child.get(this.transform.convert(key), options)
   }
 
+  /**
+   * @param {Key} key
+   * @param {Options | undefined} [options]
+   */
   has (key, options) {
     return this.child.has(this.transform.convert(key), options)
   }
 
+  /**
+   * @param {Key} key
+   * @param {Options | undefined} [options]
+   */
   delete (key, options) {
     return this.child.delete(this.transform.convert(key), options)
   }
 
+  /**
+   * @returns {Batch}
+   */
   batch () {
     const b = this.child.batch()
     return {
@@ -51,6 +85,10 @@ class KeyTransformDatastore extends Adapter {
     }
   }
 
+  /**
+   * @param {Query} q
+   * @param {Options} [options]
+   */
   query (q, options) {
     return map(this.child.query(q, options), e => {
       e.key = this.transform.invert(e.key)
