@@ -160,7 +160,7 @@ class ShardingDatastore extends Adapter {
     const { prefix } = q
     if (prefix != null) {
       tq.filters.push((e) => {
-        return this._invertKey(e.key).toString().startsWith(q.prefix ? q.prefix : '')
+        return this._invertKey(e.key).toString().startsWith(prefix)
       })
     }
 
