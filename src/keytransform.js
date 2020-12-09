@@ -8,7 +8,7 @@ const map = utils.map
  * @typedef {import("interface-datastore/src/types").Batch} Batch
  * @typedef {import('interface-datastore/src/key')} Key
  * @typedef {import('interface-datastore/src/adapter').Query} Query
- * @typedef {import('./types').KeyTransform}KeyTransform
+ * @typedef {import('./types').KeyTransform} KeyTransform
  */
 
 /**
