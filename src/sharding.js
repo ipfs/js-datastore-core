@@ -132,7 +132,7 @@ class ShardingDatastore extends Adapter {
 
   /**
    * @param {Key} key
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   delete (key, options) {
     return this.child.delete(key, options)
