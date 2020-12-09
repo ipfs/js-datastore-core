@@ -79,7 +79,7 @@ class TieredDatastore extends Adapter {
 
   /**
    * @param {Key} key
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   async delete (key, options) {
     try {
