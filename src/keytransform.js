@@ -45,7 +45,7 @@ class KeyTransformDatastore extends Adapter {
 
   /**
    * @param {Key} key
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   get (key, options) {
     return this.child.get(this.transform.convert(key), options)
