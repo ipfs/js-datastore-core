@@ -116,7 +116,7 @@ class ShardingDatastore extends Adapter {
 
   /**
    * @param {Key} key
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   get (key, options) {
     return this.child.get(key, options)
