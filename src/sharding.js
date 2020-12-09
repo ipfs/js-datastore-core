@@ -144,7 +144,7 @@ class ShardingDatastore extends Adapter {
 
   /**
    * @param {Query} q
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   query (q, options) {
     const tq = {
