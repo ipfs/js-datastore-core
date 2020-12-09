@@ -65,7 +65,7 @@ class TieredDatastore extends Adapter {
 
   /**
    * @param {Key} key
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   async has (key, options) {
     for (const s of this.stores) {
