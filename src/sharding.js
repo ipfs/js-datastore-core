@@ -108,7 +108,7 @@ class ShardingDatastore extends Adapter {
   /**
    * @param {Key} key
    * @param {Uint8Array} val
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   put (key, val, options) {
     return this.child.put(key, val, options)
