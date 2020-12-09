@@ -108,7 +108,7 @@ class ShardingDatastore extends Adapter {
   /**
    * @param {Key} key
    * @param {Uint8Array} val
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   put (key, val, options) {
     return this.child.put(key, val, options)
@@ -116,7 +116,7 @@ class ShardingDatastore extends Adapter {
 
   /**
    * @param {Key} key
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   get (key, options) {
     return this.child.get(key, options)
@@ -124,7 +124,7 @@ class ShardingDatastore extends Adapter {
 
   /**
    * @param {Key} key
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   has (key, options) {
     return this.child.has(key, options)
@@ -132,7 +132,7 @@ class ShardingDatastore extends Adapter {
 
   /**
    * @param {Key} key
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   delete (key, options) {
     return this.child.delete(key, options)
@@ -144,7 +144,7 @@ class ShardingDatastore extends Adapter {
 
   /**
    * @param {Query} q
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   query (q, options) {
     const tq = {
@@ -157,9 +157,10 @@ class ShardingDatastore extends Adapter {
       ]
     }
 
-    if (q.prefix != null) {
+    const { prefix } = q
+    if (prefix != null) {
       tq.filters.push((e) => {
-        return this._invertKey(e.key).toString().startsWith(q.prefix ? q.prefix : '')
+        return this._invertKey(e.key).toString().startsWith(prefix)
       })
     }
 

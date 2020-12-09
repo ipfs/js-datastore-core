@@ -5,7 +5,7 @@ const readme = require('./shard-readme')
 
 /**
  * @typedef {import('./types').Shard} Shard
- * @typedef {import('interface-datastore/src/types').Datastore}Datastore
+ * @typedef {import('interface-datastore/src/types').Datastore} Datastore
  */
 
 const PREFIX = '/repo/flatfs/shard/'

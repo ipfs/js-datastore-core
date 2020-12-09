@@ -49,7 +49,7 @@ class TieredDatastore extends Adapter {
 
   /**
    * @param {Key} key
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   async get (key, options) {
     for (const store of this.stores) {
@@ -65,7 +65,7 @@ class TieredDatastore extends Adapter {
 
   /**
    * @param {Key} key
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   async has (key, options) {
     for (const s of this.stores) {
@@ -79,7 +79,7 @@ class TieredDatastore extends Adapter {
 
   /**
    * @param {Key} key
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   async delete (key, options) {
     try {
@@ -116,7 +116,7 @@ class TieredDatastore extends Adapter {
 
   /**
    * @param {Query} q
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   query (q, options) {
     return this.stores[this.stores.length - 1].query(q, options)

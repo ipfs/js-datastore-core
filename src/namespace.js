@@ -3,8 +3,8 @@
 const Key = require('interface-datastore').Key
 const KeytransformDatastore = require('./keytransform')
 /**
- * @typedef {import('interface-datastore/src/types').Datastore}Datastore
- * @typedef {import("interface-datastore/src/types").Options}Options
+ * @typedef {import('interface-datastore/src/types').Datastore} Datastore
+ * @typedef {import("interface-datastore/src/types").Options} Options
  * @typedef {import("interface-datastore/src/types").Batch} Batch
  * @typedef {import('interface-datastore/src/key')} Key
  * @typedef {import('interface-datastore/src/adapter').Query} Query

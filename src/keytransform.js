@@ -3,12 +3,12 @@
 const { Adapter, utils } = require('interface-datastore')
 const map = utils.map
 /**
- * @typedef {import('interface-datastore/src/types').Datastore}Datastore
- * @typedef {import("interface-datastore/src/types").Options}Options
+ * @typedef {import('interface-datastore/src/types').Datastore} Datastore
+ * @typedef {import("interface-datastore/src/types").Options} Options
  * @typedef {import("interface-datastore/src/types").Batch} Batch
  * @typedef {import('interface-datastore/src/key')} Key
  * @typedef {import('interface-datastore/src/adapter').Query} Query
- * @typedef {import('./types').KeyTransform}KeyTransform
+ * @typedef {import('./types').KeyTransform} KeyTransform
  */
 
 /**
@@ -37,7 +37,7 @@ class KeyTransformDatastore extends Adapter {
   /**
    * @param {Key} key
    * @param {Uint8Array} val
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   put (key, val, options) {
     return this.child.put(this.transform.convert(key), val, options)
@@ -45,7 +45,7 @@ class KeyTransformDatastore extends Adapter {
 
   /**
    * @param {Key} key
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   get (key, options) {
     return this.child.get(this.transform.convert(key), options)
@@ -53,7 +53,7 @@ class KeyTransformDatastore extends Adapter {
 
   /**
    * @param {Key} key
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   has (key, options) {
     return this.child.has(this.transform.convert(key), options)
@@ -61,7 +61,7 @@ class KeyTransformDatastore extends Adapter {
 
   /**
    * @param {Key} key
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   delete (key, options) {
     return this.child.delete(this.transform.convert(key), options)
