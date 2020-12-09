@@ -122,7 +122,7 @@ class TieredDatastore extends Adapter {
 
   /**
    * @param {Query} q
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   query (q, options) {
     return this.stores[this.stores.length - 1].query(q, options)
