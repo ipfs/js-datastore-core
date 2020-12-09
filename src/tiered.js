@@ -101,15 +101,9 @@ class TieredDatastore extends Adapter {
 
     return {
       put: (key, value) => {
-        /**
-         * @param {{ put: (arg0: any, arg1: any) => any; }} b
-         */
         batches.forEach(b => b.put(key, value))
       },
       delete: (key) => {
-        /**
-         * @param {{ delete: (arg0: any) => any; }} b
-         */
         batches.forEach(b => b.delete(key))
       },
       commit: async (options) => {

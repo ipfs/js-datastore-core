@@ -21,6 +21,11 @@ const Keytransform = require('./keytransform')
  */
 
 /**
+ * @template O
+ * @typedef {import('./types').AwaitIterable<O>} AwaitIterable
+ */
+
+/**
  * A datastore that can combine multiple stores inside various
  * key prefixs.
  *
@@ -196,8 +201,9 @@ class MountDatastore extends Adapter {
 }
 
 /**
- * @param {string | any[]} iterable
- * @returns {AsyncIterable}
+ * @template T
+ * @param {ArrayLike<AwaitIterable<T>>} iterable
+ * @returns {AsyncIterable<T>}
  */
 function _many (iterable) {
   return (async function * () {
