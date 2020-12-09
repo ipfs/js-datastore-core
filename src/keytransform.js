@@ -61,7 +61,7 @@ class KeyTransformDatastore extends Adapter {
 
   /**
    * @param {Key} key
-   * @param {Options | undefined} [options]
+   * @param {Options} [options]
    */
   delete (key, options) {
     return this.child.delete(this.transform.convert(key), options)
