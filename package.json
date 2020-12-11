@@ -47,7 +47,7 @@
   },
   "homepage": "https://github.com/ipfs/js-datastore-core#readme",
   "devDependencies": {
-    "aegir": "^29.2.2",
+    "aegir": "ipfs/aegir#feat/ts-4.1.x",
     "async-iterator-all": "^1.0.0"
   },
   "dependencies": {
