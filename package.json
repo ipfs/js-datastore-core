@@ -14,11 +14,11 @@
     }
   },
   "scripts": {
+    "prepare": "aegir build",
     "test": "aegir test",
     "test:node": "aegir test -t node",
     "test:browser": "aegir test -t browser",
     "test:webworker": "aegir test -t webworker",
-    "build": "aegir build",
     "lint": "aegir lint",
     "release": "aegir release",
     "release-minor": "aegir release --type minor",
