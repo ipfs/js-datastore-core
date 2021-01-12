@@ -5,7 +5,7 @@ const readme = require('./shard-readme')
 
 /**
  * @typedef {import('./types').Shard} Shard
- * @typedef {import('interface-datastore/src/types').Datastore} Datastore
+ * @typedef {import('interface-datastore/dist/src/types').Datastore} Datastore
  */
 
 const PREFIX = '/repo/flatfs/shard/'
@@ -16,12 +16,18 @@ const README_FN = '_README'
  * @implements {Shard}
  */
 class ShardBase {
+  /**
+   * @param {any} param
+   */
   constructor (param) {
     this.param = param
     this.name = 'base'
     this._padding = ''
   }
 
+  /**
+   * @param {string} s
+   */
   fun (s) {
     return 'implement me'
   }
@@ -34,24 +40,36 @@ class ShardBase {
  * @implements {Shard}
  */
 class Prefix extends ShardBase {
+  /**
+   * @param {number} prefixLen
+   */
   constructor (prefixLen) {
     super(prefixLen)
     this._padding = ''.padStart(prefixLen, '_')
     this.name = 'prefix'
   }
 
+  /**
+   * @param {string} noslash
+   */
   fun (noslash) {
     return (noslash + this._padding).slice(0, this.param)
   }
 }
 
 class Suffix extends ShardBase {
+  /**
+   * @param {number} suffixLen
+   */
   constructor (suffixLen) {
     super(suffixLen)
     this._padding = ''.padStart(suffixLen, '_')
     this.name = 'suffix'
   }
 
+  /**
+   * @param {string} noslash
+   */
   fun (noslash) {
     const s = this._padding + noslash
     return s.slice(s.length - this.param)
@@ -59,12 +77,18 @@ class Suffix extends ShardBase {
 }
 
 class NextToLast extends ShardBase {
+  /**
+   * @param {number} suffixLen
+   */
   constructor (suffixLen) {
     super(suffixLen)
     this._padding = ''.padStart(suffixLen + 1, '_')
     this.name = 'next-to-last'
   }
 
+  /**
+   * @param {string} noslash
+   */
   fun (noslash) {
     const s = this._padding + noslash
     const offset = s.length - this.param - 1

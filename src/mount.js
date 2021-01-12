@@ -13,16 +13,15 @@ const {
 const Keytransform = require('./keytransform')
 
 /**
- * @typedef {import('interface-datastore/src/types').Datastore} Datastore
- * @typedef {import("interface-datastore/src/types").Options} Options
- * @typedef {import("interface-datastore/src/types").Batch} Batch
- * @typedef {import('interface-datastore/src/key')} Key
- * @typedef {import('interface-datastore/src/adapter').Query} Query
+ * @typedef {import('interface-datastore/dist/src/types').Datastore} Datastore
+ * @typedef {import('interface-datastore/dist/src/types').Options} Options
+ * @typedef {import('interface-datastore/dist/src/types').Batch} Batch
+ * @typedef {import('interface-datastore/dist/src/types').Query} Query
  */
 
 /**
- * @template O
- * @typedef {import('./types').AwaitIterable<O>} AwaitIterable
+ * @template TIterable
+ * @typedef {import('./types').AwaitIterable<TIterable>} AwaitIterable
  */
 
 /**
@@ -127,7 +126,11 @@ class MountDatastore extends Adapter {
    * @returns {Batch}
    */
   batch () {
+    /** @type {Record<string, Batch>} */
     const batchMounts = {}
+    /**
+     * @param {Key} key
+     */
     const lookup = (key) => {
       const match = this._lookup(key)
       if (match == null) {

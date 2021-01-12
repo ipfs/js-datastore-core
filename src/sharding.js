@@ -7,12 +7,17 @@ const KeytransformStore = require('./keytransform')
 const shardKey = new Key(sh.SHARDING_FN)
 const shardReadmeKey = new Key(sh.README_FN)
 /**
- * @typedef {import('interface-datastore/src/types').Datastore}Datastore
- * @typedef {import("interface-datastore/src/types").Options}Options
- * @typedef {import("interface-datastore/src/types").Batch} Batch
- * @typedef {import('interface-datastore/src/key')} Key
- * @typedef {import('interface-datastore/src/adapter').Query} Query
- * @typedef {import('./types').Shard}Shard
+ * @typedef {import('interface-datastore/dist/src/types').Datastore} Datastore
+ * @typedef {import('interface-datastore/dist/src/types').Options} Options
+ * @typedef {import('interface-datastore/dist/src/types').Batch} Batch
+ * @typedef {import('interface-datastore/dist/src/types').Query} Query
+ * @typedef {import('interface-datastore/dist/src/types').Pair} Pair
+ * @typedef {import('./types').Shard} Shard
+ *
+ */
+/**
+ * @template TValue
+ * @typedef {import('./types').Await<TValue> } Await
  */
 
 /**
@@ -151,8 +156,12 @@ class ShardingDatastore extends Adapter {
       keysOnly: q.keysOnly,
       offset: q.offset,
       limit: q.limit,
+      /** @type Array<(items: Pair[]) => Await<Pair[]>> */
+      orders: [],
       filters: [
+        /** @type {(item: Pair) => boolean} */
         e => e.key.toString() !== shardKey.toString(),
+        /** @type {(item: Pair) => boolean} */
         e => e.key.toString() !== shardReadmeKey.toString()
       ]
     }
@@ -165,6 +174,7 @@ class ShardingDatastore extends Adapter {
     }
 
     if (q.filters != null) {
+      // @ts-ignore
       const filters = q.filters.map((f) => (e) => {
         return f(Object.assign({}, e, {
           key: this._invertKey(e.key)

@@ -4,10 +4,15 @@
 const { expect } = require('aegir/utils/chai')
 const { Key, MemoryDatastore, utils: { utf8Encoder } } = require('interface-datastore')
 const { TieredDatastore } = require('../src')
+/**
+ * @typedef {import('interface-datastore/dist/src/types').Datastore} Datastore
+ */
 
 describe('Tiered', () => {
   describe('all stores', () => {
+    /** @type {Datastore[]} */
     const ms = []
+    /** @type {TieredDatastore} */
     let store
     beforeEach(() => {
       ms.push(new MemoryDatastore())
@@ -52,6 +57,7 @@ describe('Tiered', () => {
   })
 
   describe('inteface-datastore-single', () => {
+    // @ts-ignore
     require('interface-datastore/src/tests')({
       setup () {
         return new TieredDatastore([

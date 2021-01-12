@@ -4,7 +4,7 @@
 const { expect } = require('aegir/utils/chai')
 const { Key, MemoryDatastore, utils: { utf8Encoder } } = require('interface-datastore')
 const NamespaceStore = require('../src/').NamespaceDatastore
-const all = require('async-iterator-all')
+const all = require('it-all')
 
 describe('KeyTransformDatastore', () => {
   const prefixes = [
@@ -46,6 +46,7 @@ describe('KeyTransformDatastore', () => {
 
   prefixes.forEach((prefix) => {
     describe(`interface-datastore: '${prefix}'`, () => {
+      // @ts-ignore
       require('interface-datastore/src/tests')({
         setup () {
           return new NamespaceStore(new MemoryDatastore(), new Key(prefix))

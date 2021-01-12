@@ -3,11 +3,11 @@
 const { Adapter, Errors } = require('interface-datastore')
 const log = require('debug')('datastore:core:tiered')
 /**
- * @typedef {import('interface-datastore/src/types').Datastore}Datastore
- * @typedef {import("interface-datastore/src/types").Options}Options
- * @typedef {import("interface-datastore/src/types").Batch} Batch
- * @typedef {import('interface-datastore/src/key')} Key
- * @typedef {import('interface-datastore/src/adapter').Query} Query
+ * @typedef {import('interface-datastore/dist/src/types').Datastore} Datastore
+ * @typedef {import('interface-datastore/dist/src/types').Options} Options
+ * @typedef {import('interface-datastore/dist/src/types').Batch} Batch
+ * @typedef {import('interface-datastore/dist/src/types').Query} Query
+ * @typedef {InstanceType<import('interface-datastore')["Key"]>} Key
  */
 
 /**

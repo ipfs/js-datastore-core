@@ -3,7 +3,7 @@
 'use strict'
 
 const { expect, assert } = require('aegir/utils/chai')
-const all = require('async-iterator-all')
+const all = require('it-all')
 const { Key, MemoryDatastore, utils: { utf8Encoder } } = require('interface-datastore')
 const MountStore = require('../src').MountDatastore
 
@@ -100,6 +100,7 @@ describe('MountStore', () => {
   })
 
   describe('interface-datastore', () => {
+    // @ts-ignore
     require('interface-datastore/src/tests')({
       setup () {
         return new MountStore([{
