@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "debug": "^4.1.1",
-    "interface-datastore": "github:ipfs/interface-datastore#feat/ts-types"
+    "interface-datastore": "^3.0.0"
   },
   "engines": {
     "node": ">=12.0.0"
