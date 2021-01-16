@@ -3,11 +3,11 @@
 const { Adapter, utils } = require('interface-datastore')
 const map = utils.map
 /**
- * @typedef {import('interface-datastore/dist/src/types').Datastore} Datastore
- * @typedef {import('interface-datastore/dist/src/types').Options} Options
- * @typedef {import('interface-datastore/dist/src/types').Batch} Batch
- * @typedef {import('interface-datastore/dist/src/types')} Query
- * @typedef {InstanceType<import('interface-datastore')["Key"]>} Key
+ * @typedef {import('interface-datastore').Datastore} Datastore
+ * @typedef {import('interface-datastore').Options} Options
+ * @typedef {import('interface-datastore').Batch} Batch
+ * @typedef {import('interface-datastore').Query} Query
+ * @typedef {import('interface-datastore').Key} Key
  * @typedef {import('./types').KeyTransform} KeyTransform
  */
 

@@ -7,11 +7,11 @@ const KeytransformStore = require('./keytransform')
 const shardKey = new Key(sh.SHARDING_FN)
 const shardReadmeKey = new Key(sh.README_FN)
 /**
- * @typedef {import('interface-datastore/dist/src/types').Datastore} Datastore
- * @typedef {import('interface-datastore/dist/src/types').Options} Options
- * @typedef {import('interface-datastore/dist/src/types').Batch} Batch
- * @typedef {import('interface-datastore/dist/src/types').Query} Query
- * @typedef {import('interface-datastore/dist/src/types').Pair} Pair
+ * @typedef {import('interface-datastore').Datastore} Datastore
+ * @typedef {import('interface-datastore').Options} Options
+ * @typedef {import('interface-datastore').Batch} Batch
+ * @typedef {import('interface-datastore').Query} Query
+ * @typedef {import('interface-datastore').Pair} Pair
  * @typedef {import('./types').Shard} Shard
  *
  */
@@ -174,7 +174,7 @@ class ShardingDatastore extends Adapter {
     }
 
     if (q.filters != null) {
-      // @ts-ignore
+      // @ts-ignore - can't find a way to easily type this
       const filters = q.filters.map((f) => (e) => {
         return f(Object.assign({}, e, {
           key: this._invertKey(e.key)

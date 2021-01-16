@@ -4,8 +4,8 @@ const { Key, utils: { utf8Decoder } } = require('interface-datastore')
 const readme = require('./shard-readme')
 
 /**
+ * @typedef {import('interface-datastore').Datastore} Datastore
  * @typedef {import('./types').Shard} Shard
- * @typedef {import('interface-datastore/dist/src/types').Datastore} Datastore
  */
 
 const PREFIX = '/repo/flatfs/shard/'

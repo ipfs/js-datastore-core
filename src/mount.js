@@ -13,15 +13,16 @@ const {
 const Keytransform = require('./keytransform')
 
 /**
- * @typedef {import('interface-datastore/dist/src/types').Datastore} Datastore
- * @typedef {import('interface-datastore/dist/src/types').Options} Options
- * @typedef {import('interface-datastore/dist/src/types').Batch} Batch
- * @typedef {import('interface-datastore/dist/src/types').Query} Query
+ * @typedef {import('interface-datastore').Datastore} Datastore
+ * @typedef {import('interface-datastore').Options} Options
+ * @typedef {import('interface-datastore').Batch} Batch
+ * @typedef {import('interface-datastore').Query} Query
+ * @typedef {import('interface-datastore').Pair} Pair
  */
 
 /**
- * @template TIterable
- * @typedef {import('./types').AwaitIterable<TIterable>} AwaitIterable
+ * @template TEntry
+ * @typedef {import('./types').AwaitIterable<TEntry>} AwaitIterable
  */
 
 /**
@@ -204,9 +205,8 @@ class MountDatastore extends Adapter {
 }
 
 /**
- * @template T
- * @param {ArrayLike<AwaitIterable<T>>} iterable
- * @returns {AsyncIterable<T>}
+ * @param {ArrayLike<AwaitIterable<Pair>>} iterable
+ * @returns {AsyncIterable<Pair>}
  */
 function _many (iterable) {
   return (async function * () {
