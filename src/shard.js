@@ -1,77 +1,95 @@
-/* @flow */
 'use strict'
 
-const Key = require('interface-datastore').Key
-const { utf8Decoder } = require('../src/utils')
-
+const { Key, utils: { utf8Decoder } } = require('interface-datastore')
 const readme = require('./shard-readme')
 
-// eslint-disable-next-line
-/*:: import type {Datastore, Callback} from 'interface-datastore'
+/**
+ * @typedef {import('interface-datastore').Datastore} Datastore
+ * @typedef {import('./types').Shard} Shard
+ */
 
-export interface ShardV1 {
-  name: string;
-  param: number;
-  fun(string): string;
-  toString(): string;
-}
-*/
+const PREFIX = '/repo/flatfs/shard/'
+const SHARDING_FN = 'SHARDING'
+const README_FN = '_README'
 
-const PREFIX = exports.PREFIX = '/repo/flatfs/shard/'
-const SHARDING_FN = exports.SHARDING_FN = 'SHARDING'
-exports.README_FN = '_README'
-
-class Shard {
-  /* :: name: string */
-  /* :: param: number */
-  /* :: _padding: string */
-
-  constructor (param /* : number */) {
+/**
+ * @implements {Shard}
+ */
+class ShardBase {
+  /**
+   * @param {any} param
+   */
+  constructor (param) {
     this.param = param
+    this.name = 'base'
+    this._padding = ''
   }
 
-  fun (str /* : string */) /* : string */ {
-    throw new Error('implement me')
+  /**
+   * @param {string} s
+   */
+  fun (s) {
+    return 'implement me'
   }
 
-  toString () /* : string */ {
+  toString () {
     return `${PREFIX}v1/${this.name}/${this.param}`
   }
 }
-
-class Prefix extends Shard {
-  constructor (prefixLen /* : number */) {
+/**
+ * @implements {Shard}
+ */
+class Prefix extends ShardBase {
+  /**
+   * @param {number} prefixLen
+   */
+  constructor (prefixLen) {
     super(prefixLen)
     this._padding = ''.padStart(prefixLen, '_')
     this.name = 'prefix'
   }
 
-  fun (noslash /* : string */) /* : string */ {
+  /**
+   * @param {string} noslash
+   */
+  fun (noslash) {
     return (noslash + this._padding).slice(0, this.param)
   }
 }
 
-class Suffix extends Shard {
-  constructor (suffixLen /* : number */) {
+class Suffix extends ShardBase {
+  /**
+   * @param {number} suffixLen
+   */
+  constructor (suffixLen) {
     super(suffixLen)
     this._padding = ''.padStart(suffixLen, '_')
     this.name = 'suffix'
   }
 
-  fun (noslash /* : string */) /* : string */ {
+  /**
+   * @param {string} noslash
+   */
+  fun (noslash) {
     const s = this._padding + noslash
     return s.slice(s.length - this.param)
   }
 }
 
-class NextToLast extends Shard {
-  constructor (suffixLen /* : number */) {
+class NextToLast extends ShardBase {
+  /**
+   * @param {number} suffixLen
+   */
+  constructor (suffixLen) {
     super(suffixLen)
     this._padding = ''.padStart(suffixLen + 1, '_')
     this.name = 'next-to-last'
   }
 
-  fun (noslash /* : string */) /* : string */ {
+  /**
+   * @param {string} noslash
+   */
+  fun (noslash) {
     const s = this._padding + noslash
     const offset = s.length - this.param - 1
     return s.slice(offset, offset + this.param)
@@ -82,9 +100,9 @@ class NextToLast extends Shard {
  * Convert a given string to the matching sharding function.
  *
  * @param {string} str
- * @returns {ShardV1}
+ * @returns {Shard}
  */
-function parseShardFun (str /* : string */) {
+function parseShardFun (str) {
   str = str.trim()
 
   if (str.length === 0) {
@@ -122,15 +140,26 @@ function parseShardFun (str /* : string */) {
   }
 }
 
-exports.readShardFun = async (path /* : string */, store) /* : Promise<ShardV1> */ => {
+/**
+ * @param {string | Uint8Array} path
+ * @param {Datastore} store
+ */
+const readShardFun = async (path, store) => {
   const key = new Key(path).child(new Key(SHARDING_FN))
+  // @ts-ignore
   const get = typeof store.getRaw === 'function' ? store.getRaw.bind(store) : store.get.bind(store)
   const res = await get(key)
   return parseShardFun(utf8Decoder.decode(res || '').trim())
 }
 
-exports.readme = readme
-exports.parseShardFun = parseShardFun
-exports.Prefix = Prefix
-exports.Suffix = Suffix
-exports.NextToLast = NextToLast
+module.exports = {
+  readme,
+  parseShardFun,
+  readShardFun,
+  Prefix,
+  Suffix,
+  NextToLast,
+  README_FN,
+  SHARDING_FN,
+  PREFIX
+}

@@ -2,16 +2,9 @@
 /* eslint max-nested-callbacks: ["error", 8] */
 'use strict'
 
-const chai = require('chai')
-chai.use(require('dirty-chai'))
-const assert = chai.assert
-const expect = chai.expect
-const all = require('async-iterator-all')
-const { utf8Encoder } = require('../src/utils')
-
-const Key = require('interface-datastore').Key
-const MemoryStore = require('interface-datastore').MemoryDatastore
-
+const { expect, assert } = require('aegir/utils/chai')
+const all = require('it-all')
+const { Key, MemoryDatastore, utils: { utf8Encoder } } = require('interface-datastore')
 const MountStore = require('../src').MountDatastore
 
 describe('MountStore', () => {
@@ -27,7 +20,7 @@ describe('MountStore', () => {
 
   it('put - wrong mount', async () => {
     const m = new MountStore([{
-      datastore: new MemoryStore(),
+      datastore: new MemoryDatastore(),
       prefix: new Key('cool')
     }])
     try {
@@ -39,7 +32,7 @@ describe('MountStore', () => {
   })
 
   it('put', async () => {
-    const mds = new MemoryStore()
+    const mds = new MemoryDatastore()
     const m = new MountStore([{
       datastore: mds,
       prefix: new Key('cool')
@@ -52,7 +45,7 @@ describe('MountStore', () => {
   })
 
   it('get', async () => {
-    const mds = new MemoryStore()
+    const mds = new MemoryDatastore()
     const m = new MountStore([{
       datastore: mds,
       prefix: new Key('cool')
@@ -65,7 +58,7 @@ describe('MountStore', () => {
   })
 
   it('has', async () => {
-    const mds = new MemoryStore()
+    const mds = new MemoryDatastore()
     const m = new MountStore([{
       datastore: mds,
       prefix: new Key('cool')
@@ -78,7 +71,7 @@ describe('MountStore', () => {
   })
 
   it('delete', async () => {
-    const mds = new MemoryStore()
+    const mds = new MemoryDatastore()
     const m = new MountStore([{
       datastore: mds,
       prefix: new Key('cool')
@@ -94,7 +87,7 @@ describe('MountStore', () => {
   })
 
   it('query simple', async () => {
-    const mds = new MemoryStore()
+    const mds = new MemoryDatastore()
     const m = new MountStore([{
       datastore: mds,
       prefix: new Key('cool')
@@ -107,17 +100,18 @@ describe('MountStore', () => {
   })
 
   describe('interface-datastore', () => {
+    // @ts-ignore
     require('interface-datastore/src/tests')({
       setup () {
         return new MountStore([{
           prefix: new Key('/a'),
-          datastore: new MemoryStore()
+          datastore: new MemoryDatastore()
         }, {
           prefix: new Key('/z'),
-          datastore: new MemoryStore()
+          datastore: new MemoryDatastore()
         }, {
           prefix: new Key('/q'),
-          datastore: new MemoryStore()
+          datastore: new MemoryDatastore()
         }])
       },
       teardown () { }

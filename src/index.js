@@ -7,9 +7,16 @@ const TieredDatastore = require('./tiered')
 const NamespaceDatastore = require('./namespace')
 const shard = require('./shard')
 
-exports.KeytransformDatastore = KeytransformDatastore
-exports.ShardingDatastore = ShardingDatastore
-exports.MountDatastore = MountDatastore
-exports.TieredDatastore = TieredDatastore
-exports.NamespaceDatastore = NamespaceDatastore
-exports.shard = shard
+/**
+ * @typedef {import("./types").Shard } Shard
+ * @typedef {import("./types").KeyTransform } KeyTransform
+ */
+
+module.exports = {
+  KeytransformDatastore,
+  ShardingDatastore,
+  MountDatastore,
+  TieredDatastore,
+  NamespaceDatastore,
+  shard
+}

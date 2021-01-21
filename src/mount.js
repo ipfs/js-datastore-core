@@ -13,18 +13,37 @@ const {
 const Keytransform = require('./keytransform')
 
 /**
+ * @typedef {import('interface-datastore').Datastore} Datastore
+ * @typedef {import('interface-datastore').Options} Options
+ * @typedef {import('interface-datastore').Batch} Batch
+ * @typedef {import('interface-datastore').Query} Query
+ * @typedef {import('interface-datastore').Pair} Pair
+ */
+
+/**
+ * @template TEntry
+ * @typedef {import('./types').AwaitIterable<TEntry>} AwaitIterable
+ */
+
+/**
  * A datastore that can combine multiple stores inside various
  * key prefixs.
+ *
+ * @implements {Datastore}
  */
 class MountDatastore extends Adapter {
+  /**
+   *
+   * @param {Array<{prefix: Key, datastore: Datastore}>} mounts
+   */
   constructor (mounts) {
     super()
 
     this.mounts = mounts.slice()
   }
 
-  open () {
-    return Promise.all(this.mounts.map((m) => m.datastore.open()))
+  async open () {
+    await Promise.all(this.mounts.map((m) => m.datastore.open()))
   }
 
   /**
@@ -32,7 +51,7 @@ class MountDatastore extends Adapter {
    *
    * @private
    * @param {Key} key
-   * @returns {{Datastore, Key, Key}}
+   * @returns {{datastore: Datastore, mountpoint: Key, rest: Key} | undefined}
    */
   _lookup (key) {
     for (const mount of this.mounts) {
@@ -47,6 +66,11 @@ class MountDatastore extends Adapter {
     }
   }
 
+  /**
+   * @param {Key} key
+   * @param {Uint8Array} value
+   * @param {Options} [options]
+   */
   put (key, value, options) {
     const match = this._lookup(key)
     if (match == null) {
@@ -56,6 +80,10 @@ class MountDatastore extends Adapter {
     return match.datastore.put(match.rest, value, options)
   }
 
+  /**
+   * @param {Key} key
+   * @param {Options} [options]
+   */
   get (key, options) {
     const match = this._lookup(key)
     if (match == null) {
@@ -64,14 +92,22 @@ class MountDatastore extends Adapter {
     return match.datastore.get(match.rest, options)
   }
 
+  /**
+   * @param {Key} key
+   * @param {Options} [options]
+   */
   has (key, options) {
     const match = this._lookup(key)
     if (match == null) {
-      return false
+      return Promise.resolve(false)
     }
     return match.datastore.has(match.rest, options)
   }
 
+  /**
+   * @param {Key} key
+   * @param {Options} [options]
+   */
   delete (key, options) {
     const match = this._lookup(key)
     if (match == null) {
@@ -81,14 +117,21 @@ class MountDatastore extends Adapter {
     return match.datastore.delete(match.rest, options)
   }
 
-  close () {
-    return Promise.all(this.mounts.map((m) => {
+  async close () {
+    await Promise.all(this.mounts.map((m) => {
       return m.datastore.close()
     }))
   }
 
+  /**
+   * @returns {Batch}
+   */
   batch () {
+    /** @type {Record<string, Batch>} */
     const batchMounts = {}
+    /**
+     * @param {Key} key
+     */
     const lookup = (key) => {
       const match = this._lookup(key)
       if (match == null) {
@@ -115,12 +158,16 @@ class MountDatastore extends Adapter {
         const match = lookup(key)
         match.batch.delete(match.rest)
       },
-      commit: (options) => {
-        return Promise.all(Object.keys(batchMounts).map(p => batchMounts[p].commit(options)))
+      commit: async (options) => {
+        await Promise.all(Object.keys(batchMounts).map(p => batchMounts[p].commit(options)))
       }
     }
   }
 
+  /**
+   * @param {Query} q
+   * @param {Options} [options]
+   */
   query (q, options) {
     const qs = this.mounts.map(m => {
       const ks = new Keytransform(m.datastore, {
@@ -149,7 +196,7 @@ class MountDatastore extends Adapter {
     if (q.orders) q.orders.forEach(o => { it = sortAll(it, o) })
     if (q.offset != null) {
       let i = 0
-      it = filter(it, () => i++ >= q.offset)
+      it = filter(it, () => i++ >= /** @type {number} */ (q.offset))
     }
     if (q.limit != null) it = take(it, q.limit)
 
@@ -157,6 +204,10 @@ class MountDatastore extends Adapter {
   }
 }
 
+/**
+ * @param {ArrayLike<AwaitIterable<Pair>>} iterable
+ * @returns {AsyncIterable<Pair>}
+ */
 function _many (iterable) {
   return (async function * () {
     for (let i = 0; i < iterable.length; i++) {
