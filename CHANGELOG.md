@@ -1,3 +1,17 @@
+# [3.0.0](https://github.com/ipfs/js-datastore-core/compare/v2.0.1...v3.0.0) (2021-01-22)
+
+
+### Bug Fixes
+
+* fix ShardingDatastore creation ([#48](https://github.com/ipfs/js-datastore-core/issues/48)) ([21b48e7](https://github.com/ipfs/js-datastore-core/commit/21b48e7ccc965a1422f8a0f7eadbd83715b5cac6))
+
+
+### Features
+
+* ts types, github ci and clean up ([#39](https://github.com/ipfs/js-datastore-core/issues/39)) ([bee45ae](https://github.com/ipfs/js-datastore-core/commit/bee45ae0b778171d0919e135ea8affcf2d6de635))
+
+
+
 ## [2.0.1](https://github.com/ipfs/js-datastore-core/compare/v2.0.0...v2.0.1) (2020-11-09)
 
 
