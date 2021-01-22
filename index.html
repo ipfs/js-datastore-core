@@ -1,586 +1,284 @@
 <!doctype html>
-<html lang="en">
+<html class="default no-js">
 <head>
-  <meta charset='utf-8'>
-  <title>datastore-core 2.0.1 | Documentation</title>
-  <meta name='description' content='Wrapper implmentation for interface-datastore'>
-  <meta name='viewport' content='width=device-width,initial-scale=1'>
-  <link href='assets/bass.css' rel='stylesheet'>
-  <link href='assets/style.css' rel='stylesheet'>
-  <link href='assets/github.css' rel='stylesheet'>
-  <link href='assets/split.css' rel='stylesheet'>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>datastore-core - v3.0.0</title>
+	<meta name="description" content="Documentation for datastore-core - v3.0.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+	<link href="https://unpkg.com/nord-highlightjs@0.1.0/dist/nord.css" rel="stylesheet" type="text/css" />
+	<style>
+        .toolbar-icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .toolbar-icon-search {
+            box-sizing: border-box;
+            position: absolute;
+            overflow: hidden;
+            right: -40px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            @media (min-width: 901px){
+                display: none
+            }
+        }
+            @media (min-width: 901px){
+                .toolbar-icon-menu {
+                    display: none
+                }
+                .toolbar-icon-options {
+                    display: none
+                }
+            }
+
+        .gg-menu {
+            transform: scale(var(--ggs,1))
+        }
+        .gg-menu,
+        .gg-menu::after,
+        .gg-menu::before {
+            box-sizing: border-box;
+            position: relative;
+            display: block;
+            width: 20px;
+            height: 2px;
+            border-radius: 3px;
+            background: currentColor
+        }
+        .gg-menu::after,
+        .gg-menu::before {
+            content: "";
+            position: absolute;
+            top: -6px
+        }
+        .gg-menu::after {
+            top: 6px
+        }
+        .gg-options {
+            box-sizing: border-box;
+            position: relative;
+            display: block;
+            transform: scale(var(--ggs,1));
+            width: 10px;
+            height: 2px;
+            box-shadow:
+                -3px 4px 0 0,
+                3px -4px 0 0
+        }
+        .gg-options::after,
+        .gg-options::before {
+            content: "";
+            display: block;
+            box-sizing: border-box;
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border: 2px solid;
+            border-radius: 100%
+        }
+        .gg-options::before {
+            top: -7px;
+            left: -4px
+        }
+        .gg-options::after {
+            bottom: -7px;
+            right: -4px
+        }
+        .gg-search {
+            box-sizing: border-box;
+            position: relative;
+            display: block;
+            transform: scale(var(--ggs,1));
+            width: 16px;
+            height: 16px;
+            border: 2px solid;
+            border-radius: 100%;
+            margin-left: -4px;
+            margin-top: -4px
+        }
+        .gg-search::after {
+            content: "";
+            display: block;
+            box-sizing: border-box;
+            position: absolute;
+            border-radius: 3px;
+            width: 2px;
+            height: 8px;
+            background: currentColor;
+            transform: rotate(-45deg);
+            top: 10px;
+            left: 12px
+        }
+    </style>
 </head>
-<body class='documentation m0'>
-    <div class='flex'>
-      <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
-        <div class='py1 px2'>
-          <h3 class='mb0 no-anchor'>datastore-core</h3>
-          <div class='mb1'><code>2.0.1</code></div>
-          <input
-            placeholder='Filter'
-            id='filter-input'
-            class='col12 block input'
-            spellcheck='false'
-            autocapitalize='off'
-            autocorrect='off'
-            type='text' />
-          <div id='toc'>
-            <ul class='list-reset h5 py1-ul'>
-              
-                
-                <li><a
-                  href='#keytransformdatastore'
-                  class="">
-                  KeyTransformDatastore
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#shardingdatastore'
-                  class="">
-                  ShardingDatastore
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#mountdatastore'
-                  class="">
-                  MountDatastore
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#tiereddatastore'
-                  class="">
-                  TieredDatastore
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#namespacedatastore'
-                  class="">
-                  NamespaceDatastore
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#parseshardfun'
-                  class="">
-                  parseShardFun
-                  
-                </a>
-                
-                </li>
-              
-            </ul>
-          </div>
-          <div class='mt1 h6 quiet'>
-            <a href='https://documentation.js.org/reading-documentation.html'>Need help reading this?</a>
-          </div>
-        </div>
-      </div>
-      <div id='split-right' class='relative overflow-auto height-viewport-100'>
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='keytransformdatastore'>
-      KeyTransformDatastore
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/ipfs/js-datastore-core/blob/5c732bedff733ac442c9944b4493d797d5cc6ac1/src/keytransform.js#L11-L64'>
-      <span>src/keytransform.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>A datastore shim, that wraps around a given datastore, changing
-the way keys look to the user, for example namespacing
-keys, reversing them, etc.</p>
-
-    <div class='pre p1 fill-light mt0'>new KeyTransformDatastore(child: any, transform: any)</div>
-  
-  
-    <p>
-      Extends
-      
-        Adapter
-      
-    </p>
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>child</span> <code class='quiet'>(any)</code>
-	    
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>transform</span> <code class='quiet'>(any)</code>
-	    
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='shardingdatastore'>
-      ShardingDatastore
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/ipfs/js-datastore-core/blob/5c732bedff733ac442c9944b4493d797d5cc6ac1/src/sharding.js#L17-L140'>
-      <span>src/sharding.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>Backend independent abstraction of go-ds-flatfs.</p>
-<p>Wraps another datastore such that all values are stored
-sharded according to the given sharding function.</p>
-
-    <div class='pre p1 fill-light mt0'>new ShardingDatastore(store: any, shard: any)</div>
-  
-  
-    <p>
-      Extends
-      
-        Adapter
-      
-    </p>
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>store</span> <code class='quiet'>(any)</code>
-	    
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>shard</span> <code class='quiet'>(any)</code>
-	    
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='mountdatastore'>
-      MountDatastore
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/ipfs/js-datastore-core/blob/5c732bedff733ac442c9944b4493d797d5cc6ac1/src/mount.js#L19-L158'>
-      <span>src/mount.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>A datastore that can combine multiple stores inside various
-key prefixs.</p>
-
-    <div class='pre p1 fill-light mt0'>new MountDatastore(mounts: any)</div>
-  
-  
-    <p>
-      Extends
-      
-        Adapter
-      
-    </p>
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>mounts</span> <code class='quiet'>(any)</code>
-	    
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='tiereddatastore'>
-      TieredDatastore
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/ipfs/js-datastore-core/blob/5c732bedff733ac442c9944b4493d797d5cc6ac1/src/tiered.js#L13-L91'>
-      <span>src/tiered.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>A datastore that can combine multiple stores. Puts and deletes
-will write through to all datastores. Has and get will
-try each store sequentially. Query will always try the
-last one first.</p>
-
-    <div class='pre p1 fill-light mt0'>new TieredDatastore(stores: any)</div>
-  
-  
-    <p>
-      Extends
-      
-        Adapter
-      
-    </p>
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>stores</span> <code class='quiet'>(any)</code>
-	    
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='namespacedatastore'>
-      NamespaceDatastore
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/ipfs/js-datastore-core/blob/5c732bedff733ac442c9944b4493d797d5cc6ac1/src/namespace.js#L15-L45'>
-      <span>src/namespace.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>Wraps a given datastore into a keytransform which
-makes a given prefix transparent.</p>
-<p>For example, if the prefix is <code>new Key(/hello)</code> a call
-to <code>store.put(new Key('/world'), mydata)</code> would store the data under
-<code>/hello/world</code>.</p>
-
-    <div class='pre p1 fill-light mt0'>new NamespaceDatastore(child: any, prefix: any)</div>
-  
-  
-    <p>
-      Extends
-      
-        KeytransformDatastore
-      
-    </p>
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>child</span> <code class='quiet'>(any)</code>
-	    
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>prefix</span> <code class='quiet'>(any)</code>
-	    
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='parseshardfun'>
-      parseShardFun
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/ipfs/js-datastore-core/blob/5c732bedff733ac442c9944b4493d797d5cc6ac1/src/shard.js#L87-L123'>
-      <span>src/shard.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>Convert a given string to the matching sharding function.</p>
-
-    <div class='pre p1 fill-light mt0'>parseShardFun(str: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): ShardV1</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>str</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code>ShardV1</code>:
-        
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-      </div>
-    </div>
-  <script src='assets/anchor.js'></script>
-  <script src='assets/split.js'></script>
-  <script src='assets/site.js'></script>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="toolbar-icon toolbar-icon-search"><i class="gg-search"></i></label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">datastore-core - v3.0.0</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<a href="#" class="toolbar-icon toolbar-icon-menu" data-toggle="menu"><i class="gg-menu"></i></a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+			</ul>
+			<h1>datastore-core - v3.0.0</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#js-datastore-core-" id="js-datastore-core-" style="color: inherit; text-decoration: none;">
+					<h1>js-datastore-core <!-- omit in toc --></h1>
+				</a>
+				<p><a href="http://ipn.io"><img src="https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square" alt=""></a>
+					<a href="http://ipfs.io/"><img src="https://img.shields.io/badge/project-IPFS-blue.svg?style=flat-square" alt=""></a>
+					<a href="http://webchat.freenode.net/?channels=%23ipfs"><img src="https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square" alt=""></a>
+					<a href="https://codecov.io/gh/ipfs/js-datastore-core"><img src="https://img.shields.io/codecov/c/github/ipfs/js-datastore-core.svg?style=flat-square" alt="codecov"></a>
+				<a href="https://github.com/ipfs/js-datastore-core/actions?query=branch%3Amaster+workflow%3Aci+"><img src="https://img.shields.io/github/workflow/status/ipfs/js-datastore-core/ci?label=ci&style=flat-square" alt="GitHub Workflow Status"></a></p>
+				<blockquote>
+					<p>Wrapping implementations for <a href="https://github.com/ipfs/interface-datastore">interface-datastore</a>.</p>
+				</blockquote>
+				<a href="#lead-maintainer-" id="lead-maintainer-" style="color: inherit; text-decoration: none;">
+					<h2>Lead Maintainer <!-- omit in toc --></h2>
+				</a>
+				<p><a href="https://github.com/achingbrain">Alex Potsides</a></p>
+				<a href="#table-of-contents-" id="table-of-contents-" style="color: inherit; text-decoration: none;">
+					<h2>Table of Contents <!-- omit in toc --></h2>
+				</a>
+				<ul>
+					<li><a href="#implementations">Implementations</a></li>
+					<li><a href="#install">Install</a></li>
+					<li><a href="#usage">Usage</a><ul>
+							<li><a href="#wrapping-stores">Wrapping Stores</a></li>
+						</ul>
+					</li>
+					<li><a href="#contribute">Contribute</a></li>
+					<li><a href="#license">License</a></li>
+				</ul>
+				<a href="#implementations" id="implementations" style="color: inherit; text-decoration: none;">
+					<h2>Implementations</h2>
+				</a>
+				<ul>
+					<li>Wrapper Implementations<ul>
+							<li>Mount: <a href="src/mount.js"><code>src/mount</code></a></li>
+							<li>Keytransform: <a href="src/keytransform.js"><code>src/keytransform</code></a></li>
+							<li>Sharding: <a href="src/sharding.js"><code>src/sharding</code></a></li>
+							<li>Tiered: <a href="src/tirered.js"><code>src/tiered</code></a></li>
+							<li>Namespace: <a href="src/namespace.js"><code>src/tiered</code></a></li>
+						</ul>
+					</li>
+				</ul>
+				<a href="#install" id="install" style="color: inherit; text-decoration: none;">
+					<h2>Install</h2>
+				</a>
+				<pre><code>$ npm <span class="hljs-keyword">install</span> datastore-core</code></pre>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h2>Usage</h2>
+				</a>
+				<a href="#wrapping-stores" id="wrapping-stores" style="color: inherit; text-decoration: none;">
+					<h3>Wrapping Stores</h3>
+				</a>
+				<pre><code class="language-js"><span class="hljs-keyword">const</span> MemoryStore = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;interface-datastore&#x27;</span>).MemoryDatastore
+<span class="hljs-keyword">const</span> MountStore = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;datastore-core&#x27;</span>).MountDatastore
+<span class="hljs-keyword">const</span> Key = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;interface-datastore&#x27;</span>).Key
+
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> MountStore({<span class="hljs-attr">prefix</span>: <span class="hljs-keyword">new</span> Key(<span class="hljs-string">&#x27;/a&#x27;</span>), <span class="hljs-attr">datastore</span>: <span class="hljs-keyword">new</span> MemoryStore()})</code></pre>
+				<a href="#contribute" id="contribute" style="color: inherit; text-decoration: none;">
+					<h2>Contribute</h2>
+				</a>
+				<p>Feel free to join in. All welcome. Open an <a href="https://github.com/ipfs/js-ipfs-unixfs-importer/issues">issue</a>!</p>
+				<p>This repository falls under the IPFS <a href="https://github.com/ipfs/community/blob/master/code-of-conduct.md">Code of Conduct</a>.</p>
+				<p><a href="https://github.com/ipfs/community/blob/master/CONTRIBUTING.md"><img src="https://cdn.rawgit.com/jbenet/contribute-ipfs-gif/master/img/contribute.gif" alt=""></a></p>
+				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
+					<h2>License</h2>
+				</a>
+				<p><a href="LICENSE">MIT</a></p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" tsd-kind-module">
+						<a href="modules/__datastore_core_.html"> datastore-core</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/__users_alex_documents_workspaces_ipfs_js_datastore_core_src_keytransform_.html">/Users/alex/Documents/Workspaces/ipfs/js-datastore-core/src/keytransform</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/__users_alex_documents_workspaces_ipfs_js_datastore_core_src_mount_.html">/Users/alex/Documents/Workspaces/ipfs/js-datastore-core/src/mount</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/__users_alex_documents_workspaces_ipfs_js_datastore_core_src_namespace_.html">/Users/alex/Documents/Workspaces/ipfs/js-datastore-core/src/namespace</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/__users_alex_documents_workspaces_ipfs_js_datastore_core_src_shard_.html">/Users/alex/Documents/Workspaces/ipfs/js-datastore-core/src/shard</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/__users_alex_documents_workspaces_ipfs_js_datastore_core_src_shard_readme_.html">/Users/alex/Documents/Workspaces/ipfs/js-datastore-core/src/shard-readme</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/__users_alex_documents_workspaces_ipfs_js_datastore_core_src_sharding_.html">/Users/alex/Documents/Workspaces/ipfs/js-datastore-core/src/sharding</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/__users_alex_documents_workspaces_ipfs_js_datastore_core_src_tiered_.html">/Users/alex/Documents/Workspaces/ipfs/js-datastore-core/src/tiered</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/__users_alex_documents_workspaces_ipfs_js_datastore_core_src_types_.html">/Users/alex/Documents/Workspaces/ipfs/js-datastore-core/src/types</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer>
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
 </body>
 </html>
