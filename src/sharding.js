@@ -41,8 +41,10 @@ class ShardingDatastore extends Adapter {
     this.shard = shard
   }
 
-  open () {
-    return this.child.open()
+  async open () {
+    await this.child.open()
+
+    this.shard = await ShardingDatastore.create(this.child, this.shard)
   }
 
   /**
@@ -70,6 +72,7 @@ class ShardingDatastore extends Adapter {
   }
 
   /**
+   * @deprecated
    * @param {Datastore} store
    * @param {Shard} shard
    */
@@ -83,6 +86,7 @@ class ShardingDatastore extends Adapter {
   }
 
   /**
+   * @deprecated
    * @param {Datastore} store
    */
   static async open (store) {
@@ -95,19 +99,26 @@ class ShardingDatastore extends Adapter {
    * @param {Shard} shard
    */
   static async create (store, shard) {
-    const exists = await store.has(shardKey)
-    if (!exists) {
+    const hasShard = await store.has(shardKey)
+    if (!hasShard) {
       // @ts-ignore i have no idea what putRaw is or saw any implementation
       const put = typeof store.putRaw === 'function' ? store.putRaw.bind(store) : store.put.bind(store)
-      return Promise.all([put(shardKey, utf8Encoder.encode(shard.toString() + '\n')),
-        put(shardReadmeKey, utf8Encoder.encode(sh.readme))])
+      await Promise.all([
+        put(shardKey, utf8Encoder.encode(shard.toString() + '\n')),
+        put(shardReadmeKey, utf8Encoder.encode(sh.readme))
+      ])
+
+      return shard
     }
 
+    // test shards
     const diskShard = await sh.readShardFun('/', store)
     const a = (diskShard || '').toString()
     const b = shard.toString()
-    if (a !== b) throw new Error(`specified fun ${b} does not match repo shard fun ${a}`)
-    throw new Error('datastore exists')
+    if (a !== b) {
+      throw new Error(`specified fun ${b} does not match repo shard fun ${a}`)
+    }
+    return diskShard
   }
 
   /**
