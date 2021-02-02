@@ -100,6 +100,9 @@ class ShardingDatastore extends Adapter {
    */
   static async create (store, shard) {
     const hasShard = await store.has(shardKey)
+    if (!hasShard && !shard) {
+      throw new Error('Shard is required when datastore doesn\'t have a shard key already.')
+    }
     if (!hasShard) {
       // @ts-ignore i have no idea what putRaw is or saw any implementation
       const put = typeof store.putRaw === 'function' ? store.putRaw.bind(store) : store.put.bind(store)
