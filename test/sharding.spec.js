@@ -27,7 +27,7 @@ describe('ShardingStore', () => {
     const store = new ShardingStore(ms)
     return expect(store.open())
       .to.eventually.be.rejected()
-      .with.property('message', 'Shard is required when datastore doesn\'t have a shard key already.')
+      .with.property('code', 'ERR_DB_OPEN_FAILED')
   })
 
   it('open - existing', () => {
