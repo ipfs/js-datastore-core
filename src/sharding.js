@@ -1,6 +1,6 @@
 'use strict'
 
-const { Adapter, Key, utils: { utf8Encoder } } = require('interface-datastore')
+const { Adapter, Key, utils: { utf8Encoder }, Errors } = require('interface-datastore')
 const sh = require('./shard')
 const KeytransformStore = require('./keytransform')
 
@@ -100,6 +100,9 @@ class ShardingDatastore extends Adapter {
    */
   static async create (store, shard) {
     const hasShard = await store.has(shardKey)
+    if (!hasShard && !shard) {
+      throw Errors.dbOpenFailedError(Error('Shard is required when datastore doesn\'t have a shard key already.'))
+    }
     if (!hasShard) {
       // @ts-ignore i have no idea what putRaw is or saw any implementation
       const put = typeof store.putRaw === 'function' ? store.putRaw.bind(store) : store.put.bind(store)

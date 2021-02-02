@@ -21,21 +21,21 @@ describe('ShardingStore', () => {
     expect(utf8Decoder.decode(res[1])).to.eql(sh.readme)
   })
 
-  it('open - empty', async () => {
+  it('open - empty', () => {
     const ms = new MemoryDatastore()
     // @ts-expect-error
     const store = new ShardingStore(ms)
-    expect(store.open())
+    return expect(store.open())
       .to.eventually.be.rejected()
-      .with.property('code', 'ERR_NOT_FOUND')
+      .with.property('code', 'ERR_DB_OPEN_FAILED')
   })
 
-  it('open - existing', async () => {
+  it('open - existing', () => {
     const ms = new MemoryDatastore()
     const shard = new sh.NextToLast(2)
     const store = new ShardingStore(ms, shard)
 
-    expect(store.open()).to.eventually.be.fulfilled()
+    return expect(store.open()).to.eventually.be.fulfilled()
   })
 
   it('basics', async () => {
