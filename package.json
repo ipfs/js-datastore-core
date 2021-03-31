@@ -40,7 +40,7 @@
   "homepage": "https://github.com/ipfs/js-datastore-core#readme",
   "devDependencies": {
     "@types/debug": "^4.1.5",
-    "aegir": "^30.3.0",
+    "aegir": "^32.2.0",
     "it-all": "^1.0.4"
   },
   "dependencies": {
