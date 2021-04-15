@@ -1,3 +1,17 @@
+# [4.0.0](https://github.com/ipfs/js-datastore-core/compare/v3.0.0...v4.0.0) (2021-04-15)
+
+
+### Bug Fixes
+
+* fix async sharding tests ([#49](https://github.com/ipfs/js-datastore-core/issues/49)) ([a546afb](https://github.com/ipfs/js-datastore-core/commit/a546afb0cef751025aac73c5f3bcfa3bedd1dff4))
+
+
+### Features
+
+* split .query into .query and .queryKeys ([#59](https://github.com/ipfs/js-datastore-core/issues/59)) ([6f829db](https://github.com/ipfs/js-datastore-core/commit/6f829db2e8d1aed3b9c36a7bb95625a15c077e02))
+
+
+
 # [3.0.0](https://github.com/ipfs/js-datastore-core/compare/v2.0.1...v3.0.0) (2021-01-22)
 
 
