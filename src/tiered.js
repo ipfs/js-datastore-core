@@ -121,6 +121,14 @@ class TieredDatastore extends Adapter {
   query (q, options) {
     return this.stores[this.stores.length - 1].query(q, options)
   }
+
+  /**
+   * @param {KeyQuery} q
+   * @param {Options} [options]
+   */
+  queryKeys (q, options) {
+    return this.stores[this.stores.length - 1].queryKeys(q, options)
+  }
 }
 
 module.exports = TieredDatastore
