@@ -2,8 +2,9 @@
 'use strict'
 
 const { expect } = require('aegir/utils/chai')
-const { Key, MemoryDatastore, utils: { utf8Encoder } } = require('interface-datastore')
+const { Key, MemoryDatastore } = require('interface-datastore')
 const { TieredDatastore } = require('../src')
+const uint8ArrayFromString = require('uint8arrays/from-string')
 /**
  * @typedef {import('interface-datastore/dist/src/types').Datastore} Datastore
  */
@@ -22,7 +23,7 @@ describe('Tiered', () => {
 
     it('put', async () => {
       const k = new Key('hello')
-      const v = utf8Encoder.encode('world')
+      const v = uint8ArrayFromString('world')
       await store.put(k, v)
       const res = await Promise.all([ms[0].get(k), ms[1].get(k)])
       res.forEach((val) => {
@@ -32,7 +33,7 @@ describe('Tiered', () => {
 
     it('get and has, where available', async () => {
       const k = new Key('hello')
-      const v = utf8Encoder.encode('world')
+      const v = uint8ArrayFromString('world')
       await ms[1].put(k, v)
       const val = await store.get(k)
       expect(val).to.be.eql(v)
@@ -46,7 +47,7 @@ describe('Tiered', () => {
 
     it('has and delete', async () => {
       const k = new Key('hello')
-      const v = utf8Encoder.encode('world')
+      const v = uint8ArrayFromString('world')
       await store.put(k, v)
       let res = await Promise.all([ms[0].has(k), ms[1].has(k)])
       expect(res).to.be.eql([true, true])

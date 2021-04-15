@@ -45,7 +45,11 @@
   },
   "dependencies": {
     "debug": "^4.1.1",
-    "interface-datastore": "^3.0.1"
+    "interface-datastore": "ipfs/interface-datastore#feat/split-query-into-query-and-query-keys",
+    "it-filter": "^1.0.2",
+    "it-map": "^1.0.5",
+    "it-merge": "^1.0.1",
+    "it-take": "^1.0.1"
   },
   "engines": {
     "node": ">=12.0.0"

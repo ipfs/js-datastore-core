@@ -1,6 +1,6 @@
 'use strict'
 
-const { Adapter, Key, utils: { utf8Encoder }, Errors } = require('interface-datastore')
+const { Adapter, Key, Errors } = require('interface-datastore')
 const sh = require('./shard')
 const KeytransformStore = require('./keytransform')
 
@@ -11,6 +11,11 @@ const shardReadmeKey = new Key(sh.README_FN)
  * @typedef {import('interface-datastore').Options} Options
  * @typedef {import('interface-datastore').Batch} Batch
  * @typedef {import('interface-datastore').Query} Query
+ * @typedef {import('interface-datastore').QueryFilter} QueryFilter
+ * @typedef {import('interface-datastore').QueryOrder} QueryOrder
+ * @typedef {import('interface-datastore').KeyQuery} KeyQuery
+ * @typedef {import('interface-datastore').KeyQueryFilter} KeyQueryFilter
+ * @typedef {import('interface-datastore').KeyQueryOrder} KeyQueryOrder
  * @typedef {import('interface-datastore').Pair} Pair
  * @typedef {import('./types').Shard} Shard
  *
@@ -107,8 +112,8 @@ class ShardingDatastore extends Adapter {
       // @ts-ignore i have no idea what putRaw is or saw any implementation
       const put = typeof store.putRaw === 'function' ? store.putRaw.bind(store) : store.put.bind(store)
       await Promise.all([
-        put(shardKey, utf8Encoder.encode(shard.toString() + '\n')),
-        put(shardReadmeKey, utf8Encoder.encode(sh.readme))
+        put(shardKey, new TextEncoder().encode(shard.toString() + '\n')),
+        put(shardReadmeKey, new TextEncoder().encode(sh.readme))
       ])
 
       return shard
@@ -167,15 +172,15 @@ class ShardingDatastore extends Adapter {
    */
   query (q, options) {
     const tq = {
-      keysOnly: q.keysOnly,
       offset: q.offset,
       limit: q.limit,
-      /** @type Array<(items: Pair[]) => Await<Pair[]>> */
+      /** @type {QueryOrder[]} */
       orders: [],
+      /** @type {QueryFilter[]} */
       filters: [
-        /** @type {(item: Pair) => boolean} */
+        /** @type {QueryFilter} */
         e => e.key.toString() !== shardKey.toString(),
-        /** @type {(item: Pair) => boolean} */
+        /** @type {QueryFilter} */
         e => e.key.toString() !== shardReadmeKey.toString()
       ]
     }
@@ -188,25 +193,88 @@ class ShardingDatastore extends Adapter {
     }
 
     if (q.filters != null) {
-      // @ts-ignore - can't find a way to easily type this
-      const filters = q.filters.map((f) => (e) => {
-        return f(Object.assign({}, e, {
-          key: this._invertKey(e.key)
-        }))
+      const filters = q.filters.map(f => {
+        /** @type {QueryFilter} */
+        const filter = ({ key, value }) => {
+          return f({
+            key: this._invertKey(key),
+            value
+          })
+        }
+
+        return filter
       })
       tq.filters = tq.filters.concat(filters)
     }
 
     if (q.orders != null) {
-      tq.orders = q.orders.map((o) => async (res) => {
-        res.forEach((e) => { e.key = this._invertKey(e.key) })
-        const ordered = await o(res)
-        ordered.forEach((e) => { e.key = this._convertKey(e.key) })
-        return ordered
+      tq.orders = q.orders.map(o => {
+        /** @type {QueryOrder} */
+        const order = (a, b) => {
+          return o({
+            key: this._invertKey(a.key),
+            value: a.value
+          }, {
+            key: this._invertKey(b.key),
+            value: b.value
+          })
+        }
+
+        return order
       })
     }
 
     return this.child.query(tq, options)
+  }
+
+  /**
+   * @param {KeyQuery} q
+   * @param {Options} [options]
+   */
+  queryKeys (q, options) {
+    const tq = {
+      offset: q.offset,
+      limit: q.limit,
+      /** @type {KeyQueryOrder[]} */
+      orders: [],
+      /** @type {KeyQueryFilter[]} */
+      filters: [
+        /** @type {KeyQueryFilter} */
+        key => key.toString() !== shardKey.toString(),
+        /** @type {KeyQueryFilter} */
+        key => key.toString() !== shardReadmeKey.toString()
+      ]
+    }
+
+    const { prefix } = q
+    if (prefix != null) {
+      tq.filters.push((key) => {
+        return this._invertKey(key).toString().startsWith(prefix)
+      })
+    }
+
+    if (q.filters != null) {
+      const filters = q.filters.map(f => {
+        /** @type {KeyQueryFilter} */
+        const filter = (key) => {
+          return f(this._invertKey(key))
+        }
+
+        return filter
+      })
+      tq.filters = tq.filters.concat(filters)
+    }
+
+    if (q.orders != null) {
+      tq.orders = q.orders.map(o => {
+        /** @type {KeyQueryOrder} */
+        const order = (a, b) => o(this._invertKey(a), this._invertKey(b))
+
+        return order
+      })
+    }
+
+    return this.child.queryKeys(tq, options)
   }
 
   close () {

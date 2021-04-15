@@ -3,12 +3,13 @@
 
 const {
   Adapter, Key, Errors, utils: {
-    filter,
-    take,
     sortAll,
     replaceStartWith
   }
 } = require('interface-datastore')
+const filter = require('it-filter')
+const take = require('it-take')
+const merge = require('it-merge')
 
 const Keytransform = require('./keytransform')
 
@@ -17,7 +18,8 @@ const Keytransform = require('./keytransform')
  * @typedef {import('interface-datastore').Options} Options
  * @typedef {import('interface-datastore').Batch} Batch
  * @typedef {import('interface-datastore').Query} Query
- * @typedef {import('interface-datastore').Pair} Pair
+ * @typedef {import('interface-datastore').KeyQuery} KeyQuery
+ * @typedef {import('./types').KeyTransform} KeyTransform
  */
 
 /**
@@ -27,13 +29,12 @@ const Keytransform = require('./keytransform')
 
 /**
  * A datastore that can combine multiple stores inside various
- * key prefixs.
+ * key prefixes
  *
  * @implements {Datastore}
  */
 class MountDatastore extends Adapter {
   /**
-   *
    * @param {Array<{prefix: Key, datastore: Datastore}>} mounts
    */
   constructor (mounts) {
@@ -47,7 +48,7 @@ class MountDatastore extends Adapter {
   }
 
   /**
-   * Lookup the matching datastore for the given key.
+   * Lookup the matching datastore for the given key
    *
    * @private
    * @param {Key} key
@@ -186,12 +187,11 @@ class MountDatastore extends Adapter {
 
       return ks.query({
         prefix: prefix,
-        filters: q.filters,
-        keysOnly: q.keysOnly
+        filters: q.filters
       }, options)
     })
 
-    let it = _many(qs)
+    let it = merge(...qs)
     if (q.filters) q.filters.forEach(f => { it = filter(it, f) })
     if (q.orders) q.orders.forEach(o => { it = sortAll(it, o) })
     if (q.offset != null) {
@@ -202,20 +202,44 @@ class MountDatastore extends Adapter {
 
     return it
   }
-}
 
-/**
- * @param {ArrayLike<AwaitIterable<Pair>>} iterable
- * @returns {AsyncIterable<Pair>}
- */
-function _many (iterable) {
-  return (async function * () {
-    for (let i = 0; i < iterable.length; i++) {
-      for await (const v of iterable[i]) {
-        yield v
+  /**
+   * @param {KeyQuery} q
+   * @param {Options} [options]
+   */
+  queryKeys (q, options) {
+    const qs = this.mounts.map(m => {
+      const ks = new Keytransform(m.datastore, {
+        convert: (key) => {
+          throw new Error('should never be called')
+        },
+        invert: (key) => {
+          return m.prefix.child(key)
+        }
+      })
+
+      let prefix
+      if (q.prefix != null) {
+        prefix = replaceStartWith(q.prefix, m.prefix.toString())
       }
+
+      return ks.queryKeys({
+        prefix: prefix,
+        filters: q.filters
+      }, options)
+    })
+
+    let it = merge(...qs)
+    if (q.filters) q.filters.forEach(f => { it = filter(it, f) })
+    if (q.orders) q.orders.forEach(o => { it = sortAll(it, o) })
+    if (q.offset != null) {
+      let i = 0
+      it = filter(it, () => i++ >= /** @type {number} */ (q.offset))
     }
-  })()
+    if (q.limit != null) it = take(it, q.limit)
+
+    return it
+  }
 }
 
 module.exports = MountDatastore

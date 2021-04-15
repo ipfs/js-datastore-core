@@ -4,14 +4,15 @@
 
 const { expect, assert } = require('aegir/utils/chai')
 const all = require('it-all')
-const { Key, MemoryDatastore, utils: { utf8Encoder } } = require('interface-datastore')
+const { Key, MemoryDatastore } = require('interface-datastore')
 const MountStore = require('../src').MountDatastore
+const uint8ArrayFromString = require('uint8arrays/from-string')
 
 describe('MountStore', () => {
   it('put - no mount', async () => {
     const m = new MountStore([])
     try {
-      await m.put(new Key('hello'), utf8Encoder.encode('foo'))
+      await m.put(new Key('hello'), uint8ArrayFromString('foo'))
       assert(false, 'Failed to throw error on no mount')
     } catch (err) {
       expect(err).to.be.an('Error')
@@ -24,7 +25,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
     try {
-      await m.put(new Key('/fail/hello'), utf8Encoder.encode('foo'))
+      await m.put(new Key('/fail/hello'), uint8ArrayFromString('foo'))
       assert(false, 'Failed to throw error on wrong mount')
     } catch (err) {
       expect(err).to.be.an('Error')
@@ -38,7 +39,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
 
-    const val = utf8Encoder.encode('hello')
+    const val = uint8ArrayFromString('hello')
     await m.put(new Key('/cool/hello'), val)
     const res = await mds.get(new Key('/hello'))
     expect(res).to.eql(val)
@@ -51,7 +52,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
 
-    const val = utf8Encoder.encode('hello')
+    const val = uint8ArrayFromString('hello')
     await mds.put(new Key('/hello'), val)
     const res = await m.get(new Key('/cool/hello'))
     expect(res).to.eql(val)
@@ -64,7 +65,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
 
-    const val = utf8Encoder.encode('hello')
+    const val = uint8ArrayFromString('hello')
     await mds.put(new Key('/hello'), val)
     const exists = await m.has(new Key('/cool/hello'))
     expect(exists).to.eql(true)
@@ -77,7 +78,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
 
-    const val = utf8Encoder.encode('hello')
+    const val = uint8ArrayFromString('hello')
     await m.put(new Key('/cool/hello'), val)
     await m.delete(new Key('/cool/hello'))
     let exists = await m.has(new Key('/cool/hello'))
@@ -93,7 +94,7 @@ describe('MountStore', () => {
       prefix: new Key('cool')
     }])
 
-    const val = utf8Encoder.encode('hello')
+    const val = uint8ArrayFromString('hello')
     await m.put(new Key('/cool/hello'), val)
     const res = await all(m.query({ prefix: '/cool' }))
     expect(res).to.eql([{ key: new Key('/cool/hello'), value: val }])
