@@ -1,12 +1,14 @@
 'use strict'
 
-const { Adapter, utils } = require('interface-datastore')
-const map = utils.map
+const { Adapter } = require('interface-datastore')
+const map = require('it-map')
+
 /**
  * @typedef {import('interface-datastore').Datastore} Datastore
  * @typedef {import('interface-datastore').Options} Options
  * @typedef {import('interface-datastore').Batch} Batch
  * @typedef {import('interface-datastore').Query} Query
+ * @typedef {import('interface-datastore').KeyQuery} KeyQuery
  * @typedef {import('interface-datastore').Key} Key
  * @typedef {import('./types').KeyTransform} KeyTransform
  */
@@ -90,9 +92,21 @@ class KeyTransformDatastore extends Adapter {
    * @param {Options} [options]
    */
   query (q, options) {
-    return map(this.child.query(q, options), e => {
-      e.key = this.transform.invert(e.key)
-      return e
+    return map(this.child.query(q, options), ({ key, value }) => {
+      return {
+        key: this.transform.invert(key),
+        value
+      }
+    })
+  }
+
+  /**
+   * @param {KeyQuery} q
+   * @param {Options} [options]
+   */
+  queryKeys (q, options) {
+    return map(this.child.queryKeys(q, options), key => {
+      return this.transform.invert(key)
     })
   }
 

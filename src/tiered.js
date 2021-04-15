@@ -7,6 +7,7 @@ const log = require('debug')('datastore:core:tiered')
  * @typedef {import('interface-datastore').Options} Options
  * @typedef {import('interface-datastore').Batch} Batch
  * @typedef {import('interface-datastore').Query} Query
+ * @typedef {import('interface-datastore').KeyQuery} KeyQuery
  * @typedef {import('interface-datastore').Key} Key
  */
 
@@ -120,6 +121,14 @@ class TieredDatastore extends Adapter {
    */
   query (q, options) {
     return this.stores[this.stores.length - 1].query(q, options)
+  }
+
+  /**
+   * @param {KeyQuery} q
+   * @param {Options} [options]
+   */
+  queryKeys (q, options) {
+    return this.stores[this.stores.length - 1].queryKeys(q, options)
   }
 }
 

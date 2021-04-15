@@ -2,7 +2,9 @@
 'use strict'
 
 const { expect } = require('aegir/utils/chai')
-const { Key, MemoryDatastore, utils: { utf8Decoder, utf8Encoder } } = require('interface-datastore')
+const { Key, MemoryDatastore } = require('interface-datastore')
+const uint8ArrayFromString = require('uint8arrays/from-string')
+const uint8ArrayToString = require('uint8arrays/to-string')
 
 const ShardingStore = require('../src').ShardingDatastore
 const sh = require('../src').shard
@@ -17,8 +19,8 @@ describe('ShardingStore', () => {
       ms.get(new Key(sh.SHARDING_FN)),
       ms.get(new Key(sh.README_FN))
     ])
-    expect(utf8Decoder.decode(res[0])).to.eql(shard.toString() + '\n')
-    expect(utf8Decoder.decode(res[1])).to.eql(sh.readme)
+    expect(uint8ArrayToString(res[0])).to.eql(shard.toString() + '\n')
+    expect(uint8ArrayToString(res[1])).to.eql(sh.readme)
   })
 
   it('open - empty', () => {
@@ -43,9 +45,9 @@ describe('ShardingStore', () => {
     const shard = new sh.NextToLast(2)
     const store = new ShardingStore(ms, shard)
     await store.open()
-    await store.put(new Key('hello'), utf8Encoder.encode('test'))
+    await store.put(new Key('hello'), uint8ArrayFromString('test'))
     const res = await ms.get(new Key('ll').child(new Key('hello')))
-    expect(res).to.eql(utf8Encoder.encode('test'))
+    expect(res).to.eql(uint8ArrayFromString('test'))
   })
 
   describe('interface-datastore', () => {

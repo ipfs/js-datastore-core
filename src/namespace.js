@@ -5,6 +5,7 @@ const KeytransformDatastore = require('./keytransform')
 /**
  * @typedef {import('interface-datastore').Datastore} Datastore
  * @typedef {import('interface-datastore').Query} Query
+ * @typedef {import('interface-datastore').KeyQuery} KeyQuery
  * @typedef {import('interface-datastore').Options} Options
  * @typedef {import('interface-datastore').Batch} Batch
  * @typedef {import('./types').KeyTransform} KeyTransform
@@ -56,6 +57,19 @@ class NamespaceDatastore extends KeytransformDatastore {
       }))
     }
     return super.query(q, options)
+  }
+
+  /**
+   * @param {KeyQuery} q
+   * @param {Options} [options]
+   */
+  queryKeys (q, options) {
+    if (q.prefix && this.prefix.toString() !== '/') {
+      return super.queryKeys(Object.assign({}, q, {
+        prefix: this.prefix.child(new Key(q.prefix)).toString()
+      }))
+    }
+    return super.queryKeys(q, options)
   }
 }
 

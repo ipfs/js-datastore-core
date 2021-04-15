@@ -2,9 +2,10 @@
 'use strict'
 
 const { expect } = require('aegir/utils/chai')
-const { Key, MemoryDatastore, utils: { utf8Encoder } } = require('interface-datastore')
+const { Key, MemoryDatastore } = require('interface-datastore')
 const NamespaceStore = require('../src/').NamespaceDatastore
 const all = require('it-all')
+const uint8ArrayFromString = require('uint8arrays/from-string')
 
 describe('KeyTransformDatastore', () => {
   const prefixes = [
@@ -24,7 +25,7 @@ describe('KeyTransformDatastore', () => {
       'foo/bar/baz/barb'
     ].map((s) => new Key(s))
 
-    await Promise.all(keys.map(key => store.put(key, utf8Encoder.encode(key.toString()))))
+    await Promise.all(keys.map(key => store.put(key, uint8ArrayFromString(key.toString()))))
     const nResults = Promise.all(keys.map((key) => store.get(key)))
     const mResults = Promise.all(keys.map((key) => mStore.get(new Key(prefix).child(key))))
     const results = await Promise.all([nResults, mResults])
