@@ -102,7 +102,7 @@ describe('MountStore', () => {
 
   describe('interface-datastore', () => {
     // @ts-ignore
-    require('interface-datastore/src/tests')({
+    require('interface-datastore-tests')({
       setup () {
         return new MountStore([{
           prefix: new Key('/a'),

@@ -59,7 +59,7 @@ describe('Tiered', () => {
 
   describe('inteface-datastore-single', () => {
     // @ts-ignore
-    require('interface-datastore/src/tests')({
+    require('interface-datastore-tests')({
       setup () {
         return new TieredDatastore([
           new MemoryDatastore(),

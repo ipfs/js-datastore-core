@@ -48,7 +48,7 @@ describe('KeyTransformDatastore', () => {
   prefixes.forEach((prefix) => {
     describe(`interface-datastore: '${prefix}'`, () => {
       // @ts-ignore
-      require('interface-datastore/src/tests')({
+      require('interface-datastore-tests')({
         setup () {
           return new NamespaceStore(new MemoryDatastore(), new Key(prefix))
         },

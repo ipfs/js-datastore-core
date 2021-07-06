@@ -52,7 +52,7 @@ describe('ShardingStore', () => {
 
   describe('interface-datastore', () => {
     // @ts-ignore
-    require('interface-datastore/src/tests')({
+    require('interface-datastore-tests')({
       setup () {
         const shard = new sh.NextToLast(2)
         return new ShardingStore(new MemoryDatastore(), shard)
