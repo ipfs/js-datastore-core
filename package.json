@@ -1,6 +1,6 @@
 {
   "name": "datastore-core",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "Wrapper implementation for interface-datastore",
   "leadMaintainer": "Alex Potsides <alex.potsides@protocol.ai>",
   "main": "src/index.js",
