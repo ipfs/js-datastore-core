@@ -1,3 +1,17 @@
+# [5.0.0](https://github.com/ipfs/js-datastore-core/compare/v4.0.0...v5.0.0) (2021-07-06)
+
+
+### chore
+
+* update deps ([e154404](https://github.com/ipfs/js-datastore-core/commit/e154404317838f147fbb9ab11417a8d671aba9a4))
+
+
+### BREAKING CHANGES
+
+* implements new interface-datastore types, will cause duplicates in the dep tree
+
+
+
 # [4.0.0](https://github.com/ipfs/js-datastore-core/compare/v3.0.0...v4.0.0) (2021-04-15)
 
 
