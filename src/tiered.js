@@ -2,6 +2,9 @@
 
 const { Adapter, Errors } = require('interface-datastore')
 const log = require('debug')('datastore:core:tiered')
+const pushable = require('it-pushable')
+const drain = require('it-drain')
+
 /**
  * @typedef {import('interface-datastore').Datastore} Datastore
  * @typedef {import('interface-datastore').Options} Options
@@ -9,6 +12,12 @@ const log = require('debug')('datastore:core:tiered')
  * @typedef {import('interface-datastore').Query} Query
  * @typedef {import('interface-datastore').KeyQuery} KeyQuery
  * @typedef {import('interface-datastore').Key} Key
+ * @typedef {import('interface-datastore').Pair} Pair
+ */
+
+/**
+ * @template TEntry
+ * @typedef {import('interface-store').AwaitIterable<TEntry>} AwaitIterable
  */
 
 /**
@@ -87,6 +96,74 @@ class TieredDatastore extends Adapter {
       await Promise.all(this.stores.map(store => store.delete(key, options)))
     } catch (err) {
       throw Errors.dbDeleteFailedError()
+    }
+  }
+
+  /**
+   * @param {AwaitIterable<Pair>} source
+   * @param {Options} [options]
+   * @returns {AsyncIterable<Pair>}
+   */
+  async * putMany (source, options = {}) {
+    let error
+    const pushables = this.stores.map(store => {
+      const source = pushable()
+
+      drain(store.putMany(source, options))
+        .catch(err => {
+          // store threw while putting, make sure we bubble the error up
+          error = err
+        })
+
+      return source
+    })
+
+    try {
+      for await (const pair of source) {
+        if (error) {
+          throw error
+        }
+
+        pushables.forEach(p => p.push(pair))
+
+        yield pair
+      }
+    } finally {
+      pushables.forEach(p => p.end())
+    }
+  }
+
+  /**
+   * @param {AwaitIterable<Key>} source
+   * @param {Options} [options]
+   * @returns {AsyncIterable<Key>}
+   */
+  async * deleteMany (source, options = {}) {
+    let error
+    const pushables = this.stores.map(store => {
+      const source = pushable()
+
+      drain(store.deleteMany(source, options))
+        .catch(err => {
+          // store threw while putting, make sure we bubble the error up
+          error = err
+        })
+
+      return source
+    })
+
+    try {
+      for await (const key of source) {
+        if (error) {
+          throw error
+        }
+
+        pushables.forEach(p => p.push(key))
+
+        yield key
+      }
+    } finally {
+      pushables.forEach(p => p.end())
     }
   }
 

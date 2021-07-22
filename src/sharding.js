@@ -22,7 +22,12 @@ const shardReadmeKey = new Key(sh.README_FN)
  */
 /**
  * @template TValue
- * @typedef {import('./types').Await<TValue> } Await
+ * @typedef {import('interface-store').Await<TValue> } Await
+ */
+
+/**
+ * @template TEntry
+ * @typedef {import('interface-store').AwaitIterable<TEntry>} AwaitIterable
  */
 
 /**
@@ -160,6 +165,33 @@ class ShardingDatastore extends Adapter {
    */
   delete (key, options) {
     return this.child.delete(key, options)
+  }
+
+  /**
+   * @param {AwaitIterable<Pair>} source
+   * @param {Options} [options]
+   * @returns {AsyncIterable<Pair>}
+   */
+  async * putMany (source, options = {}) {
+    yield * this.child.putMany(source, options)
+  }
+
+  /**
+   * @param {AwaitIterable<Key>} source
+   * @param {Options} [options]
+   * @returns {AsyncIterable<Uint8Array>}
+   */
+  async * getMany (source, options = {}) {
+    yield * this.child.getMany(source, options)
+  }
+
+  /**
+   * @param {AwaitIterable<Key>} source
+   * @param {Options} [options]
+   * @returns {AsyncIterable<Key>}
+   */
+  async * deleteMany (source, options = {}) {
+    yield * this.child.deleteMany(source, options)
   }
 
   batch () {

@@ -2,6 +2,7 @@
 
 const { Adapter } = require('interface-datastore')
 const map = require('it-map')
+const { pipe } = require('it-pipe')
 
 /**
  * @typedef {import('interface-datastore').Datastore} Datastore
@@ -10,7 +11,13 @@ const map = require('it-map')
  * @typedef {import('interface-datastore').Query} Query
  * @typedef {import('interface-datastore').KeyQuery} KeyQuery
  * @typedef {import('interface-datastore').Key} Key
+ * @typedef {import('interface-datastore').Pair} Pair
  * @typedef {import('./types').KeyTransform} KeyTransform
+ */
+
+/**
+ * @template TEntry
+ * @typedef {import('interface-store').AwaitIterable<TEntry>} AwaitIterable
  */
 
 /**
@@ -67,6 +74,78 @@ class KeyTransformDatastore extends Adapter {
    */
   delete (key, options) {
     return this.child.delete(this.transform.convert(key), options)
+  }
+
+  /**
+   * @param {AwaitIterable<Pair>} source
+   * @param {Options} [options]
+   * @returns {AsyncIterable<Pair>}
+   */
+  async * putMany (source, options = {}) {
+    const transform = this.transform
+    const child = this.child
+
+    yield * pipe(
+      source,
+      async function * (source) {
+        yield * map(source, ({ key, value }) => ({
+          key: transform.convert(key),
+          value
+        }))
+      },
+      async function * (source) {
+        yield * child.putMany(source, options)
+      },
+      async function * (source) {
+        yield * map(source, ({ key, value }) => ({
+          key: transform.invert(key),
+          value
+        }))
+      }
+    )
+  }
+
+  /**
+   * @param {AwaitIterable<Key>} source
+   * @param {Options} [options]
+   * @returns {AsyncIterable<Uint8Array>}
+   */
+  async * getMany (source, options = {}) {
+    const transform = this.transform
+    const child = this.child
+
+    yield * pipe(
+      source,
+      async function * (source) {
+        yield * map(source, key => transform.convert(key))
+      },
+      async function * (source) {
+        yield * child.getMany(source, options)
+      }
+    )
+  }
+
+  /**
+   * @param {AwaitIterable<Key>} source
+   * @param {Options} [options]
+   * @returns {AsyncIterable<Key>}
+   */
+  async * deleteMany (source, options = {}) {
+    const transform = this.transform
+    const child = this.child
+
+    yield * pipe(
+      source,
+      async function * (source) {
+        yield * map(source, key => transform.convert(key))
+      },
+      async function * (source) {
+        yield * child.deleteMany(source, options)
+      },
+      async function * (source) {
+        yield * map(source, key => transform.invert(key))
+      }
+    )
   }
 
   /**

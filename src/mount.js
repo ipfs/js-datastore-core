@@ -23,11 +23,6 @@ const Keytransform = require('./keytransform')
  */
 
 /**
- * @template TEntry
- * @typedef {import('./types').AwaitIterable<TEntry>} AwaitIterable
- */
-
-/**
  * A datastore that can combine multiple stores inside various
  * key prefixes
  *
