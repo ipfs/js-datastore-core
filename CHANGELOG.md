@@ -1,3 +1,12 @@
+## [5.0.1](https://github.com/ipfs/js-datastore-core/compare/v5.0.0...v5.0.1) (2021-07-23)
+
+
+### Bug Fixes
+
+* use streaming methods where possible ([#65](https://github.com/ipfs/js-datastore-core/issues/65)) ([ec90398](https://github.com/ipfs/js-datastore-core/commit/ec9039827829dcd0e6e5c652ecb8707e80c48010))
+
+
+
 # [5.0.0](https://github.com/ipfs/js-datastore-core/compare/v4.0.0...v5.0.0) (2021-07-06)
 
 
