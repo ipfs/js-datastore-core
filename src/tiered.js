@@ -145,7 +145,7 @@ class TieredDatastore extends Adapter {
 
       drain(store.deleteMany(source, options))
         .catch(err => {
-          // store threw while putting, make sure we bubble the error up
+          // store threw while deleting, make sure we bubble the error up
           error = err
         })
 
