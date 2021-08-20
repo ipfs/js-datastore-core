@@ -5,7 +5,7 @@ const { expect } = require('aegir/utils/chai')
 const { Key, MemoryDatastore } = require('interface-datastore')
 const NamespaceStore = require('../src/').NamespaceDatastore
 const all = require('it-all')
-const uint8ArrayFromString = require('uint8arrays/from-string')
+const { fromString: uint8ArrayFromString } = require('uint8arrays/from-string')
 
 describe('KeyTransformDatastore', () => {
   const prefixes = [

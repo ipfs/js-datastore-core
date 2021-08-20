@@ -4,7 +4,7 @@
 const { expect } = require('aegir/utils/chai')
 const { Key, MemoryDatastore } = require('interface-datastore')
 const { TieredDatastore } = require('../src')
-const uint8ArrayFromString = require('uint8arrays/from-string')
+const { fromString: uint8ArrayFromString } = require('uint8arrays/from-string')
 /**
  * @typedef {import('interface-datastore/dist/src/types').Datastore} Datastore
  */
