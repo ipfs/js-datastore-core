@@ -6,7 +6,7 @@ const { expect, assert } = require('aegir/utils/chai')
 const all = require('it-all')
 const { Key, MemoryDatastore } = require('interface-datastore')
 const MountStore = require('../src').MountDatastore
-const uint8ArrayFromString = require('uint8arrays/from-string')
+const { fromString: uint8ArrayFromString } = require('uint8arrays/from-string')
 
 describe('MountStore', () => {
   it('put - no mount', async () => {
