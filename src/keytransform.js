@@ -1,8 +1,6 @@
-'use strict'
-
-const { Adapter } = require('interface-datastore')
-const map = require('it-map')
-const { pipe } = require('it-pipe')
+import { BaseDatastore } from './base.js'
+import map from 'it-map'
+import { pipe } from 'it-pipe'
 
 /**
  * @typedef {import('interface-datastore').Datastore} Datastore
@@ -27,7 +25,7 @@ const { pipe } = require('it-pipe')
  *
  * @implements {Datastore}
  */
-class KeyTransformDatastore extends Adapter {
+export class KeyTransformDatastore extends BaseDatastore {
   /**
    * @param {Datastore} child
    * @param {KeyTransform} transform
@@ -193,5 +191,3 @@ class KeyTransformDatastore extends Adapter {
     return this.child.close()
   }
 }
-
-module.exports = KeyTransformDatastore

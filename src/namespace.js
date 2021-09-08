@@ -1,7 +1,5 @@
-'use strict'
-
-const Key = require('interface-datastore').Key
-const KeytransformDatastore = require('./keytransform')
+import { Key } from 'interface-datastore'
+import { KeyTransformDatastore } from './keytransform.js'
 /**
  * @typedef {import('interface-datastore').Datastore} Datastore
  * @typedef {import('interface-datastore').Query} Query
@@ -20,7 +18,7 @@ const KeytransformDatastore = require('./keytransform')
  * `/hello/world`.
  *
  */
-class NamespaceDatastore extends KeytransformDatastore {
+export class NamespaceDatastore extends KeyTransformDatastore {
   /**
    * @param {Datastore} child
    * @param {Key} prefix
@@ -72,5 +70,3 @@ class NamespaceDatastore extends KeytransformDatastore {
     return super.queryKeys(q, options)
   }
 }
-
-module.exports = NamespaceDatastore

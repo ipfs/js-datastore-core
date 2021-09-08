@@ -1,21 +1,21 @@
-'use strict'
-
-const { Key } = require('interface-datastore')
-const readme = require('./shard-readme')
+import { Key } from 'interface-datastore/key'
+// @ts-expect-error readme is unused
+// eslint-disable-next-line no-unused-vars
+import readme from './shard-readme.js'
 
 /**
  * @typedef {import('interface-datastore').Datastore} Datastore
  * @typedef {import('./types').Shard} Shard
  */
 
-const PREFIX = '/repo/flatfs/shard/'
-const SHARDING_FN = 'SHARDING'
-const README_FN = '_README'
+export const PREFIX = '/repo/flatfs/shard/'
+export const SHARDING_FN = 'SHARDING'
+export const README_FN = '_README'
 
 /**
  * @implements {Shard}
  */
-class ShardBase {
+export class ShardBase {
   /**
    * @param {any} param
    */
@@ -39,7 +39,7 @@ class ShardBase {
 /**
  * @implements {Shard}
  */
-class Prefix extends ShardBase {
+export class Prefix extends ShardBase {
   /**
    * @param {number} prefixLen
    */
@@ -57,7 +57,7 @@ class Prefix extends ShardBase {
   }
 }
 
-class Suffix extends ShardBase {
+export class Suffix extends ShardBase {
   /**
    * @param {number} suffixLen
    */
@@ -76,7 +76,7 @@ class Suffix extends ShardBase {
   }
 }
 
-class NextToLast extends ShardBase {
+export class NextToLast extends ShardBase {
   /**
    * @param {number} suffixLen
    */
@@ -102,7 +102,7 @@ class NextToLast extends ShardBase {
  * @param {string} str
  * @returns {Shard}
  */
-function parseShardFun (str) {
+export function parseShardFun (str) {
   str = str.trim()
 
   if (str.length === 0) {
@@ -144,7 +144,7 @@ function parseShardFun (str) {
  * @param {string | Uint8Array} path
  * @param {Datastore} store
  */
-const readShardFun = async (path, store) => {
+export const readShardFun = async (path, store) => {
   const key = new Key(path).child(new Key(SHARDING_FN))
   // @ts-ignore
   const get = typeof store.getRaw === 'function' ? store.getRaw.bind(store) : store.get.bind(store)
@@ -152,14 +152,4 @@ const readShardFun = async (path, store) => {
   return parseShardFun(new TextDecoder().decode(res || '').trim())
 }
 
-module.exports = {
-  readme,
-  parseShardFun,
-  readShardFun,
-  Prefix,
-  Suffix,
-  NextToLast,
-  README_FN,
-  SHARDING_FN,
-  PREFIX
-}
+export { default as readme } from './shard-readme.js'

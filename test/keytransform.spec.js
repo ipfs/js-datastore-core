@@ -1,11 +1,10 @@
 /* eslint-env mocha */
-'use strict'
 
-const { expect } = require('aegir/utils/chai')
-const { Key, MemoryDatastore } = require('interface-datastore')
-const all = require('it-all')
-
-const KeytransformStore = require('../src/').KeytransformDatastore
+import { expect } from 'aegir/utils/chai.js'
+import all from 'it-all'
+import { Key } from 'interface-datastore/key'
+import { MemoryDatastore } from '../src/memory.js'
+import { KeyTransformDatastore } from '../src/keytransform.js'
 
 describe('KeyTransformDatastore', () => {
   it('basic', async () => {
@@ -29,7 +28,7 @@ describe('KeyTransformDatastore', () => {
       }
     }
 
-    const kStore = new KeytransformStore(mStore, transform)
+    const kStore = new KeyTransformDatastore(mStore, transform)
 
     const keys = [
       'foo',

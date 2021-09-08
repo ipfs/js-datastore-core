@@ -6,7 +6,7 @@
 [![codecov](https://img.shields.io/codecov/c/github/ipfs/js-datastore-core.svg?style=flat-square)](https://codecov.io/gh/ipfs/js-datastore-core)
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/ipfs/js-datastore-core/ci?label=ci&style=flat-square)](https://github.com/ipfs/js-datastore-core/actions?query=branch%3Amaster+workflow%3Aci+)
 
-> Wrapping implementations for [interface-datastore](https://github.com/ipfs/interface-datastore).
+> Implementations for [interface-datastore](https://github.com/ipfs/js-ipfs-interfaces/packages/interface-datastore).
 
 ## Lead Maintainer <!-- omit in toc -->
 
@@ -17,6 +17,7 @@
 - [Implementations](#implementations)
 - [Install](#install)
 - [Usage](#usage)
+  - [BaseDatastore](#basedatastore)
   - [Wrapping Stores](#wrapping-stores)
 - [Contribute](#contribute)
 - [License](#license)
@@ -38,12 +39,41 @@ $ npm install datastore-core
 
 ## Usage
 
+
+### BaseDatastore
+
+An base store is made available to make implementing your own datastore easier:
+
+```javascript
+const { BaseDatastore } from 'datastore-core')
+
+class MyDatastore extends BaseDatastore {
+  constructor () {
+    super()
+  }
+
+  async put (key, val) {
+    // your implementation here
+  }
+
+  async get (key) {
+    // your implementation here
+  }
+
+  // etc...
+}
+```
+
+See the [MemoryDatastore](./src/memory.js) for an example of how it is used.
+
 ### Wrapping Stores
 
 ```js
-const MemoryStore = require('interface-datastore').MemoryDatastore
-const MountStore = require('datastore-core').MountDatastore
-const Key = require('interface-datastore').Key
+import { Key } from 'interface-datastore'
+import {
+  MemoryStore,
+  MountStore
+} from 'datastore-core'
 
 const store = new MountStore({prefix: new Key('/a'), datastore: new MemoryStore()})
 ```

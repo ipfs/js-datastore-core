@@ -1,24 +1,28 @@
 /* eslint-env mocha */
-'use strict'
 
-const { expect } = require('aegir/utils/chai')
-const shard = require('../src').shard
+import { expect } from 'aegir/utils/chai.js'
+import {
+  Prefix,
+  Suffix,
+  NextToLast,
+  parseShardFun
+} from '../src/shard.js'
 
 describe('shard', () => {
   it('prefix', () => {
     expect(
-      new shard.Prefix(2).fun('hello')
+      new Prefix(2).fun('hello')
     ).to.eql(
       'he'
     )
     expect(
-      new shard.Prefix(2).fun('h')
+      new Prefix(2).fun('h')
     ).to.eql(
       'h_'
     )
 
     expect(
-      new shard.Prefix(2).toString()
+      new Prefix(2).toString()
     ).to.eql(
       '/repo/flatfs/shard/v1/prefix/2'
     )
@@ -26,18 +30,18 @@ describe('shard', () => {
 
   it('suffix', () => {
     expect(
-      new shard.Suffix(2).fun('hello')
+      new Suffix(2).fun('hello')
     ).to.eql(
       'lo'
     )
     expect(
-      new shard.Suffix(2).fun('h')
+      new Suffix(2).fun('h')
     ).to.eql(
       '_h'
     )
 
     expect(
-      new shard.Suffix(2).toString()
+      new Suffix(2).toString()
     ).to.eql(
       '/repo/flatfs/shard/v1/suffix/2'
     )
@@ -45,18 +49,18 @@ describe('shard', () => {
 
   it('next-to-last', () => {
     expect(
-      new shard.NextToLast(2).fun('hello')
+      new NextToLast(2).fun('hello')
     ).to.eql(
       'll'
     )
     expect(
-      new shard.NextToLast(3).fun('he')
+      new NextToLast(3).fun('he')
     ).to.eql(
       '__h'
     )
 
     expect(
-      new shard.NextToLast(2).toString()
+      new NextToLast(2).toString()
     ).to.eql(
       '/repo/flatfs/shard/v1/next-to-last/2'
     )
@@ -75,7 +79,7 @@ describe('parsesShardFun', () => {
 
     errors.forEach((input) => {
       expect(
-        () => shard.parseShardFun(input)
+        () => parseShardFun(input)
       ).to.throw()
     })
   })
@@ -90,7 +94,7 @@ describe('parsesShardFun', () => {
     success.forEach((name) => {
       const n = Math.floor(Math.random() * 100)
       expect(
-        shard.parseShardFun(
+        parseShardFun(
           `/repo/flatfs/shard/v1/${name}/${n}`
         ).name
       ).to.eql(name)

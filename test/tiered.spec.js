@@ -1,12 +1,14 @@
 /* eslint-env mocha */
-'use strict'
 
-const { expect } = require('aegir/utils/chai')
-const { Key, MemoryDatastore } = require('interface-datastore')
-const { TieredDatastore } = require('../src')
-const { fromString: uint8ArrayFromString } = require('uint8arrays/from-string')
+import { expect } from 'aegir/utils/chai.js'
+import { Key } from 'interface-datastore/key'
+import { MemoryDatastore } from '../src/memory.js'
+import { TieredDatastore } from '../src/tiered.js'
+import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
+import { interfaceDatastoreTests } from 'interface-datastore-tests'
+
 /**
- * @typedef {import('interface-datastore/dist/src/types').Datastore} Datastore
+ * @typedef {import('interface-datastore').Datastore} Datastore
  */
 
 describe('Tiered', () => {
@@ -58,8 +60,7 @@ describe('Tiered', () => {
   })
 
   describe('inteface-datastore-single', () => {
-    // @ts-ignore
-    require('interface-datastore-tests')({
+    interfaceDatastoreTests({
       setup () {
         return new TieredDatastore([
           new MemoryDatastore(),

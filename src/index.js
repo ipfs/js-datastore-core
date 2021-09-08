@@ -1,22 +1,13 @@
-'use strict'
-
-const KeytransformDatastore = require('./keytransform')
-const ShardingDatastore = require('./sharding')
-const MountDatastore = require('./mount')
-const TieredDatastore = require('./tiered')
-const NamespaceDatastore = require('./namespace')
-const shard = require('./shard')
+export { BaseDatastore } from './base.js'
+export { MemoryDatastore } from './memory.js'
+export { KeyTransformDatastore } from './keytransform.js'
+export { ShardingDatastore } from './sharding.js'
+export { MountDatastore } from './mount.js'
+export { TieredDatastore } from './tiered.js'
+export { NamespaceDatastore } from './namespace.js'
+export * as shard from './shard.js'
 
 /**
  * @typedef {import("./types").Shard } Shard
  * @typedef {import("./types").KeyTransform } KeyTransform
  */
-
-module.exports = {
-  KeytransformDatastore,
-  ShardingDatastore,
-  MountDatastore,
-  TieredDatastore,
-  NamespaceDatastore,
-  shard
-}
