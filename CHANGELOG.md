@@ -1,3 +1,17 @@
+# [6.0.0](https://github.com/ipfs/js-datastore-core/compare/v5.0.2...v6.0.0) (2021-09-08)
+
+
+### chore
+
+* update to esm ([#71](https://github.com/ipfs/js-datastore-core/issues/71)) ([ace9a06](https://github.com/ipfs/js-datastore-core/commit/ace9a06e879ff3fef9493754a7bbc7981595d9a4))
+
+
+### BREAKING CHANGES
+
+* deep requires/imports are no longer possible
+
+
+
 ## [5.0.2](https://github.com/ipfs/js-datastore-core/compare/v5.0.1...v5.0.2) (2021-08-23)
 
 
