@@ -1,3 +1,7 @@
+## [6.0.5](https://github.com/ipfs/js-datastore-core/compare/v6.0.4...v6.0.5) (2021-09-08)
+
+
+
 ## [6.0.4](https://github.com/ipfs/js-datastore-core/compare/v6.0.3...v6.0.4) (2021-09-08)
 
 
