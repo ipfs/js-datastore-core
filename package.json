@@ -5,7 +5,7 @@
   "leadMaintainer": "Alex Potsides <alex.potsides@protocol.ai>",
   "main": "src/index.js",
   "type": "module",
-  "types": "dist/src/index.d.ts",
+  "types": "types/src/index.d.ts",
   "exports": {
     "./": {
       "import": "./src/index.js"
@@ -54,8 +54,8 @@
     "dep-check": "aegir dep-check"
   },
   "files": [
-    "src",
-    "dist"
+    "*",
+    "!**/*.tsbuildinfo"
   ],
   "repository": {
     "type": "git",
