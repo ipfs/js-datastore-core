@@ -48,7 +48,7 @@
     "release-major": "aegir release --type major --target node",
     "pretest": "aegir build --esm-tests",
     "test": "aegir test",
-    "dep-check": "aegir dep-check"
+    "dep-check": "aegir dep-check -i rimraf"
   },
   "files": [
     "*",
