@@ -7,7 +7,7 @@
   "type": "module",
   "types": "types/src/index.d.ts",
   "exports": {
-    "./": {
+    ".": {
       "import": "./src/index.js"
     },
     "./base": {
