@@ -1,11 +1,12 @@
 /* eslint-env mocha */
-'use strict'
 
-const { expect } = require('aegir/utils/chai')
-const { Key, MemoryDatastore } = require('interface-datastore')
-const NamespaceStore = require('../src/').NamespaceDatastore
-const all = require('it-all')
-const { fromString: uint8ArrayFromString } = require('uint8arrays/from-string')
+import { expect } from 'aegir/utils/chai.js'
+import all from 'it-all'
+import { Key } from 'interface-datastore/key'
+import { MemoryDatastore } from '../src/memory.js'
+import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
+import { NamespaceDatastore } from '../src/namespace.js'
+import { interfaceDatastoreTests } from 'interface-datastore-tests'
 
 describe('KeyTransformDatastore', () => {
   const prefixes = [
@@ -14,7 +15,7 @@ describe('KeyTransformDatastore', () => {
   ]
   prefixes.forEach((prefix) => it(`basic '${prefix}'`, async () => {
     const mStore = new MemoryDatastore()
-    const store = new NamespaceStore(mStore, new Key(prefix))
+    const store = new NamespaceDatastore(mStore, new Key(prefix))
 
     const keys = [
       'foo',
@@ -47,10 +48,9 @@ describe('KeyTransformDatastore', () => {
 
   prefixes.forEach((prefix) => {
     describe(`interface-datastore: '${prefix}'`, () => {
-      // @ts-ignore
-      require('interface-datastore-tests')({
+      interfaceDatastoreTests({
         setup () {
-          return new NamespaceStore(new MemoryDatastore(), new Key(prefix))
+          return new NamespaceDatastore(new MemoryDatastore(), new Key(prefix))
         },
         async teardown () { }
       })

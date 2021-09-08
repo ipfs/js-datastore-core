@@ -1,17 +1,14 @@
-/* @flow */
-'use strict'
-
-const {
-  Adapter, Key, Errors, utils: {
-    sortAll,
-    replaceStartWith
-  }
-} = require('interface-datastore')
-const filter = require('it-filter')
-const take = require('it-take')
-const merge = require('it-merge')
-
-const Keytransform = require('./keytransform')
+import filter from 'it-filter'
+import take from 'it-take'
+import merge from 'it-merge'
+import { BaseDatastore } from './base.js'
+import { KeyTransformDatastore } from './keytransform.js'
+import * as Errors from './errors.js'
+import {
+  sortAll,
+  replaceStartWith
+} from './utils.js'
+import { Key } from 'interface-datastore/key'
 
 /**
  * @typedef {import('interface-datastore').Datastore} Datastore
@@ -28,7 +25,7 @@ const Keytransform = require('./keytransform')
  *
  * @implements {Datastore}
  */
-class MountDatastore extends Adapter {
+export class MountDatastore extends BaseDatastore {
   /**
    * @param {Array<{prefix: Key, datastore: Datastore}>} mounts
    */
@@ -166,7 +163,7 @@ class MountDatastore extends Adapter {
    */
   query (q, options) {
     const qs = this.mounts.map(m => {
-      const ks = new Keytransform(m.datastore, {
+      const ks = new KeyTransformDatastore(m.datastore, {
         convert: (key) => {
           throw new Error('should never be called')
         },
@@ -204,7 +201,7 @@ class MountDatastore extends Adapter {
    */
   queryKeys (q, options) {
     const qs = this.mounts.map(m => {
-      const ks = new Keytransform(m.datastore, {
+      const ks = new KeyTransformDatastore(m.datastore, {
         convert: (key) => {
           throw new Error('should never be called')
         },
@@ -236,5 +233,3 @@ class MountDatastore extends Adapter {
     return it
   }
 }
-
-module.exports = MountDatastore

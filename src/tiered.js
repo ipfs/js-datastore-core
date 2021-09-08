@@ -1,9 +1,10 @@
-'use strict'
+import { BaseDatastore } from './base.js'
+import * as Errors from './errors.js'
+import debug from 'debug'
+import pushable from 'it-pushable'
+import drain from 'it-drain'
 
-const { Adapter, Errors } = require('interface-datastore')
-const log = require('debug')('datastore:core:tiered')
-const pushable = require('it-pushable')
-const drain = require('it-drain')
+const log = debug('datastore:core:tiered')
 
 /**
  * @typedef {import('interface-datastore').Datastore} Datastore
@@ -27,7 +28,7 @@ const drain = require('it-drain')
  * last one first.
  *
  */
-class TieredDatastore extends Adapter {
+export class TieredDatastore extends BaseDatastore {
   /**
    * @param {Datastore[]} stores
    */
@@ -208,5 +209,3 @@ class TieredDatastore extends Adapter {
     return this.stores[this.stores.length - 1].queryKeys(q, options)
   }
 }
-
-module.exports = TieredDatastore

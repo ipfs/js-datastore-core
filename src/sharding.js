@@ -1,11 +1,16 @@
-'use strict'
+import { Key } from 'interface-datastore'
+import {
+  readShardFun,
+  SHARDING_FN,
+  README_FN,
+  readme
+} from './shard.js'
+import { BaseDatastore } from './base.js'
+import { KeyTransformDatastore } from './keytransform.js'
+import * as Errors from './errors.js'
 
-const { Adapter, Key, Errors } = require('interface-datastore')
-const sh = require('./shard')
-const KeytransformStore = require('./keytransform')
-
-const shardKey = new Key(sh.SHARDING_FN)
-const shardReadmeKey = new Key(sh.README_FN)
+const shardKey = new Key(SHARDING_FN)
+const shardReadmeKey = new Key(README_FN)
 /**
  * @typedef {import('interface-datastore').Datastore} Datastore
  * @typedef {import('interface-datastore').Options} Options
@@ -36,7 +41,7 @@ const shardReadmeKey = new Key(sh.README_FN)
  * Wraps another datastore such that all values are stored
  * sharded according to the given sharding function.
  */
-class ShardingDatastore extends Adapter {
+export class ShardingDatastore extends BaseDatastore {
   /**
    * @param {Datastore} store
    * @param {Shard} shard
@@ -44,7 +49,7 @@ class ShardingDatastore extends Adapter {
   constructor (store, shard) {
     super()
 
-    this.child = new KeytransformStore(store, {
+    this.child = new KeyTransformDatastore(store, {
       convert: this._convertKey.bind(this),
       invert: this._invertKey.bind(this)
     })
@@ -89,7 +94,7 @@ class ShardingDatastore extends Adapter {
   static async createOrOpen (store, shard) {
     try {
       await ShardingDatastore.create(store, shard)
-    } catch (err) {
+    } catch (/** @type {any} */ err) {
       if (err && err.message !== 'datastore exists') throw err
     }
     return ShardingDatastore.open(store)
@@ -100,7 +105,7 @@ class ShardingDatastore extends Adapter {
    * @param {Datastore} store
    */
   static async open (store) {
-    const shard = await sh.readShardFun('/', store)
+    const shard = await readShardFun('/', store)
     return new ShardingDatastore(store, shard)
   }
 
@@ -118,14 +123,14 @@ class ShardingDatastore extends Adapter {
       const put = typeof store.putRaw === 'function' ? store.putRaw.bind(store) : store.put.bind(store)
       await Promise.all([
         put(shardKey, new TextEncoder().encode(shard.toString() + '\n')),
-        put(shardReadmeKey, new TextEncoder().encode(sh.readme))
+        put(shardReadmeKey, new TextEncoder().encode(readme))
       ])
 
       return shard
     }
 
     // test shards
-    const diskShard = await sh.readShardFun('/', store)
+    const diskShard = await readShardFun('/', store)
     const a = (diskShard || '').toString()
     const b = shard.toString()
     if (a !== b) {
@@ -313,5 +318,3 @@ class ShardingDatastore extends Adapter {
     return this.child.close()
   }
 }
-
-module.exports = ShardingDatastore

@@ -1,32 +1,39 @@
 /* eslint-env mocha */
-'use strict'
 
-const { expect } = require('aegir/utils/chai')
-const { Key, MemoryDatastore } = require('interface-datastore')
-const { fromString: uint8ArrayFromString } = require('uint8arrays/from-string')
-const { toString: uint8ArrayToString } = require('uint8arrays/to-string')
+import { expect } from 'aegir/utils/chai.js'
+import { Key } from 'interface-datastore/key'
+import { MemoryDatastore } from '../src/memory.js'
+import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
+import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
+import {
+  NextToLast,
+  SHARDING_FN,
+  README_FN,
+  readme
+} from '../src/shard.js'
+import {
+  ShardingDatastore
+} from '../src/sharding.js'
+import { interfaceDatastoreTests } from 'interface-datastore-tests'
 
-const ShardingStore = require('../src').ShardingDatastore
-const sh = require('../src').shard
-
-describe('ShardingStore', () => {
+describe('ShardingDatastore', () => {
   it('create', async () => {
     const ms = new MemoryDatastore()
-    const shard = new sh.NextToLast(2)
-    const store = new ShardingStore(ms, shard)
+    const shard = new NextToLast(2)
+    const store = new ShardingDatastore(ms, shard)
     await store.open()
     const res = await Promise.all([
-      ms.get(new Key(sh.SHARDING_FN)),
-      ms.get(new Key(sh.README_FN))
+      ms.get(new Key(SHARDING_FN)),
+      ms.get(new Key(README_FN))
     ])
     expect(uint8ArrayToString(res[0])).to.eql(shard.toString() + '\n')
-    expect(uint8ArrayToString(res[1])).to.eql(sh.readme)
+    expect(uint8ArrayToString(res[1])).to.eql(readme)
   })
 
   it('open - empty', () => {
     const ms = new MemoryDatastore()
     // @ts-expect-error
-    const store = new ShardingStore(ms)
+    const store = new ShardingDatastore(ms)
     return expect(store.open())
       .to.eventually.be.rejected()
       .with.property('code', 'ERR_DB_OPEN_FAILED')
@@ -34,16 +41,16 @@ describe('ShardingStore', () => {
 
   it('open - existing', () => {
     const ms = new MemoryDatastore()
-    const shard = new sh.NextToLast(2)
-    const store = new ShardingStore(ms, shard)
+    const shard = new NextToLast(2)
+    const store = new ShardingDatastore(ms, shard)
 
     return expect(store.open()).to.eventually.be.fulfilled()
   })
 
   it('basics', async () => {
     const ms = new MemoryDatastore()
-    const shard = new sh.NextToLast(2)
-    const store = new ShardingStore(ms, shard)
+    const shard = new NextToLast(2)
+    const store = new ShardingDatastore(ms, shard)
     await store.open()
     await store.put(new Key('hello'), uint8ArrayFromString('test'))
     const res = await ms.get(new Key('ll').child(new Key('hello')))
@@ -51,11 +58,10 @@ describe('ShardingStore', () => {
   })
 
   describe('interface-datastore', () => {
-    // @ts-ignore
-    require('interface-datastore-tests')({
+    interfaceDatastoreTests({
       setup () {
-        const shard = new sh.NextToLast(2)
-        return new ShardingStore(new MemoryDatastore(), shard)
+        const shard = new NextToLast(2)
+        return new ShardingDatastore(new MemoryDatastore(), shard)
       },
       teardown () { }
     })
