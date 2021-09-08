@@ -5,6 +5,7 @@ export { ShardingDatastore } from './sharding.js'
 export { MountDatastore } from './mount.js'
 export { TieredDatastore } from './tiered.js'
 export { NamespaceDatastore } from './namespace.js'
+export * as Errors from './errors.js'
 export * as shard from './shard.js'
 
 /**
