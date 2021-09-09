@@ -6,6 +6,16 @@
   "main": "src/index.js",
   "type": "module",
   "types": "types/src/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "types/src/*"
+      ],
+      "types/*": [
+        "types/src/*"
+      ]
+    }
+  },
   "exports": {
     ".": {
       "import": "./src/index.js"
