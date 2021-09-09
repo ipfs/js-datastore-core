@@ -9,9 +9,11 @@
   "typesVersions": {
     "*": {
       "*": [
+        "types/*",
         "types/src/*"
       ],
       "types/*": [
+        "types/*",
         "types/src/*"
       ]
     }
