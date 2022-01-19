@@ -2,16 +2,14 @@ import filter from 'it-filter'
 import take from 'it-take'
 import merge from 'it-merge'
 import { BaseDatastore } from './base.js'
-import { KeyTransformDatastore } from './keytransform.js'
 import * as Errors from './errors.js'
 import {
-  sortAll,
-  replaceStartWith
+  sortAll
 } from './utils.js'
-import { Key } from 'interface-datastore/key'
 
 /**
  * @typedef {import('interface-datastore').Datastore} Datastore
+ * @typedef {import('interface-datastore').Key} Key
  * @typedef {import('interface-datastore').Options} Options
  * @typedef {import('interface-datastore').Batch} Batch
  * @typedef {import('interface-datastore').Query} Query
@@ -44,16 +42,14 @@ export class MountDatastore extends BaseDatastore {
    *
    * @private
    * @param {Key} key
-   * @returns {{datastore: Datastore, mountpoint: Key, rest: Key} | undefined}
+   * @returns {{datastore: Datastore, mountpoint: Key} | undefined}
    */
   _lookup (key) {
     for (const mount of this.mounts) {
       if (mount.prefix.toString() === key.toString() || mount.prefix.isAncestorOf(key)) {
-        const s = replaceStartWith(key.toString(), mount.prefix.toString())
         return {
           datastore: mount.datastore,
-          mountpoint: mount.prefix,
-          rest: new Key(s)
+          mountpoint: mount.prefix
         }
       }
     }
@@ -70,7 +66,7 @@ export class MountDatastore extends BaseDatastore {
       throw Errors.dbWriteFailedError(new Error('No datastore mounted for this key'))
     }
 
-    return match.datastore.put(match.rest, value, options)
+    return match.datastore.put(key, value, options)
   }
 
   /**
@@ -82,7 +78,7 @@ export class MountDatastore extends BaseDatastore {
     if (match == null) {
       throw Errors.notFoundError(new Error('No datastore mounted for this key'))
     }
-    return match.datastore.get(match.rest, options)
+    return match.datastore.get(key, options)
   }
 
   /**
@@ -94,7 +90,7 @@ export class MountDatastore extends BaseDatastore {
     if (match == null) {
       return Promise.resolve(false)
     }
-    return match.datastore.has(match.rest, options)
+    return match.datastore.has(key, options)
   }
 
   /**
@@ -107,7 +103,7 @@ export class MountDatastore extends BaseDatastore {
       throw Errors.dbDeleteFailedError(new Error('No datastore mounted for this key'))
     }
 
-    return match.datastore.delete(match.rest, options)
+    return match.datastore.delete(key, options)
   }
 
   async close () {
@@ -137,19 +133,18 @@ export class MountDatastore extends BaseDatastore {
       }
 
       return {
-        batch: batchMounts[m],
-        rest: match.rest
+        batch: batchMounts[m]
       }
     }
 
     return {
       put: (key, value) => {
         const match = lookup(key)
-        match.batch.put(match.rest, value)
+        match.batch.put(key, value)
       },
       delete: (key) => {
         const match = lookup(key)
-        match.batch.delete(match.rest)
+        match.batch.delete(key)
       },
       commit: async (options) => {
         await Promise.all(Object.keys(batchMounts).map(p => batchMounts[p].commit(options)))
@@ -163,22 +158,8 @@ export class MountDatastore extends BaseDatastore {
    */
   query (q, options) {
     const qs = this.mounts.map(m => {
-      const ks = new KeyTransformDatastore(m.datastore, {
-        convert: (key) => {
-          throw new Error('should never be called')
-        },
-        invert: (key) => {
-          return m.prefix.child(key)
-        }
-      })
-
-      let prefix
-      if (q.prefix != null) {
-        prefix = replaceStartWith(q.prefix, m.prefix.toString())
-      }
-
-      return ks.query({
-        prefix: prefix,
+      return m.datastore.query({
+        prefix: q.prefix,
         filters: q.filters
       }, options)
     })
@@ -201,22 +182,8 @@ export class MountDatastore extends BaseDatastore {
    */
   queryKeys (q, options) {
     const qs = this.mounts.map(m => {
-      const ks = new KeyTransformDatastore(m.datastore, {
-        convert: (key) => {
-          throw new Error('should never be called')
-        },
-        invert: (key) => {
-          return m.prefix.child(key)
-        }
-      })
-
-      let prefix
-      if (q.prefix != null) {
-        prefix = replaceStartWith(q.prefix, m.prefix.toString())
-      }
-
-      return ks.queryKeys({
-        prefix: prefix,
+      return m.datastore.queryKeys({
+        prefix: q.prefix,
         filters: q.filters
       }, options)
     })

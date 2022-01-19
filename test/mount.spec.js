@@ -8,6 +8,25 @@ import { MemoryDatastore } from '../src/memory.js'
 import { MountDatastore } from '../src/mount.js'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import { interfaceDatastoreTests } from 'interface-datastore-tests'
+import { KeyTransformDatastore } from '../src/keytransform.js'
+
+/**
+ * @param {import('interface-datastore').Datastore} datastore
+ * @param {Key} prefix
+ */
+const stripPrefixDatastore = (datastore, prefix) => {
+  return new KeyTransformDatastore(
+    datastore, {
+      convert: (key) => {
+        if (!prefix.isAncestorOf(key)) {
+          throw new Error(`Expected prefix: (${prefix.toString()}) in key: ${key.toString()}`)
+        }
+
+        return Key.withNamespaces(key.namespaces().slice(prefix.namespaces().length))
+      },
+      invert: (key) => Key.withNamespaces([...prefix.namespaces(), ...key.namespaces()])
+    })
+}
 
 describe('MountDatastore', () => {
   it('put - no mount', async () => {
@@ -22,7 +41,7 @@ describe('MountDatastore', () => {
 
   it('put - wrong mount', async () => {
     const m = new MountDatastore([{
-      datastore: new MemoryDatastore(),
+      datastore: stripPrefixDatastore(new MemoryDatastore(), new Key('cool')),
       prefix: new Key('cool')
     }])
     try {
@@ -36,7 +55,7 @@ describe('MountDatastore', () => {
   it('put', async () => {
     const mds = new MemoryDatastore()
     const m = new MountDatastore([{
-      datastore: mds,
+      datastore: stripPrefixDatastore(mds, new Key('cool')),
       prefix: new Key('cool')
     }])
 
@@ -49,7 +68,7 @@ describe('MountDatastore', () => {
   it('get', async () => {
     const mds = new MemoryDatastore()
     const m = new MountDatastore([{
-      datastore: mds,
+      datastore: stripPrefixDatastore(mds, new Key('cool')),
       prefix: new Key('cool')
     }])
 
@@ -62,7 +81,7 @@ describe('MountDatastore', () => {
   it('has', async () => {
     const mds = new MemoryDatastore()
     const m = new MountDatastore([{
-      datastore: mds,
+      datastore: stripPrefixDatastore(mds, new Key('cool')),
       prefix: new Key('cool')
     }])
 
@@ -75,7 +94,7 @@ describe('MountDatastore', () => {
   it('delete', async () => {
     const mds = new MemoryDatastore()
     const m = new MountDatastore([{
-      datastore: mds,
+      datastore: stripPrefixDatastore(mds, new Key('cool')),
       prefix: new Key('cool')
     }])
 
@@ -91,7 +110,7 @@ describe('MountDatastore', () => {
   it('query simple', async () => {
     const mds = new MemoryDatastore()
     const m = new MountDatastore([{
-      datastore: mds,
+      datastore: stripPrefixDatastore(mds, new Key('cool')),
       prefix: new Key('cool')
     }])
 
