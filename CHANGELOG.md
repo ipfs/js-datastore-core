@@ -1,3 +1,19 @@
+## [7.0.0](https://github.com/ipfs/js-datastore-core/compare/v6.0.7...v7.0.0) (2022-01-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* key prefixes are no longer stripped by MountDatastore
+
+### Bug Fixes
+
+* do not strip prefixes for MountDatastores ([#82](https://github.com/ipfs/js-datastore-core/issues/82)) ([73bae74](https://github.com/ipfs/js-datastore-core/commit/73bae74ac794bf7585d432a3337e40fe85cb68f4))
+
+
+### Trivial Changes
+
+* switch to unified ci ([#83](https://github.com/ipfs/js-datastore-core/issues/83)) ([b3f79e6](https://github.com/ipfs/js-datastore-core/commit/b3f79e6d07440e37aabc83d1ebabe2b5c0e2bd30))
+
 ## [6.0.7](https://github.com/ipfs/js-datastore-core/compare/v6.0.6...v6.0.7) (2021-09-09)
 
 
@@ -201,6 +217,3 @@
 
 <a name="0.1.0"></a>
 # 0.1.0 (2017-03-15)
-
-
-
