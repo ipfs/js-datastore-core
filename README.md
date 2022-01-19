@@ -29,7 +29,7 @@
   - Keytransform: [`src/keytransform`](src/keytransform.js)
   - Sharding: [`src/sharding`](src/sharding.js)
   - Tiered: [`src/tiered`](src/tirered.js)
-  - Namespace: [`src/tiered`](src/namespace.js)
+  - Namespace: [`src/namespace`](src/namespace.js)
 
 ## Install
 

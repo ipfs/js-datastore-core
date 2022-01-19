@@ -169,7 +169,33 @@ export class KeyTransformDatastore extends BaseDatastore {
    * @param {Options} [options]
    */
   query (q, options) {
-    return map(this.child.query(q, options), ({ key, value }) => {
+    /** @type {Query} */
+    const query = {
+      ...q
+    }
+
+    query.filters = (query.filters || []).map(filter => {
+      return ({ key, value }) => filter({ key: this.transform.convert(key), value })
+    })
+
+    const { prefix } = q
+    if (prefix != null && prefix !== '/') {
+      delete query.prefix
+      query.filters.push(({ key }) => {
+        return this.transform.invert(key).toString().startsWith(prefix)
+      })
+    }
+
+    if (query.orders) {
+      query.orders = query.orders.map(order => {
+        return (a, b) => order(
+          { key: this.transform.invert(a.key), value: a.value },
+          { key: this.transform.invert(b.key), value: b.value }
+        )
+      })
+    }
+
+    return map(this.child.query(query, options), ({ key, value }) => {
       return {
         key: this.transform.invert(key),
         value
@@ -182,7 +208,32 @@ export class KeyTransformDatastore extends BaseDatastore {
    * @param {Options} [options]
    */
   queryKeys (q, options) {
-    return map(this.child.queryKeys(q, options), key => {
+    const query = {
+      ...q
+    }
+
+    query.filters = (query.filters || []).map(filter => {
+      return (key) => filter(this.transform.convert(key))
+    })
+
+    const { prefix } = q
+    if (prefix != null && prefix !== '/') {
+      delete query.prefix
+      query.filters.push((key) => {
+        return this.transform.invert(key).toString().startsWith(prefix)
+      })
+    }
+
+    if (query.orders) {
+      query.orders = query.orders.map(order => {
+        return (a, b) => order(
+          this.transform.invert(a),
+          this.transform.invert(b)
+        )
+      })
+    }
+
+    return map(this.child.queryKeys(query, options), key => {
       return this.transform.invert(key)
     })
   }

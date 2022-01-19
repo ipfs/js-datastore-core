@@ -16,7 +16,6 @@ import { KeyTransformDatastore } from './keytransform.js'
  * For example, if the prefix is `new Key(/hello)` a call
  * to `store.put(new Key('/world'), mydata)` would store the data under
  * `/hello/world`.
- *
  */
 export class NamespaceDatastore extends KeyTransformDatastore {
   /**
@@ -40,33 +39,5 @@ export class NamespaceDatastore extends KeyTransformDatastore {
         return new Key(key.toString().slice(prefix.toString().length), false)
       }
     })
-
-    this.prefix = prefix
-  }
-
-  /**
-   * @param {Query} q
-   * @param {Options} [options]
-   */
-  query (q, options) {
-    if (q.prefix && this.prefix.toString() !== '/') {
-      return super.query(Object.assign({}, q, {
-        prefix: this.prefix.child(new Key(q.prefix)).toString()
-      }))
-    }
-    return super.query(q, options)
-  }
-
-  /**
-   * @param {KeyQuery} q
-   * @param {Options} [options]
-   */
-  queryKeys (q, options) {
-    if (q.prefix && this.prefix.toString() !== '/') {
-      return super.queryKeys(Object.assign({}, q, {
-        prefix: this.prefix.child(new Key(q.prefix)).toString()
-      }))
-    }
-    return super.queryKeys(q, options)
   }
 }
