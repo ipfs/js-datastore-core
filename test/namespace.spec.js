@@ -8,7 +8,7 @@ import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import { NamespaceDatastore } from '../src/namespace.js'
 import { interfaceDatastoreTests } from 'interface-datastore-tests'
 
-describe('KeyTransformDatastore', () => {
+describe('NamespaceDatastore', () => {
   const prefixes = [
     'abc',
     ''

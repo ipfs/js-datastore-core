@@ -208,57 +208,15 @@ export class ShardingDatastore extends BaseDatastore {
    * @param {Options} [options]
    */
   query (q, options) {
+    /** @type {Query} */
     const tq = {
-      offset: q.offset,
-      limit: q.limit,
-      /** @type {QueryOrder[]} */
-      orders: [],
-      /** @type {QueryFilter[]} */
+      ...q,
       filters: [
         /** @type {QueryFilter} */
-        e => e.key.toString() !== shardKey.toString(),
+        ({ key }) => key.toString() !== shardKey.toString(),
         /** @type {QueryFilter} */
-        e => e.key.toString() !== shardReadmeKey.toString()
-      ]
-    }
-
-    const { prefix } = q
-    if (prefix != null) {
-      tq.filters.push((e) => {
-        return this._invertKey(e.key).toString().startsWith(prefix)
-      })
-    }
-
-    if (q.filters != null) {
-      const filters = q.filters.map(f => {
-        /** @type {QueryFilter} */
-        const filter = ({ key, value }) => {
-          return f({
-            key: this._invertKey(key),
-            value
-          })
-        }
-
-        return filter
-      })
-      tq.filters = tq.filters.concat(filters)
-    }
-
-    if (q.orders != null) {
-      tq.orders = q.orders.map(o => {
-        /** @type {QueryOrder} */
-        const order = (a, b) => {
-          return o({
-            key: this._invertKey(a.key),
-            value: a.value
-          }, {
-            key: this._invertKey(b.key),
-            value: b.value
-          })
-        }
-
-        return order
-      })
+        ({ key }) => key.toString() !== shardReadmeKey.toString()
+      ].concat(q.filters || [])
     }
 
     return this.child.query(tq, options)
@@ -269,46 +227,15 @@ export class ShardingDatastore extends BaseDatastore {
    * @param {Options} [options]
    */
   queryKeys (q, options) {
+    /** @type {KeyQuery} */
     const tq = {
-      offset: q.offset,
-      limit: q.limit,
-      /** @type {KeyQueryOrder[]} */
-      orders: [],
-      /** @type {KeyQueryFilter[]} */
+      ...q,
       filters: [
         /** @type {KeyQueryFilter} */
         key => key.toString() !== shardKey.toString(),
         /** @type {KeyQueryFilter} */
         key => key.toString() !== shardReadmeKey.toString()
-      ]
-    }
-
-    const { prefix } = q
-    if (prefix != null) {
-      tq.filters.push((key) => {
-        return this._invertKey(key).toString().startsWith(prefix)
-      })
-    }
-
-    if (q.filters != null) {
-      const filters = q.filters.map(f => {
-        /** @type {KeyQueryFilter} */
-        const filter = (key) => {
-          return f(this._invertKey(key))
-        }
-
-        return filter
-      })
-      tq.filters = tq.filters.concat(filters)
-    }
-
-    if (q.orders != null) {
-      tq.orders = q.orders.map(o => {
-        /** @type {KeyQueryOrder} */
-        const order = (a, b) => o(this._invertKey(a), this._invertKey(b))
-
-        return order
-      })
+      ].concat(q.filters || [])
     }
 
     return this.child.queryKeys(tq, options)
