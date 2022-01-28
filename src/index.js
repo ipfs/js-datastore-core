@@ -9,13 +9,8 @@ export { MountDatastore } from './mount.js'
 export { TieredDatastore } from './tiered.js'
 export { NamespaceDatastore } from './namespace.js'
 
-export const Errors = {
-  ...ErrorsImport
-}
-
-export const shard = {
-  ...ShardImport
-}
+export const Errors = ErrorsImport
+export const shard = ShardImport
 
 /**
  * @typedef {import("./types").Shard } Shard
