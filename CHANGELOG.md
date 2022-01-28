@@ -1,3 +1,10 @@
+### [7.0.1](https://github.com/ipfs/js-datastore-core/compare/v7.0.0...v7.0.1) (2022-01-28)
+
+
+### Bug Fixes
+
+* fix generated types to missing import ([#86](https://github.com/ipfs/js-datastore-core/issues/86)) ([8805e71](https://github.com/ipfs/js-datastore-core/commit/8805e71f5840dac2dea4d3220b4f3975b39d5161)), closes [#85](https://github.com/ipfs/js-datastore-core/issues/85)
+
 ## [7.0.0](https://github.com/ipfs/js-datastore-core/compare/v6.0.7...v7.0.0) (2022-01-19)
 
 
