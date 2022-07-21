@@ -190,7 +190,7 @@
     "test:chrome-webworker": "aegir test -t webworker",
     "test:firefox": "aegir test -t browser -- --browser firefox",
     "test:firefox-webworker": "aegir test -t webworker -- --browser firefox",
-    "test:electron-main": "aegir test -t electron-main -f dist/cjs/node-test/*js",
+    "test:electron-main": "aegir test -t electron-main",
     "dep-check": "aegir dep-check"
   },
   "dependencies": {
