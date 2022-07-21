@@ -1,3 +1,16 @@
+### [7.0.2](https://github.com/ipfs/js-datastore-core/compare/v7.0.1...v7.0.2) (2022-07-21)
+
+
+### Bug Fixes
+
+* pass options to tiered put ([#108](https://github.com/ipfs/js-datastore-core/issues/108)) ([7a8f9ff](https://github.com/ipfs/js-datastore-core/commit/7a8f9ffb226c4940145637a6c881b835ce4886cb))
+
+
+### Trivial Changes
+
+* Update .github/workflows/stale.yml [skip ci] ([7e56180](https://github.com/ipfs/js-datastore-core/commit/7e56180b4d1da793a2ab3102135a4665b80bd462))
+* update package.json version ([54b543d](https://github.com/ipfs/js-datastore-core/commit/54b543d08aef9c75e6bd3cb015d2a3d000ef26c6))
+
 ### [7.0.1](https://github.com/ipfs/js-datastore-core/compare/v7.0.0...v7.0.1) (2022-01-28)
 
 
