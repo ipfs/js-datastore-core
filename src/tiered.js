@@ -49,10 +49,11 @@ export class TieredDatastore extends BaseDatastore {
   /**
    * @param {Key} key
    * @param {Uint8Array} value
+   * @param {Options} [options]
    */
-  async put (key, value) {
+  async put (key, value, options) {
     try {
-      await Promise.all(this.stores.map(store => store.put(key, value)))
+      await Promise.all(this.stores.map(store => store.put(key, value, options)))
     } catch (err) {
       throw Errors.dbWriteFailedError()
     }
