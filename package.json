@@ -22,54 +22,69 @@
     "node": ">=16.0.0",
     "npm": ">=7.0.0"
   },
-  "main": "src/index.js",
   "type": "module",
-  "types": "types/src/index.d.ts",
+  "types": "./dist/src/index.d.ts",
   "typesVersions": {
     "*": {
       "*": [
-        "types/*",
-        "types/src/*"
+        "*",
+        "dist/*",
+        "dist/src/*",
+        "dist/src/*/index"
       ],
-      "types/*": [
-        "types/*",
-        "types/src/*"
+      "src/*": [
+        "*",
+        "dist/*",
+        "dist/src/*",
+        "dist/src/*/index"
       ]
     }
   },
   "files": [
-    "*",
+    "src",
+    "dist",
+    "!dist/test",
     "!**/*.tsbuildinfo"
   ],
   "exports": {
     ".": {
+      "types": "./dist/src/index.d.ts",
       "import": "./src/index.js"
     },
     "./base": {
+      "types": "./src/base.d.ts",
       "import": "./src/base.js"
     },
     "./errors": {
+      "types": "./src/errors.d.ts",
       "import": "./src/errors.js"
     },
     "./keytransform": {
+      "types": "./src/keytransform.d.ts",
       "import": "./src/keytransform.js"
     },
     "./memory": {
+      "types": "./src/memory.d.ts",
       "import": "./src/memory.js"
     },
     "./mount": {
+      "types": "./src/mount.d.ts",
       "import": "./src/mount.js"
     },
     "./namespace": {
+      "types": "./src/namespace.d.ts",
       "import": "./src/namespace.js"
     },
     "./shard": {
+      "types": "./src/shard.d.ts",
       "import": "./src/shard.js"
     },
     "./sharding": {
+      "types": "./src/sharding.d.ts",
       "import": "./src/sharding.js"
     },
     "./tiered": {
+      "types": "./src/tiered.d.ts",
       "import": "./src/tiered.js"
     }
   },
@@ -144,7 +159,11 @@
               },
               {
                 "type": "docs",
-                "section": "Trivial Changes"
+                "section": "Documentation"
+              },
+              {
+                "type": "deps",
+                "section": "Dependencies"
               },
               {
                 "type": "test",
@@ -155,30 +174,23 @@
         }
       ],
       "@semantic-release/changelog",
-      [
-        "@semantic-release/npm",
-        {
-          "pkgRoot": "dist"
-        }
-      ],
+      "@semantic-release/npm",
       "@semantic-release/github",
       "@semantic-release/git"
     ]
   },
   "scripts": {
-    "clean": "rimraf dist types",
-    "prepare": "aegir build --no-bundle && cp -R types dist",
-    "lint": "aegir ts -p check && aegir lint",
-    "build": "aegir build --esm-tests",
-    "release": "semantic-release",
+    "clean": "aegir clean",
+    "lint": "aegir lint",
+    "build": "aegir build",
+    "release": "aegir release",
     "test": "aegir test",
-    "test:node": "aegir test -t node",
-    "test:chrome": "aegir test -t browser",
+    "test:node": "aegir test -t node --cov",
+    "test:chrome": "aegir test -t browser --cov",
     "test:chrome-webworker": "aegir test -t webworker",
     "test:firefox": "aegir test -t browser -- --browser firefox",
     "test:firefox-webworker": "aegir test -t webworker -- --browser firefox",
     "test:electron-main": "aegir test -t electron-main -f dist/cjs/node-test/*js",
-    "test:electron-renderer": "aegir test -t electron-renderer -f dist/cjs/node-test/*js",
     "dep-check": "aegir dep-check -i rimraf"
   },
   "dependencies": {
@@ -196,7 +208,7 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.5",
-    "aegir": "^36.1.3",
+    "aegir": "^37.4.5",
     "interface-datastore-tests": "^2.0.3",
     "it-all": "^1.0.4",
     "rimraf": "^3.0.2",

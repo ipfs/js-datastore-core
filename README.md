@@ -1,26 +1,33 @@
-# js-datastore-core <!-- omit in toc -->
+# datastore-core <!-- omit in toc -->
 
-[![](https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square)](http://ipn.io)
-[![](https://img.shields.io/badge/project-IPFS-blue.svg?style=flat-square)](http://ipfs.io/)
-[![](https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square)](http://webchat.freenode.net/?channels=%23ipfs)
+[![ipfs.io](https://img.shields.io/badge/project-IPFS-blue.svg?style=flat-square)](http://ipfs.io)
+[![IRC](https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square)](http://webchat.freenode.net/?channels=%23ipfs)
+[![Discord](https://img.shields.io/discord/806902334369824788?style=flat-square)](https://discord.gg/ipfs)
 [![codecov](https://img.shields.io/codecov/c/github/ipfs/js-datastore-core.svg?style=flat-square)](https://codecov.io/gh/ipfs/js-datastore-core)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/ipfs/js-datastore-core/ci?label=ci&style=flat-square)](https://github.com/ipfs/js-datastore-core/actions?query=branch%3Amaster+workflow%3Aci+)
+[![CI](https://img.shields.io/github/workflow/status/libp2p/js-libp2p-interfaces/test%20&%20maybe%20release/master?style=flat-square)](https://github.com/ipfs/js-datastore-core/actions/workflows/js-test-and-release.yml)
 
-> Implementations for [interface-datastore](https://github.com/ipfs/js-ipfs-interfaces/packages/interface-datastore).
+> Wrapper implementation for interface-datastore
 
-## Lead Maintainer <!-- omit in toc -->
+## Table of contents <!-- omit in toc -->
 
-[Alex Potsides](https://github.com/achingbrain)
-
-## Table of Contents <!-- omit in toc -->
-
-- [Implementations](#implementations)
 - [Install](#install)
+- [Implementations](#implementations)
 - [Usage](#usage)
   - [BaseDatastore](#basedatastore)
   - [Wrapping Stores](#wrapping-stores)
 - [Contribute](#contribute)
 - [License](#license)
+- [Contribute](#contribute-1)
+
+## Install
+
+```console
+$ npm i datastore-core
+```
+
+## Lead Maintainer <!-- omit in toc -->
+
+[Alex Potsides](https://github.com/achingbrain)
 
 ## Implementations
 
@@ -31,21 +38,14 @@
   - Tiered: [`src/tiered`](src/tirered.js)
   - Namespace: [`src/namespace`](src/namespace.js)
 
-## Install
-
-```
-$ npm install datastore-core
-```
-
 ## Usage
-
 
 ### BaseDatastore
 
 An base store is made available to make implementing your own datastore easier:
 
 ```javascript
-const { BaseDatastore } from 'datastore-core')
+import { BaseDatastore } from 'datastore-core'
 
 class MyDatastore extends BaseDatastore {
   constructor () {
@@ -88,5 +88,15 @@ This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/c
 
 ## License
 
-[MIT](LICENSE)
+Licensed under either of
 
+- Apache 2.0, ([LICENSE-APACHE](LICENSE-APACHE) / <http://www.apache.org/licenses/LICENSE-2.0>)
+- MIT ([LICENSE-MIT](LICENSE-MIT) / <http://opensource.org/licenses/MIT>)
+
+## Contribute
+
+Feel free to join in. All welcome. Open an [issue](https://github.com/ipfs/js-ipfs-unixfs-importer/issues)!
+
+This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/community/blob/master/code-of-conduct.md).
+
+[![](https://cdn.rawgit.com/jbenet/contribute-ipfs-gif/master/img/contribute.gif)](https://github.com/ipfs/community/blob/master/CONTRIBUTING.md)
