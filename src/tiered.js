@@ -1,10 +1,10 @@
 import { BaseDatastore } from './base.js'
 import * as Errors from './errors.js'
-import debug from 'debug'
-import pushable from 'it-pushable'
+import { logger } from '@libp2p/logger'
+import { pushable } from 'it-pushable'
 import drain from 'it-drain'
 
-const log = debug('datastore:core:tiered')
+const log = logger('datastore:core:tiered')
 
 /**
  * @typedef {import('interface-datastore').Datastore} Datastore
@@ -69,7 +69,7 @@ export class TieredDatastore extends BaseDatastore {
         const res = await store.get(key, options)
         if (res) return res
       } catch (err) {
-        log(err)
+        log.error(err)
       }
     }
     throw Errors.notFoundError()
@@ -109,7 +109,9 @@ export class TieredDatastore extends BaseDatastore {
   async * putMany (source, options = {}) {
     let error
     const pushables = this.stores.map(store => {
-      const source = pushable()
+      const source = pushable({
+        objectMode: true
+      })
 
       drain(store.putMany(source, options))
         .catch(err => {
@@ -143,7 +145,9 @@ export class TieredDatastore extends BaseDatastore {
   async * deleteMany (source, options = {}) {
     let error
     const pushables = this.stores.map(store => {
-      const source = pushable()
+      const source = pushable({
+        objectMode: true
+      })
 
       drain(store.deleteMany(source, options))
         .catch(err => {

@@ -194,7 +194,7 @@
     "dep-check": "aegir dep-check"
   },
   "dependencies": {
-    "debug": "^4.1.1",
+    "@libp2p/logger": "^2.0.0",
     "err-code": "^3.0.1",
     "interface-datastore": "^6.0.2",
     "it-all": "^1.0.4",
@@ -202,13 +202,12 @@
     "it-filter": "^1.0.2",
     "it-map": "^1.0.5",
     "it-merge": "^1.0.1",
-    "it-pipe": "^1.1.0",
-    "it-pushable": "^1.4.2",
+    "it-pipe": "^2.0.3",
+    "it-pushable": "^3.0.0",
     "it-take": "^1.0.1",
     "uint8arrays": "^3.0.0"
   },
   "devDependencies": {
-    "@types/debug": "^4.1.5",
     "aegir": "^37.4.5",
     "interface-datastore-tests": "^2.0.3"
   }
