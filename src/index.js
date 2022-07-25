@@ -1,3 +1,6 @@
+import * as Errors from './errors.js'
+import * as shard from './shard.js'
+
 export { BaseDatastore } from './base.js'
 export { MemoryDatastore } from './memory.js'
 export { KeyTransformDatastore } from './keytransform.js'
@@ -6,8 +9,8 @@ export { MountDatastore } from './mount.js'
 export { TieredDatastore } from './tiered.js'
 export { NamespaceDatastore } from './namespace.js'
 
-export * as Errors from './errors.js'
-export * as shard from './shard.js'
+export { Errors }
+export { shard }
 
 /**
  * @typedef {import("./types").Shard } Shard
