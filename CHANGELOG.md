@@ -1,3 +1,10 @@
+### [7.0.3](https://github.com/ipfs/js-datastore-core/compare/v7.0.2...v7.0.3) (2022-07-25)
+
+
+### Bug Fixes
+
+* errors export ([#111](https://github.com/ipfs/js-datastore-core/issues/111)) ([be15e74](https://github.com/ipfs/js-datastore-core/commit/be15e74bb2a505aeee81d06da2dfdc07fc919096)), closes [#109](https://github.com/ipfs/js-datastore-core/issues/109)
+
 ### [7.0.2](https://github.com/ipfs/js-datastore-core/compare/v7.0.1...v7.0.2) (2022-07-21)
 
 
