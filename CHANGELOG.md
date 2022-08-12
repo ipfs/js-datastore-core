@@ -1,3 +1,10 @@
+## [8.0.1](https://github.com/ipfs/js-datastore-core/compare/v8.0.0...v8.0.1) (2022-08-12)
+
+
+### Dependencies
+
+* update interface-datastore and interface-datastore-tests ([#118](https://github.com/ipfs/js-datastore-core/issues/118)) ([e5f47e2](https://github.com/ipfs/js-datastore-core/commit/e5f47e200059e056c34da1fcf4b795a3272f1459))
+
 ## [8.0.0](https://github.com/ipfs/js-datastore-core/compare/v7.0.3...v8.0.0) (2022-08-12)
 
 
