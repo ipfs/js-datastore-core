@@ -1,3 +1,14 @@
+## [8.0.0](https://github.com/ipfs/js-datastore-core/compare/v7.0.3...v8.0.0) (2022-08-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* this module is now ESM-only
+
+### Features
+
+* switch to ESM-only ([#109](https://github.com/ipfs/js-datastore-core/issues/109)) ([cbaef20](https://github.com/ipfs/js-datastore-core/commit/cbaef2000a78bcdaa750e932b3a681d8e41cd727))
+
 ### [7.0.3](https://github.com/ipfs/js-datastore-core/compare/v7.0.2...v7.0.3) (2022-07-25)
 
 
