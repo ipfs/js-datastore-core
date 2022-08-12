@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 /* eslint max-nested-callbacks: ["error", 8] */
 
-import { expect, assert } from 'aegir/utils/chai.js'
+import { expect, assert } from 'aegir/chai'
 import all from 'it-all'
 import { Key } from 'interface-datastore/key'
 import { MemoryDatastore } from '../src/memory.js'

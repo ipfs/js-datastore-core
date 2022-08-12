@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 
-import { expect } from 'aegir/utils/chai.js'
+import { expect } from 'aegir/chai'
 import * as utils from '../src/utils.js'
 import filter from 'it-filter'
 import take from 'it-take'

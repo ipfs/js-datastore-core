@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 
-import { expect } from 'aegir/utils/chai.js'
+import { expect } from 'aegir/chai'
 import { Key } from 'interface-datastore/key'
 import { MemoryDatastore } from '../src/memory.js'
 import { TieredDatastore } from '../src/tiered.js'
