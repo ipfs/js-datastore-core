@@ -1,3 +1,10 @@
+## [8.0.2](https://github.com/ipfs/js-datastore-core/compare/v8.0.1...v8.0.2) (2022-10-12)
+
+
+### Dependencies
+
+* update uint8arrays from 3.x.x to 4.x.x ([#121](https://github.com/ipfs/js-datastore-core/issues/121)) ([16d99b7](https://github.com/ipfs/js-datastore-core/commit/16d99b72454df33453f68d644a1daa6656d9dcf2))
+
 ## [8.0.1](https://github.com/ipfs/js-datastore-core/compare/v8.0.0...v8.0.1) (2022-08-12)
 
 
