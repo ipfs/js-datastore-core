@@ -204,7 +204,7 @@
     "it-merge": "^1.0.1",
     "it-pipe": "^2.0.3",
     "it-pushable": "^3.0.0",
-    "it-take": "^1.0.1",
+    "it-take": "^2.0.0",
     "uint8arrays": "^4.0.2"
   },
   "devDependencies": {
