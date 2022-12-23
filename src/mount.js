@@ -10,6 +10,7 @@ import {
 /**
  * @typedef {import('interface-datastore').Datastore} Datastore
  * @typedef {import('interface-datastore').Key} Key
+ * @typedef {import('interface-datastore').Pair} Pair
  * @typedef {import('interface-datastore').Options} Options
  * @typedef {import('interface-datastore').Batch} Batch
  * @typedef {import('interface-datastore').Query} Query
@@ -164,6 +165,7 @@ export class MountDatastore extends BaseDatastore {
       }, options)
     })
 
+    /** @type AsyncIterable<Pair> */
     let it = merge(...qs)
     if (q.filters) q.filters.forEach(f => { it = filter(it, f) })
     if (q.orders) q.orders.forEach(o => { it = sortAll(it, o) })
@@ -188,6 +190,7 @@ export class MountDatastore extends BaseDatastore {
       }, options)
     })
 
+    /** @type AsyncIterable<Key> */
     let it = merge(...qs)
     if (q.filters) q.filters.forEach(f => { it = filter(it, f) })
     if (q.orders) q.orders.forEach(o => { it = sortAll(it, o) })
