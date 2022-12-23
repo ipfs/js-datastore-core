@@ -1,3 +1,10 @@
+## [8.0.3](https://github.com/ipfs/js-datastore-core/compare/v8.0.2...v8.0.3) (2022-12-23)
+
+
+### Dependencies
+
+* bump it-* deps ([#132](https://github.com/ipfs/js-datastore-core/issues/132)) ([4b7fd55](https://github.com/ipfs/js-datastore-core/commit/4b7fd559e21bfb5645037a177b32c973e7f05b4a))
+
 ## [8.0.2](https://github.com/ipfs/js-datastore-core/compare/v8.0.1...v8.0.2) (2022-10-12)
 
 
