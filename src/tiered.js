@@ -41,8 +41,8 @@ export class TieredDatastore extends BaseDatastore {
   async open () {
     try {
       await Promise.all(this.stores.map((store) => store.open()))
-    } catch (err) {
-      throw Errors.dbOpenFailedError()
+    } catch (/** @type {any} */ err) {
+      throw Errors.dbOpenFailedError(err)
     }
   }
 
@@ -54,8 +54,8 @@ export class TieredDatastore extends BaseDatastore {
   async put (key, value, options) {
     try {
       await Promise.all(this.stores.map(store => store.put(key, value, options)))
-    } catch (err) {
-      throw Errors.dbWriteFailedError()
+    } catch (/** @type {any} */ err) {
+      throw Errors.dbWriteFailedError(err)
     }
   }
 
@@ -96,8 +96,8 @@ export class TieredDatastore extends BaseDatastore {
   async delete (key, options) {
     try {
       await Promise.all(this.stores.map(store => store.delete(key, options)))
-    } catch (err) {
-      throw Errors.dbDeleteFailedError()
+    } catch (/** @type {any} */ err) {
+      throw Errors.dbDeleteFailedError(err)
     }
   }
 
