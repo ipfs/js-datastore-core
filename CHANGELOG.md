@@ -1,3 +1,10 @@
+## [8.0.4](https://github.com/ipfs/js-datastore-core/compare/v8.0.3...v8.0.4) (2023-01-11)
+
+
+### Bug Fixes
+
+* throw error with message from error in tiered datastore ([#133](https://github.com/ipfs/js-datastore-core/issues/133)) ([2fd4be4](https://github.com/ipfs/js-datastore-core/commit/2fd4be4b72ff203b4bc3643ca469aab7a17abbc3))
+
 ## [8.0.3](https://github.com/ipfs/js-datastore-core/compare/v8.0.2...v8.0.3) (2022-12-23)
 
 
