@@ -208,7 +208,7 @@
     "uint8arrays": "^4.0.2"
   },
   "devDependencies": {
-    "aegir": "^37.4.5",
+    "aegir": "^38.1.6",
     "interface-datastore-tests": "^3.0.0"
   }
 }
