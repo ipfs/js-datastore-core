@@ -1,3 +1,14 @@
+## [9.0.0](https://github.com/ipfs/js-datastore-core/compare/v8.0.4...v9.0.0) (2023-03-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* update to latest datastore interface
+
+### Features
+
+* update to latest datastore interface ([#144](https://github.com/ipfs/js-datastore-core/issues/144)) ([46059f1](https://github.com/ipfs/js-datastore-core/commit/46059f184bb49414fb494135ca544ca6a2d0ee66))
+
 ## [8.0.4](https://github.com/ipfs/js-datastore-core/compare/v8.0.3...v8.0.4) (2023-01-11)
 
 
