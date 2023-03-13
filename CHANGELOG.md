@@ -1,3 +1,10 @@
+## [9.0.1](https://github.com/ipfs/js-datastore-core/compare/v9.0.0...v9.0.1) (2023-03-13)
+
+
+### Bug Fixes
+
+* update project config ([#145](https://github.com/ipfs/js-datastore-core/issues/145)) ([5bb5601](https://github.com/ipfs/js-datastore-core/commit/5bb5601735c59f6aed7dd52112194d233e86267b))
+
 ## [9.0.0](https://github.com/ipfs/js-datastore-core/compare/v8.0.4...v9.0.0) (2023-03-13)
 
 
