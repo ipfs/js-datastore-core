@@ -3,23 +3,10 @@ import * as Errors from './errors.js'
 import { logger } from '@libp2p/logger'
 import { pushable } from 'it-pushable'
 import drain from 'it-drain'
+import type { Batch, Datastore, Key, KeyQuery, Options, Pair, Query } from 'interface-datastore'
+import type { AwaitIterable } from 'interface-store'
 
 const log = logger('datastore:core:tiered')
-
-/**
- * @typedef {import('interface-datastore').Datastore} Datastore
- * @typedef {import('interface-datastore').Options} Options
- * @typedef {import('interface-datastore').Batch} Batch
- * @typedef {import('interface-datastore').Query} Query
- * @typedef {import('interface-datastore').KeyQuery} KeyQuery
- * @typedef {import('interface-datastore').Key} Key
- * @typedef {import('interface-datastore').Pair} Pair
- */
-
-/**
- * @template TEntry
- * @typedef {import('interface-store').AwaitIterable<TEntry>} AwaitIterable
- */
 
 /**
  * A datastore that can combine multiple stores. Puts and deletes
@@ -29,41 +16,23 @@ const log = logger('datastore:core:tiered')
  *
  */
 export class TieredDatastore extends BaseDatastore {
-  /**
-   * @param {Datastore[]} stores
-   */
-  constructor (stores) {
+  private stores: Datastore[]
+
+  constructor (stores: Datastore[]) {
     super()
 
     this.stores = stores.slice()
   }
 
-  async open () {
-    try {
-      await Promise.all(this.stores.map((store) => store.open()))
-    } catch (/** @type {any} */ err) {
-      throw Errors.dbOpenFailedError(err)
-    }
-  }
-
-  /**
-   * @param {Key} key
-   * @param {Uint8Array} value
-   * @param {Options} [options]
-   */
-  async put (key, value, options) {
+  async put (key: Key, value: Uint8Array, options?: Options): Promise<void> {
     try {
       await Promise.all(this.stores.map(store => store.put(key, value, options)))
-    } catch (/** @type {any} */ err) {
+    } catch (err: any) {
       throw Errors.dbWriteFailedError(err)
     }
   }
 
-  /**
-   * @param {Key} key
-   * @param {Options} [options]
-   */
-  async get (key, options) {
+  async get (key: Key, options?: Options): Promise<Uint8Array> {
     for (const store of this.stores) {
       try {
         const res = await store.get(key, options)
@@ -75,11 +44,7 @@ export class TieredDatastore extends BaseDatastore {
     throw Errors.notFoundError()
   }
 
-  /**
-   * @param {Key} key
-   * @param {Options} [options]
-   */
-  async has (key, options) {
+  async has (key: Key, options?: Options): Promise<boolean> {
     for (const s of this.stores) {
       if (await s.has(key, options)) {
         return true
@@ -89,27 +54,18 @@ export class TieredDatastore extends BaseDatastore {
     return false
   }
 
-  /**
-   * @param {Key} key
-   * @param {Options} [options]
-   */
-  async delete (key, options) {
+  async delete (key: Key, options?: Options): Promise<void> {
     try {
       await Promise.all(this.stores.map(store => store.delete(key, options)))
-    } catch (/** @type {any} */ err) {
+    } catch (err: any) {
       throw Errors.dbDeleteFailedError(err)
     }
   }
 
-  /**
-   * @param {AwaitIterable<Pair>} source
-   * @param {Options} [options]
-   * @returns {AsyncIterable<Pair>}
-   */
-  async * putMany (source, options = {}) {
+  async * putMany (source: AwaitIterable<Pair>, options: Options = {}): AsyncIterable<Pair> {
     let error
     const pushables = this.stores.map(store => {
-      const source = pushable({
+      const source = pushable<Pair>({
         objectMode: true
       })
 
@@ -137,15 +93,10 @@ export class TieredDatastore extends BaseDatastore {
     }
   }
 
-  /**
-   * @param {AwaitIterable<Key>} source
-   * @param {Options} [options]
-   * @returns {AsyncIterable<Key>}
-   */
-  async * deleteMany (source, options = {}) {
+  async * deleteMany (source: AwaitIterable<Key>, options: Options = {}): AsyncIterable<Key> {
     let error
     const pushables = this.stores.map(store => {
-      const source = pushable({
+      const source = pushable<Key>({
         objectMode: true
       })
 
@@ -173,14 +124,7 @@ export class TieredDatastore extends BaseDatastore {
     }
   }
 
-  async close () {
-    await Promise.all(this.stores.map(store => store.close()))
-  }
-
-  /**
-   * @returns {Batch}
-   */
-  batch () {
+  batch (): Batch {
     const batches = this.stores.map(store => store.batch())
 
     return {
@@ -198,19 +142,11 @@ export class TieredDatastore extends BaseDatastore {
     }
   }
 
-  /**
-   * @param {Query} q
-   * @param {Options} [options]
-   */
-  query (q, options) {
+  query (q: Query, options?: Options): AsyncIterable<Pair> {
     return this.stores[this.stores.length - 1].query(q, options)
   }
 
-  /**
-   * @param {KeyQuery} q
-   * @param {Options} [options]
-   */
-  queryKeys (q, options) {
+  queryKeys (q: KeyQuery, options?: Options): AsyncIterable<Key> {
     return this.stores[this.stores.length - 1].queryKeys(q, options)
   }
 }

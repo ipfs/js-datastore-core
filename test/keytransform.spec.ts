@@ -10,16 +10,10 @@ describe('KeyTransformDatastore', () => {
   it('basic', async () => {
     const mStore = new MemoryDatastore()
     const transform = {
-      /**
-       * @param {Key} key
-       */
-      convert (key) {
+      convert (key: Key): Key {
         return new Key('/abc').child(key)
       },
-      /**
-       * @param {Key} key
-       */
-      invert (key) {
+      invert (key: Key): Key {
         const l = key.list()
         if (l[0] !== 'abc') {
           throw new Error('missing prefix, convert failed?')
@@ -54,6 +48,5 @@ describe('KeyTransformDatastore', () => {
       expect(transform.invert(kA)).to.eql(kB)
       expect(kA).to.eql(transform.convert(kB))
     })
-    await kStore.close()
   })
 })

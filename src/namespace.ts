@@ -1,13 +1,6 @@
 import { Key } from 'interface-datastore'
+import type { Datastore } from 'interface-datastore'
 import { KeyTransformDatastore } from './keytransform.js'
-/**
- * @typedef {import('interface-datastore').Datastore} Datastore
- * @typedef {import('interface-datastore').Query} Query
- * @typedef {import('interface-datastore').KeyQuery} KeyQuery
- * @typedef {import('interface-datastore').Options} Options
- * @typedef {import('interface-datastore').Batch} Batch
- * @typedef {import('./types').KeyTransform} KeyTransform
- */
 
 /**
  * Wraps a given datastore into a keytransform which
@@ -18,11 +11,7 @@ import { KeyTransformDatastore } from './keytransform.js'
  * `/hello/world`.
  */
 export class NamespaceDatastore extends KeyTransformDatastore {
-  /**
-   * @param {Datastore} child
-   * @param {Key} prefix
-   */
-  constructor (child, prefix) {
+  constructor (child: Datastore, prefix: Key) {
     super(child, {
       convert (key) {
         return prefix.child(key)

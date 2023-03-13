@@ -1,3 +1,5 @@
+import type { Key } from 'interface-datastore'
+
 import * as Errors from './errors.js'
 import * as shard from './shard.js'
 
@@ -12,7 +14,15 @@ export { NamespaceDatastore } from './namespace.js'
 export { Errors }
 export { shard }
 
-/**
- * @typedef {import("./types").Shard } Shard
- * @typedef {import("./types").KeyTransform } KeyTransform
- */
+export interface Shard {
+  name: string
+  param: number
+  readonly _padding: string
+  fun: (s: string) => string
+  toString: () => string
+}
+
+export interface KeyTransform {
+  convert: (key: Key) => Key
+  invert: (key: Key) => Key
+}

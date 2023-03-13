@@ -41,7 +41,6 @@ describe('NamespaceDatastore', () => {
       expect(store.transform.invert(kA)).to.eql(kB)
       expect(kA).to.eql(store.transform.convert(kB))
     })
-    await store.close()
 
     expect(results[0]).to.eql(results[1])
   }))

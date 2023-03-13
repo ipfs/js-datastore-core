@@ -6,6 +6,7 @@ import { MemoryDatastore } from '../src/memory.js'
 import { TieredDatastore } from '../src/tiered.js'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import { interfaceDatastoreTests } from 'interface-datastore-tests'
+import type { Datastore } from 'interface-datastore'
 
 /**
  * @typedef {import('interface-datastore').Datastore} Datastore
@@ -13,10 +14,8 @@ import { interfaceDatastoreTests } from 'interface-datastore-tests'
 
 describe('Tiered', () => {
   describe('all stores', () => {
-    /** @type {Datastore[]} */
-    const ms = []
-    /** @type {TieredDatastore} */
-    let store
+    const ms: Datastore[] = []
+    let store: TieredDatastore
     beforeEach(() => {
       ms.push(new MemoryDatastore())
       ms.push(new MemoryDatastore())

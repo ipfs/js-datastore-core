@@ -7,9 +7,7 @@ import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
 import {
   NextToLast,
-  SHARDING_FN,
-  README_FN,
-  readme
+  SHARDING_FN
 } from '../src/shard.js'
 import {
   ShardingDatastore
@@ -23,11 +21,9 @@ describe('ShardingDatastore', () => {
     const store = new ShardingDatastore(ms, shard)
     await store.open()
     const res = await Promise.all([
-      ms.get(new Key(SHARDING_FN)),
-      ms.get(new Key(README_FN))
+      store.get(new Key(SHARDING_FN)),
     ])
     expect(uint8ArrayToString(res[0])).to.eql(shard.toString() + '\n')
-    expect(uint8ArrayToString(res[1])).to.eql(readme)
   })
 
   it('open - empty', () => {

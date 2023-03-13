@@ -49,43 +49,43 @@
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
-      "import": "./src/index.js"
+      "import": "./dist/src/index.js"
     },
     "./base": {
-      "types": "./src/base.d.ts",
-      "import": "./src/base.js"
+      "types": "./dist/src/base.d.ts",
+      "import": "./dist/src/base.js"
     },
     "./errors": {
-      "types": "./src/errors.d.ts",
-      "import": "./src/errors.js"
+      "types": "./dist/src/errors.d.ts",
+      "import": "./dist/src/errors.js"
     },
     "./keytransform": {
-      "types": "./src/keytransform.d.ts",
-      "import": "./src/keytransform.js"
+      "types": "./dist/src/keytransform.d.ts",
+      "import": "./dist/src/keytransform.js"
     },
     "./memory": {
-      "types": "./src/memory.d.ts",
-      "import": "./src/memory.js"
+      "types": "./dist/src/memory.d.ts",
+      "import": "./dist/src/memory.js"
     },
     "./mount": {
-      "types": "./src/mount.d.ts",
-      "import": "./src/mount.js"
+      "types": "./dist/src/mount.d.ts",
+      "import": "./dist/src/mount.js"
     },
     "./namespace": {
-      "types": "./src/namespace.d.ts",
-      "import": "./src/namespace.js"
+      "types": "./dist/src/namespace.d.ts",
+      "import": "./dist/src/namespace.js"
     },
     "./shard": {
-      "types": "./src/shard.d.ts",
-      "import": "./src/shard.js"
+      "types": "./dist/src/shard.d.ts",
+      "import": "./dist/src/shard.js"
     },
     "./sharding": {
-      "types": "./src/sharding.d.ts",
-      "import": "./src/sharding.js"
+      "types": "./dist/src/sharding.d.ts",
+      "import": "./dist/src/sharding.js"
     },
     "./tiered": {
-      "types": "./src/tiered.d.ts",
-      "import": "./src/tiered.js"
+      "types": "./dist/src/tiered.d.ts",
+      "import": "./dist/src/tiered.js"
     }
   },
   "eslintConfig": {
@@ -196,7 +196,7 @@
   "dependencies": {
     "@libp2p/logger": "^2.0.0",
     "err-code": "^3.0.1",
-    "interface-datastore": "^7.0.0",
+    "interface-store": "^4.0.0",
     "it-all": "^2.0.0",
     "it-drain": "^2.0.0",
     "it-filter": "^2.0.0",
@@ -204,11 +204,13 @@
     "it-merge": "^2.0.0",
     "it-pipe": "^2.0.3",
     "it-pushable": "^3.0.0",
+    "it-sort": "^2.0.1",
     "it-take": "^2.0.0",
     "uint8arrays": "^4.0.2"
   },
   "devDependencies": {
-    "aegir": "^37.4.5",
-    "interface-datastore-tests": "^3.0.0"
+    "aegir": "^38.1.7",
+    "interface-datastore": "^8.0.0",
+    "interface-datastore-tests": "^4.0.0"
   }
 }
