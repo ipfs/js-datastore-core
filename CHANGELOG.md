@@ -1,3 +1,10 @@
+## [9.0.2](https://github.com/ipfs/js-datastore-core/compare/v9.0.1...v9.0.2) (2023-03-13)
+
+
+### Bug Fixes
+
+* update shard creation ([59081a7](https://github.com/ipfs/js-datastore-core/commit/59081a7a3b8e596705fd5834b35bfb9ac73c3f39))
+
 ## [9.0.1](https://github.com/ipfs/js-datastore-core/compare/v9.0.0...v9.0.1) (2023-03-13)
 
 
