@@ -88,7 +88,7 @@ export function parseShardFun (str: string): Shard {
 
   const name = parts[1]
 
-  if (!parts[2]) {
+  if (parts[2] == null || parts[2] === '') {
     throw new Error('missing param')
   }
 
@@ -106,10 +106,10 @@ export function parseShardFun (str: string): Shard {
   }
 }
 
-export const readShardFun = async (path: string | Uint8Array, store: Datastore): Promise<Shard>  => {
+export const readShardFun = async (path: string | Uint8Array, store: Datastore): Promise<Shard> => {
   const key = new Key(path).child(new Key(SHARDING_FN))
-  // @ts-ignore
+  // @ts-expect-error
   const get = typeof store.getRaw === 'function' ? store.getRaw.bind(store) : store.get.bind(store)
   const res = await get(key)
-  return parseShardFun(new TextDecoder().decode(res || '').trim())
+  return parseShardFun(new TextDecoder().decode(res ?? '').trim())
 }

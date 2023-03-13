@@ -32,9 +32,9 @@ describe('KeyTransformDatastore', () => {
       'foo/bar/bazb',
       'foo/bar/baz/barb'
     ].map((s) => new Key(s))
-    await Promise.all(keys.map((key) => kStore.put(key, key.uint8Array())))
-    const kResults = Promise.all(keys.map((key) => kStore.get(key)))
-    const mResults = Promise.all(keys.map((key) => mStore.get(new Key('abc').child(key))))
+    await Promise.all(keys.map(async (key) => { await kStore.put(key, key.uint8Array()) }))
+    const kResults = Promise.all(keys.map(async (key) => await kStore.get(key)))
+    const mResults = Promise.all(keys.map(async (key) => await mStore.get(new Key('abc').child(key))))
     const results = await Promise.all([kResults, mResults])
     expect(results[0]).to.eql(results[1])
 

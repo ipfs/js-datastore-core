@@ -11,7 +11,7 @@ import type { AwaitIterable } from 'interface-store'
  * keys, reversing them, etc.
  */
 export class KeyTransformDatastore extends BaseDatastore {
-  private child: Datastore
+  private readonly child: Datastore
   public transform: KeyTransform
 
   constructor (child: Datastore, transform: KeyTransform) {
@@ -30,7 +30,7 @@ export class KeyTransformDatastore extends BaseDatastore {
   }
 
   async has (key: Key, options?: Options): Promise<boolean> {
-    return this.child.has(this.transform.convert(key), options)
+    return await this.child.has(this.transform.convert(key), options)
   }
 
   async delete (key: Key, options?: Options): Promise<void> {
@@ -103,8 +103,8 @@ export class KeyTransformDatastore extends BaseDatastore {
       delete: (key) => {
         b.delete(this.transform.convert(key))
       },
-      commit: (options) => {
-        return b.commit(options)
+      commit: async (options) => {
+        await b.commit(options)
       }
     }
   }
@@ -114,7 +114,7 @@ export class KeyTransformDatastore extends BaseDatastore {
       ...q
     }
 
-    query.filters = (query.filters || []).map(filter => {
+    query.filters = (query.filters ?? []).map(filter => {
       return ({ key, value }) => filter({ key: this.transform.convert(key), value })
     })
 
@@ -126,7 +126,7 @@ export class KeyTransformDatastore extends BaseDatastore {
       })
     }
 
-    if (query.orders) {
+    if (query.orders != null) {
       query.orders = query.orders.map(order => {
         return (a, b) => order(
           { key: this.transform.invert(a.key), value: a.value },
@@ -148,7 +148,7 @@ export class KeyTransformDatastore extends BaseDatastore {
       ...q
     }
 
-    query.filters = (query.filters || []).map(filter => {
+    query.filters = (query.filters ?? []).map(filter => {
       return (key) => filter(this.transform.convert(key))
     })
 
@@ -160,7 +160,7 @@ export class KeyTransformDatastore extends BaseDatastore {
       })
     }
 
-    if (query.orders) {
+    if (query.orders != null) {
       query.orders = query.orders.map(order => {
         return (a, b) => order(
           this.transform.invert(a),

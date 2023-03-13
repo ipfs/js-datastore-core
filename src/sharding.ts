@@ -9,6 +9,7 @@ import * as Errors from './errors.js'
 import type { Shard } from './index.js'
 import type { Datastore } from 'interface-datastore'
 import type { AwaitIterable } from 'interface-store'
+import { isOpenable } from './utils.js'
 
 const shardKey = new Key(SHARDING_FN)
 
@@ -19,7 +20,7 @@ const shardKey = new Key(SHARDING_FN)
  * sharded according to the given sharding function.
  */
 export class ShardingDatastore extends BaseDatastore {
-  private child: KeyTransformDatastore
+  private readonly child: KeyTransformDatastore
   private shard: Shard
 
   constructor (store: Datastore, shard: Shard) {
@@ -32,8 +33,10 @@ export class ShardingDatastore extends BaseDatastore {
     this.shard = shard
   }
 
-  async open () {
-    await this.child.open()
+  async open (): Promise<void> {
+    if (isOpenable(this.child)) {
+      await this.child.open()
+    }
 
     this.shard = await ShardingDatastore.create(this.child, this.shard)
   }
@@ -56,35 +59,13 @@ export class ShardingDatastore extends BaseDatastore {
     return Key.withNamespaces(key.list().slice(1))
   }
 
-  /**
-   * @deprecated
-   */
-  static async createOrOpen (store: Datastore, shard: Shard): Promise<ShardingDatastore> {
-    try {
-      await ShardingDatastore.create(store, shard)
-    } catch (err: any) {
-      if (err && err.message !== 'datastore exists') {
-        throw err
-      }
-    }
-    return ShardingDatastore.open(store)
-  }
-
-  /**
-   * @deprecated
-   */
-  static async open (store: Datastore): Promise<ShardingDatastore> {
-    const shard = await readShardFun('/', store)
-    return new ShardingDatastore(store, shard)
-  }
-
   static async create (store: Datastore, shard: Shard): Promise<Shard> {
     const hasShard = await store.has(shardKey)
-    if (!hasShard && !shard) {
+    if (!hasShard && shard == null) {
       throw Errors.dbOpenFailedError(Error('Shard is required when datastore doesn\'t have a shard key already.'))
     }
     if (!hasShard) {
-      // @ts-ignore i have no idea what putRaw is or saw any implementation
+      // @ts-expect-error i have no idea what putRaw is or saw any implementation
       const put = typeof store.putRaw === 'function' ? store.putRaw.bind(store) : store.put.bind(store)
       await Promise.all([
         put(shardKey, new TextEncoder().encode(shard.toString() + '\n'))
@@ -95,7 +76,7 @@ export class ShardingDatastore extends BaseDatastore {
 
     // test shards
     const diskShard = await readShardFun('/', store)
-    const a = (diskShard || '').toString()
+    const a = diskShard.toString()
     const b = shard.toString()
     if (a !== b) {
       throw new Error(`specified fun ${b} does not match repo shard fun ${a}`)
@@ -155,13 +136,15 @@ export class ShardingDatastore extends BaseDatastore {
       ...q,
       filters: [
         omitShard
-      ].concat(q.filters || [])
+      ].concat(q.filters ?? [])
     }
 
     return this.child.queryKeys(tq, options)
   }
 
-  close () {
-    return this.child.close()
+  async close (): Promise<void> {
+    if (isOpenable(this.child)) {
+      await this.child.close()
+    }
   }
 }

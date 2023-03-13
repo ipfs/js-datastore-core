@@ -14,20 +14,20 @@ export class BaseDatastore implements Datastore {
 
   }
 
-  put (key: Key, val: Uint8Array, options?: Options): Promise<void> {
-    return Promise.reject(new Error('.put is not implemented'))
+  async put (key: Key, val: Uint8Array, options?: Options): Promise<void> {
+    await Promise.reject(new Error('.put is not implemented'))
   }
 
-  get (key: Key, options?: Options): Promise<Uint8Array> {
-    return Promise.reject(new Error('.get is not implemented'))
+  async get (key: Key, options?: Options): Promise<Uint8Array> {
+    return await Promise.reject(new Error('.get is not implemented'))
   }
 
-  has (key: Key, options?: Options): Promise<boolean> {
-    return Promise.reject(new Error('.has is not implemented'))
+  async has (key: Key, options?: Options): Promise<boolean> {
+    return await Promise.reject(new Error('.has is not implemented'))
   }
 
-  delete (key: Key, options?: Options): Promise<void> {
-    return Promise.reject(new Error('.delete is not implemented'))
+  async delete (key: Key, options?: Options): Promise<void> {
+    await Promise.reject(new Error('.delete is not implemented'))
   }
 
   async * putMany (source: AwaitIterable<Pair>, options: Options = {}): AsyncIterable<Pair> {
@@ -87,7 +87,7 @@ export class BaseDatastore implements Datastore {
     throw new Error('._allKeys is not implemented')
   }
 
-  query (q: Query, options?: Options) {
+  query (q: Query, options?: Options): AsyncIterable<Pair> {
     let it = this._all(q, options)
 
     if (q.prefix != null) {
@@ -116,7 +116,7 @@ export class BaseDatastore implements Datastore {
     return it
   }
 
-  queryKeys (q: KeyQuery, options?: Options) {
+  queryKeys (q: KeyQuery, options?: Options): AsyncIterable<Key> {
     let it = this._allKeys(q, options)
 
     if (q.prefix != null) {

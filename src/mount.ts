@@ -12,9 +12,9 @@ import type { Options } from 'interface-store'
  * key prefixes
  */
 export class MountDatastore extends BaseDatastore {
-  private mounts: Array<{prefix: Key, datastore: Datastore}>
+  private readonly mounts: Array<{ prefix: Key, datastore: Datastore }>
 
-  constructor (mounts: Array<{prefix: Key, datastore: Datastore}>) {
+  constructor (mounts: Array<{ prefix: Key, datastore: Datastore }>) {
     super()
 
     this.mounts = mounts.slice()
@@ -23,7 +23,7 @@ export class MountDatastore extends BaseDatastore {
   /**
    * Lookup the matching datastore for the given key
    */
-  private _lookup (key: Key): {datastore: Datastore, mountpoint: Key} | undefined {
+  private _lookup (key: Key): { datastore: Datastore, mountpoint: Key } | undefined {
     for (const mount of this.mounts) {
       if (mount.prefix.toString() === key.toString() || mount.prefix.isAncestorOf(key)) {
         return {
@@ -58,7 +58,7 @@ export class MountDatastore extends BaseDatastore {
   async has (key: Key, options?: Options): Promise<boolean> {
     const match = this._lookup(key)
     if (match == null) {
-      return Promise.resolve(false)
+      return await Promise.resolve(false)
     }
     return await match.datastore.has(key, options)
   }
@@ -69,7 +69,7 @@ export class MountDatastore extends BaseDatastore {
       throw Errors.dbDeleteFailedError(new Error('No datastore mounted for this key'))
     }
 
-    return await match.datastore.delete(key, options)
+    await match.datastore.delete(key, options)
   }
 
   batch (): Batch {
@@ -101,7 +101,7 @@ export class MountDatastore extends BaseDatastore {
         match.batch.delete(key)
       },
       commit: async (options) => {
-        await Promise.all(Object.keys(batchMounts).map(p => batchMounts[p].commit(options)))
+        await Promise.all(Object.keys(batchMounts).map(async p => { await batchMounts[p].commit(options) }))
       }
     }
   }
@@ -115,8 +115,8 @@ export class MountDatastore extends BaseDatastore {
     })
 
     let it = merge(...qs)
-    if (q.filters) q.filters.forEach(f => { it = filter(it, f) })
-    if (q.orders) q.orders.forEach(o => { it = sort(it, o) })
+    if (q.filters != null) q.filters.forEach(f => { it = filter(it, f) })
+    if (q.orders != null) q.orders.forEach(o => { it = sort(it, o) })
     if (q.offset != null) {
       let i = 0
       const offset = q.offset
@@ -127,7 +127,7 @@ export class MountDatastore extends BaseDatastore {
     return it
   }
 
-  queryKeys (q: KeyQuery, options?: Options) {
+  queryKeys (q: KeyQuery, options?: Options): AsyncIterable<Key> {
     const qs = this.mounts.map(m => {
       return m.datastore.queryKeys({
         prefix: q.prefix,
@@ -137,8 +137,8 @@ export class MountDatastore extends BaseDatastore {
 
     /** @type AsyncIterable<Key> */
     let it = merge(...qs)
-    if (q.filters) q.filters.forEach(f => { it = filter(it, f) })
-    if (q.orders) q.orders.forEach(o => { it = sort(it, o) })
+    if (q.filters != null) q.filters.forEach(f => { it = filter(it, f) })
+    if (q.orders != null) q.orders.forEach(o => { it = sort(it, o) })
     if (q.offset != null) {
       let i = 0
       const offset = q.offset

@@ -11,7 +11,7 @@ import { interfaceDatastoreTests } from 'interface-datastore-tests'
 import { KeyTransformDatastore } from '../src/keytransform.js'
 import type { Datastore } from 'interface-datastore'
 
-const stripPrefixDatastore = (datastore: Datastore, prefix: Key) => {
+const stripPrefixDatastore = (datastore: Datastore, prefix: Key): Datastore => {
   return new KeyTransformDatastore(
     datastore, {
       convert: (key) => {

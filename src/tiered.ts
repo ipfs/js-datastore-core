@@ -16,7 +16,7 @@ const log = logger('datastore:core:tiered')
  *
  */
 export class TieredDatastore extends BaseDatastore {
-  private stores: Datastore[]
+  private readonly stores: Datastore[]
 
   constructor (stores: Datastore[]) {
     super()
@@ -26,7 +26,7 @@ export class TieredDatastore extends BaseDatastore {
 
   async put (key: Key, value: Uint8Array, options?: Options): Promise<void> {
     try {
-      await Promise.all(this.stores.map(store => store.put(key, value, options)))
+      await Promise.all(this.stores.map(async store => { await store.put(key, value, options) }))
     } catch (err: any) {
       throw Errors.dbWriteFailedError(err)
     }
@@ -36,7 +36,7 @@ export class TieredDatastore extends BaseDatastore {
     for (const store of this.stores) {
       try {
         const res = await store.get(key, options)
-        if (res) return res
+        if (res != null) return res
       } catch (err) {
         log.error(err)
       }
@@ -56,14 +56,14 @@ export class TieredDatastore extends BaseDatastore {
 
   async delete (key: Key, options?: Options): Promise<void> {
     try {
-      await Promise.all(this.stores.map(store => store.delete(key, options)))
+      await Promise.all(this.stores.map(async store => { await store.delete(key, options) }))
     } catch (err: any) {
       throw Errors.dbDeleteFailedError(err)
     }
   }
 
   async * putMany (source: AwaitIterable<Pair>, options: Options = {}): AsyncIterable<Pair> {
-    let error
+    let error: Error | undefined
     const pushables = this.stores.map(store => {
       const source = pushable<Pair>({
         objectMode: true
@@ -80,7 +80,7 @@ export class TieredDatastore extends BaseDatastore {
 
     try {
       for await (const pair of source) {
-        if (error) {
+        if (error != null) {
           throw error
         }
 
@@ -94,7 +94,7 @@ export class TieredDatastore extends BaseDatastore {
   }
 
   async * deleteMany (source: AwaitIterable<Key>, options: Options = {}): AsyncIterable<Key> {
-    let error
+    let error: Error | undefined
     const pushables = this.stores.map(store => {
       const source = pushable<Key>({
         objectMode: true
@@ -111,7 +111,7 @@ export class TieredDatastore extends BaseDatastore {
 
     try {
       for await (const key of source) {
-        if (error) {
+        if (error != null) {
           throw error
         }
 
@@ -129,10 +129,10 @@ export class TieredDatastore extends BaseDatastore {
 
     return {
       put: (key, value) => {
-        batches.forEach(b => b.put(key, value))
+        batches.forEach(b => { b.put(key, value) })
       },
       delete: (key) => {
-        batches.forEach(b => b.delete(key))
+        batches.forEach(b => { b.delete(key) })
       },
       commit: async (options) => {
         for (const batch of batches) {

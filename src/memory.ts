@@ -4,7 +4,7 @@ import * as Errors from './errors.js'
 import type { Pair } from 'interface-datastore'
 
 export class MemoryDatastore extends BaseDatastore {
-  private data: Map<string, Uint8Array>
+  private readonly data: Map<string, Uint8Array>
 
   constructor () {
     super()

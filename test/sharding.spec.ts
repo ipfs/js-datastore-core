@@ -21,7 +21,7 @@ describe('ShardingDatastore', () => {
     const store = new ShardingDatastore(ms, shard)
     await store.open()
     const res = await Promise.all([
-      store.get(new Key(SHARDING_FN)),
+      store.get(new Key(SHARDING_FN))
     ])
     expect(uint8ArrayToString(res[0])).to.eql(shard.toString() + '\n')
   })
