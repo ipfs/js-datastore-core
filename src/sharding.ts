@@ -54,28 +54,30 @@ export class ShardingDatastore extends BaseDatastore {
     return Key.withNamespaces(key.list().slice(1))
   }
 
-  static async create (store: Datastore, shard: Shard): Promise<Shard> {
+  static async create (store: Datastore, shard?: Shard): Promise<Shard> {
     const hasShard = await store.has(shardKey)
-    if (!hasShard && shard == null) {
-      throw Errors.dbOpenFailedError(Error('Shard is required when datastore doesn\'t have a shard key already.'))
-    }
-    if (!hasShard) {
-      // @ts-expect-error i have no idea what putRaw is or saw any implementation
-      const put = typeof store.putRaw === 'function' ? store.putRaw.bind(store) : store.put.bind(store)
-      await Promise.all([
-        put(shardKey, new TextEncoder().encode(shard.toString() + '\n'))
-      ])
 
-      return shard
+    if (!hasShard) {
+      if (shard == null) {
+        throw Errors.dbOpenFailedError(Error('Shard is required when datastore doesn\'t have a shard key already.'))
+      }
+
+      await store.put(shardKey, new TextEncoder().encode(shard.toString() + '\n'))
+    }
+
+    if (shard == null) {
+      shard = await readShardFun('/', store)
     }
 
     // test shards
     const diskShard = await readShardFun('/', store)
     const a = diskShard.toString()
     const b = shard.toString()
+
     if (a !== b) {
       throw new Error(`specified fun ${b} does not match repo shard fun ${a}`)
     }
+
     return diskShard
   }
 
