@@ -1,11 +1,10 @@
 {
-    "extends": "aegir/src/config/tsconfig.aegir.json",
-    "compilerOptions": {
-      "outDir": "dist",
-      "emitDeclarationOnly": true
-    },
-    "include": [
-      "test",
-      "src"
-    ]
+  "extends": "aegir/src/config/tsconfig.aegir.json",
+  "compilerOptions": {
+    "outDir": "dist"
+  },
+  "include": [
+    "src",
+    "test"
+  ]
 }

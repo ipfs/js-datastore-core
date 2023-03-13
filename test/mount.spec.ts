@@ -9,12 +9,9 @@ import { MountDatastore } from '../src/mount.js'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import { interfaceDatastoreTests } from 'interface-datastore-tests'
 import { KeyTransformDatastore } from '../src/keytransform.js'
+import type { Datastore } from 'interface-datastore'
 
-/**
- * @param {import('interface-datastore').Datastore} datastore
- * @param {Key} prefix
- */
-const stripPrefixDatastore = (datastore, prefix) => {
+const stripPrefixDatastore = (datastore: Datastore, prefix: Key): Datastore => {
   return new KeyTransformDatastore(
     datastore, {
       convert: (key) => {

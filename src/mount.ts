@@ -3,49 +3,27 @@ import take from 'it-take'
 import merge from 'it-merge'
 import { BaseDatastore } from './base.js'
 import * as Errors from './errors.js'
-import {
-  sortAll
-} from './utils.js'
-
-/**
- * @typedef {import('interface-datastore').Datastore} Datastore
- * @typedef {import('interface-datastore').Key} Key
- * @typedef {import('interface-datastore').Pair} Pair
- * @typedef {import('interface-datastore').Options} Options
- * @typedef {import('interface-datastore').Batch} Batch
- * @typedef {import('interface-datastore').Query} Query
- * @typedef {import('interface-datastore').KeyQuery} KeyQuery
- * @typedef {import('./types').KeyTransform} KeyTransform
- */
+import sort from 'it-sort'
+import type { Batch, Datastore, Key, KeyQuery, Pair, Query } from 'interface-datastore'
+import type { Options } from 'interface-store'
 
 /**
  * A datastore that can combine multiple stores inside various
  * key prefixes
- *
- * @implements {Datastore}
  */
 export class MountDatastore extends BaseDatastore {
-  /**
-   * @param {Array<{prefix: Key, datastore: Datastore}>} mounts
-   */
-  constructor (mounts) {
+  private readonly mounts: Array<{ prefix: Key, datastore: Datastore }>
+
+  constructor (mounts: Array<{ prefix: Key, datastore: Datastore }>) {
     super()
 
     this.mounts = mounts.slice()
   }
 
-  async open () {
-    await Promise.all(this.mounts.map((m) => m.datastore.open()))
-  }
-
   /**
    * Lookup the matching datastore for the given key
-   *
-   * @private
-   * @param {Key} key
-   * @returns {{datastore: Datastore, mountpoint: Key} | undefined}
    */
-  _lookup (key) {
+  private _lookup (key: Key): { datastore: Datastore, mountpoint: Key } | undefined {
     for (const mount of this.mounts) {
       if (mount.prefix.toString() === key.toString() || mount.prefix.isAncestorOf(key)) {
         return {
@@ -56,73 +34,48 @@ export class MountDatastore extends BaseDatastore {
     }
   }
 
-  /**
-   * @param {Key} key
-   * @param {Uint8Array} value
-   * @param {Options} [options]
-   */
-  put (key, value, options) {
+  async put (key: Key, value: Uint8Array, options?: Options): Promise<void> {
     const match = this._lookup(key)
     if (match == null) {
       throw Errors.dbWriteFailedError(new Error('No datastore mounted for this key'))
     }
 
-    return match.datastore.put(key, value, options)
+    await match.datastore.put(key, value, options)
   }
 
   /**
    * @param {Key} key
    * @param {Options} [options]
    */
-  get (key, options) {
+  async get (key: Key, options: Options = {}): Promise<Uint8Array> {
     const match = this._lookup(key)
     if (match == null) {
       throw Errors.notFoundError(new Error('No datastore mounted for this key'))
     }
-    return match.datastore.get(key, options)
+    return await match.datastore.get(key, options)
   }
 
-  /**
-   * @param {Key} key
-   * @param {Options} [options]
-   */
-  has (key, options) {
+  async has (key: Key, options?: Options): Promise<boolean> {
     const match = this._lookup(key)
     if (match == null) {
-      return Promise.resolve(false)
+      return await Promise.resolve(false)
     }
-    return match.datastore.has(key, options)
+    return await match.datastore.has(key, options)
   }
 
-  /**
-   * @param {Key} key
-   * @param {Options} [options]
-   */
-  delete (key, options) {
+  async delete (key: Key, options?: Options): Promise<void> {
     const match = this._lookup(key)
     if (match == null) {
       throw Errors.dbDeleteFailedError(new Error('No datastore mounted for this key'))
     }
 
-    return match.datastore.delete(key, options)
+    await match.datastore.delete(key, options)
   }
 
-  async close () {
-    await Promise.all(this.mounts.map((m) => {
-      return m.datastore.close()
-    }))
-  }
+  batch (): Batch {
+    const batchMounts: Record<string, Batch> = {}
 
-  /**
-   * @returns {Batch}
-   */
-  batch () {
-    /** @type {Record<string, Batch>} */
-    const batchMounts = {}
-    /**
-     * @param {Key} key
-     */
-    const lookup = (key) => {
+    const lookup = (key: Key): { batch: Batch } => {
       const match = this._lookup(key)
       if (match == null) {
         throw new Error('No datastore mounted for this key')
@@ -148,16 +101,12 @@ export class MountDatastore extends BaseDatastore {
         match.batch.delete(key)
       },
       commit: async (options) => {
-        await Promise.all(Object.keys(batchMounts).map(p => batchMounts[p].commit(options)))
+        await Promise.all(Object.keys(batchMounts).map(async p => { await batchMounts[p].commit(options) }))
       }
     }
   }
 
-  /**
-   * @param {Query} q
-   * @param {Options} [options]
-   */
-  query (q, options) {
+  query (q: Query, options?: Options): AsyncIterable<Pair> {
     const qs = this.mounts.map(m => {
       return m.datastore.query({
         prefix: q.prefix,
@@ -165,24 +114,20 @@ export class MountDatastore extends BaseDatastore {
       }, options)
     })
 
-    /** @type AsyncIterable<Pair> */
     let it = merge(...qs)
-    if (q.filters) q.filters.forEach(f => { it = filter(it, f) })
-    if (q.orders) q.orders.forEach(o => { it = sortAll(it, o) })
+    if (q.filters != null) q.filters.forEach(f => { it = filter(it, f) })
+    if (q.orders != null) q.orders.forEach(o => { it = sort(it, o) })
     if (q.offset != null) {
       let i = 0
-      it = filter(it, () => i++ >= /** @type {number} */ (q.offset))
+      const offset = q.offset
+      it = filter(it, () => i++ >= offset)
     }
     if (q.limit != null) it = take(it, q.limit)
 
     return it
   }
 
-  /**
-   * @param {KeyQuery} q
-   * @param {Options} [options]
-   */
-  queryKeys (q, options) {
+  queryKeys (q: KeyQuery, options?: Options): AsyncIterable<Key> {
     const qs = this.mounts.map(m => {
       return m.datastore.queryKeys({
         prefix: q.prefix,
@@ -192,11 +137,12 @@ export class MountDatastore extends BaseDatastore {
 
     /** @type AsyncIterable<Key> */
     let it = merge(...qs)
-    if (q.filters) q.filters.forEach(f => { it = filter(it, f) })
-    if (q.orders) q.orders.forEach(o => { it = sortAll(it, o) })
+    if (q.filters != null) q.filters.forEach(f => { it = filter(it, f) })
+    if (q.orders != null) q.orders.forEach(o => { it = sort(it, o) })
     if (q.offset != null) {
       let i = 0
-      it = filter(it, () => i++ >= /** @type {number} */ (q.offset))
+      const offset = q.offset
+      it = filter(it, () => i++ >= offset)
     }
     if (q.limit != null) it = take(it, q.limit)
 
