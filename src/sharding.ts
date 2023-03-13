@@ -9,7 +9,6 @@ import * as Errors from './errors.js'
 import type { Shard } from './index.js'
 import type { Datastore } from 'interface-datastore'
 import type { AwaitIterable } from 'interface-store'
-import { isOpenable } from './utils.js'
 
 const shardKey = new Key(SHARDING_FN)
 
@@ -34,10 +33,6 @@ export class ShardingDatastore extends BaseDatastore {
   }
 
   async open (): Promise<void> {
-    if (isOpenable(this.child)) {
-      await this.child.open()
-    }
-
     this.shard = await ShardingDatastore.create(this.child, this.shard)
   }
 
@@ -140,11 +135,5 @@ export class ShardingDatastore extends BaseDatastore {
     }
 
     return this.child.queryKeys(tq, options)
-  }
-
-  async close (): Promise<void> {
-    if (isOpenable(this.child)) {
-      await this.child.close()
-    }
   }
 }
