@@ -15,6 +15,11 @@ export function dbWriteFailedError (err?: Error): Error {
   return errCode(err, 'ERR_DB_WRITE_FAILED')
 }
 
+export function dbReadFailedError (err?: Error): Error {
+  err = err ?? new Error('Read failed')
+  return errCode(err, 'ERR_DB_READ_FAILED')
+}
+
 export function notFoundError (err?: Error): Error {
   err = err ?? new Error('Not Found')
   return errCode(err, 'ERR_NOT_FOUND')
