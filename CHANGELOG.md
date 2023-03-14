@@ -1,3 +1,10 @@
+## [9.0.3](https://github.com/ipfs/js-datastore-core/compare/v9.0.2...v9.0.3) (2023-03-14)
+
+
+### Bug Fixes
+
+* add error for db read failures ([#146](https://github.com/ipfs/js-datastore-core/issues/146)) ([afab18a](https://github.com/ipfs/js-datastore-core/commit/afab18a9b6000ebe4670abee5bd401e024d0ae0f))
+
 ## [9.0.2](https://github.com/ipfs/js-datastore-core/compare/v9.0.1...v9.0.2) (2023-03-13)
 
 
