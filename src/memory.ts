@@ -2,6 +2,7 @@ import { BaseDatastore } from './base.js'
 import { Key } from 'interface-datastore/key'
 import * as Errors from './errors.js'
 import type { Pair } from 'interface-datastore'
+import type { Await, AwaitIterable } from 'interface-store'
 
 export class MemoryDatastore extends BaseDatastore {
   private readonly data: Map<string, Uint8Array>
@@ -12,11 +13,13 @@ export class MemoryDatastore extends BaseDatastore {
     this.data = new Map()
   }
 
-  async put (key: Key, val: Uint8Array): Promise<void> { // eslint-disable-line require-await
+  put (key: Key, val: Uint8Array): Await<Key> { // eslint-disable-line require-await
     this.data.set(key.toString(), val)
+
+    return key
   }
 
-  async get (key: Key): Promise<Uint8Array> {
+  get (key: Key): Await<Uint8Array> {
     const result = this.data.get(key.toString())
 
     if (result == null) {
@@ -26,21 +29,21 @@ export class MemoryDatastore extends BaseDatastore {
     return result
   }
 
-  async has (key: Key): Promise<boolean> { // eslint-disable-line require-await
+  has (key: Key): Await<boolean> { // eslint-disable-line require-await
     return this.data.has(key.toString())
   }
 
-  async delete (key: Key): Promise<void> { // eslint-disable-line require-await
+  delete (key: Key): Await<void> { // eslint-disable-line require-await
     this.data.delete(key.toString())
   }
 
-  async * _all (): AsyncIterable<Pair> {
+  * _all (): AwaitIterable<Pair> {
     for (const [key, value] of this.data.entries()) {
       yield { key: new Key(key), value }
     }
   }
 
-  async * _allKeys (): AsyncIterable<Key> {
+  * _allKeys (): AwaitIterable<Key> {
     for (const key of this.data.keys()) {
       yield new Key(key)
     }

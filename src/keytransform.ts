@@ -2,8 +2,8 @@ import { BaseDatastore } from './base.js'
 import map from 'it-map'
 import { pipe } from 'it-pipe'
 import type { KeyTransform } from './index.js'
-import type { Batch, Datastore, Key, KeyQuery, Options, Pair, Query } from 'interface-datastore'
-import type { AwaitIterable } from 'interface-store'
+import type { Batch, Datastore, Key, KeyQuery, Pair, Query } from 'interface-datastore'
+import type { AbortOptions, AwaitIterable } from 'interface-store'
 
 /**
  * A datastore shim, that wraps around a given datastore, changing
@@ -21,23 +21,25 @@ export class KeyTransformDatastore extends BaseDatastore {
     this.transform = transform
   }
 
-  async put (key: Key, val: Uint8Array, options?: Options): Promise<void> {
+  async put (key: Key, val: Uint8Array, options?: AbortOptions): Promise<Key> {
     await this.child.put(this.transform.convert(key), val, options)
+
+    return key
   }
 
-  async get (key: Key, options?: Options): Promise<Uint8Array> {
+  async get (key: Key, options?: AbortOptions): Promise<Uint8Array> {
     return await this.child.get(this.transform.convert(key), options)
   }
 
-  async has (key: Key, options?: Options): Promise<boolean> {
+  async has (key: Key, options?: AbortOptions): Promise<boolean> {
     return await this.child.has(this.transform.convert(key), options)
   }
 
-  async delete (key: Key, options?: Options): Promise<void> {
+  async delete (key: Key, options?: AbortOptions): Promise<void> {
     await this.child.delete(this.transform.convert(key), options)
   }
 
-  async * putMany (source: AwaitIterable<Pair>, options: Options = {}): AsyncIterable<Pair> {
+  async * putMany (source: AwaitIterable<Pair>, options: AbortOptions = {}): AsyncIterable<Key> {
     const transform = this.transform
     const child = this.child
 
@@ -53,15 +55,12 @@ export class KeyTransformDatastore extends BaseDatastore {
         yield * child.putMany(source, options)
       },
       async function * (source) {
-        yield * map(source, ({ key, value }) => ({
-          key: transform.invert(key),
-          value
-        }))
+        yield * map(source, key => transform.invert(key))
       }
     )
   }
 
-  async * getMany (source: AwaitIterable<Key>, options: Options = {}): AsyncIterable<Uint8Array> {
+  async * getMany (source: AwaitIterable<Key>, options: AbortOptions = {}): AsyncIterable<Pair> {
     const transform = this.transform
     const child = this.child
 
@@ -72,11 +71,17 @@ export class KeyTransformDatastore extends BaseDatastore {
       },
       async function * (source) {
         yield * child.getMany(source, options)
+      },
+      async function * (source) {
+        yield * map(source, ({ key, value }) => ({
+          key: transform.invert(key),
+          value
+        }))
       }
     )
   }
 
-  async * deleteMany (source: AwaitIterable<Key>, options: Options = {}): AsyncIterable<Key> {
+  async * deleteMany (source: AwaitIterable<Key>, options: AbortOptions = {}): AsyncIterable<Key> {
     const transform = this.transform
     const child = this.child
 
@@ -109,7 +114,7 @@ export class KeyTransformDatastore extends BaseDatastore {
     }
   }
 
-  query (q: Query, options?: Options): AsyncIterable<Pair> {
+  query (q: Query, options?: AbortOptions): AsyncIterable<Pair> {
     const query: Query = {
       ...q
     }
@@ -143,7 +148,7 @@ export class KeyTransformDatastore extends BaseDatastore {
     })
   }
 
-  queryKeys (q: KeyQuery, options?: Options): AsyncIterable<Key> {
+  queryKeys (q: KeyQuery, options?: AbortOptions): AsyncIterable<Key> {
     const query = {
       ...q
     }

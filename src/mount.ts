@@ -5,7 +5,7 @@ import { BaseDatastore } from './base.js'
 import * as Errors from './errors.js'
 import sort from 'it-sort'
 import type { Batch, Datastore, Key, KeyQuery, Pair, Query } from 'interface-datastore'
-import type { Options } from 'interface-store'
+import type { AbortOptions } from 'interface-store'
 
 /**
  * A datastore that can combine multiple stores inside various
@@ -34,20 +34,22 @@ export class MountDatastore extends BaseDatastore {
     }
   }
 
-  async put (key: Key, value: Uint8Array, options?: Options): Promise<void> {
+  async put (key: Key, value: Uint8Array, options?: AbortOptions): Promise<Key> {
     const match = this._lookup(key)
     if (match == null) {
       throw Errors.dbWriteFailedError(new Error('No datastore mounted for this key'))
     }
 
     await match.datastore.put(key, value, options)
+
+    return key
   }
 
   /**
    * @param {Key} key
    * @param {Options} [options]
    */
-  async get (key: Key, options: Options = {}): Promise<Uint8Array> {
+  async get (key: Key, options: AbortOptions = {}): Promise<Uint8Array> {
     const match = this._lookup(key)
     if (match == null) {
       throw Errors.notFoundError(new Error('No datastore mounted for this key'))
@@ -55,7 +57,7 @@ export class MountDatastore extends BaseDatastore {
     return await match.datastore.get(key, options)
   }
 
-  async has (key: Key, options?: Options): Promise<boolean> {
+  async has (key: Key, options?: AbortOptions): Promise<boolean> {
     const match = this._lookup(key)
     if (match == null) {
       return await Promise.resolve(false)
@@ -63,7 +65,7 @@ export class MountDatastore extends BaseDatastore {
     return await match.datastore.has(key, options)
   }
 
-  async delete (key: Key, options?: Options): Promise<void> {
+  async delete (key: Key, options?: AbortOptions): Promise<void> {
     const match = this._lookup(key)
     if (match == null) {
       throw Errors.dbDeleteFailedError(new Error('No datastore mounted for this key'))
@@ -106,7 +108,7 @@ export class MountDatastore extends BaseDatastore {
     }
   }
 
-  query (q: Query, options?: Options): AsyncIterable<Pair> {
+  query (q: Query, options?: AbortOptions): AsyncIterable<Pair> {
     const qs = this.mounts.map(m => {
       return m.datastore.query({
         prefix: q.prefix,
@@ -127,7 +129,7 @@ export class MountDatastore extends BaseDatastore {
     return it
   }
 
-  queryKeys (q: KeyQuery, options?: Options): AsyncIterable<Key> {
+  queryKeys (q: KeyQuery, options?: AbortOptions): AsyncIterable<Key> {
     const qs = this.mounts.map(m => {
       return m.datastore.queryKeys({
         prefix: q.prefix,

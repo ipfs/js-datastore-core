@@ -1,4 +1,4 @@
-import { Batch, Key, KeyQuery, KeyQueryFilter, Options, Pair, Query, QueryFilter } from 'interface-datastore'
+import { Batch, Key, KeyQuery, KeyQueryFilter, Pair, Query, QueryFilter } from 'interface-datastore'
 import {
   readShardFun,
   SHARDING_FN
@@ -8,7 +8,7 @@ import { KeyTransformDatastore } from './keytransform.js'
 import * as Errors from './errors.js'
 import type { Shard } from './index.js'
 import type { Datastore } from 'interface-datastore'
-import type { AwaitIterable } from 'interface-store'
+import type { AbortOptions, AwaitIterable } from 'interface-store'
 
 const shardKey = new Key(SHARDING_FN)
 
@@ -81,31 +81,33 @@ export class ShardingDatastore extends BaseDatastore {
     return diskShard
   }
 
-  async put (key: Key, val: Uint8Array, options?: Options): Promise<void> {
+  async put (key: Key, val: Uint8Array, options?: AbortOptions): Promise<Key> {
     await this.child.put(key, val, options)
+
+    return key
   }
 
-  async get (key: Key, options?: Options): Promise<Uint8Array> {
+  async get (key: Key, options?: AbortOptions): Promise<Uint8Array> {
     return await this.child.get(key, options)
   }
 
-  async has (key: Key, options?: Options): Promise<boolean> {
+  async has (key: Key, options?: AbortOptions): Promise<boolean> {
     return await this.child.has(key, options)
   }
 
-  async delete (key: Key, options?: Options): Promise<void> {
+  async delete (key: Key, options?: AbortOptions): Promise<void> {
     await this.child.delete(key, options)
   }
 
-  async * putMany (source: AwaitIterable<Pair>, options: Options = {}): AsyncIterable<Pair> {
+  async * putMany (source: AwaitIterable<Pair>, options: AbortOptions = {}): AsyncIterable<Key> {
     yield * this.child.putMany(source, options)
   }
 
-  async * getMany (source: AwaitIterable<Key>, options: Options = {}): AsyncIterable<Uint8Array> {
+  async * getMany (source: AwaitIterable<Key>, options: AbortOptions = {}): AsyncIterable<Pair> {
     yield * this.child.getMany(source, options)
   }
 
-  async * deleteMany (source: AwaitIterable<Key>, options: Options = {}): AsyncIterable<Key> {
+  async * deleteMany (source: AwaitIterable<Key>, options: AbortOptions = {}): AsyncIterable<Key> {
     yield * this.child.deleteMany(source, options)
   }
 
@@ -113,7 +115,7 @@ export class ShardingDatastore extends BaseDatastore {
     return this.child.batch()
   }
 
-  query (q: Query, options?: Options): AsyncIterable<Pair> {
+  query (q: Query, options?: AbortOptions): AsyncIterable<Pair> {
     const omitShard: QueryFilter = ({ key }) => key.toString() !== shardKey.toString()
 
     const tq: Query = {
@@ -126,7 +128,7 @@ export class ShardingDatastore extends BaseDatastore {
     return this.child.query(tq, options)
   }
 
-  queryKeys (q: KeyQuery, options?: Options): AsyncIterable<Key> {
+  queryKeys (q: KeyQuery, options?: AbortOptions): AsyncIterable<Key> {
     const omitShard: KeyQueryFilter = (key) => key.toString() !== shardKey.toString()
 
     const tq: KeyQuery = {
