@@ -3,8 +3,8 @@ import * as Errors from './errors.js'
 import { logger } from '@libp2p/logger'
 import { pushable } from 'it-pushable'
 import drain from 'it-drain'
-import type { Batch, Datastore, Key, KeyQuery, Options, Pair, Query } from 'interface-datastore'
-import type { AwaitIterable } from 'interface-store'
+import type { Batch, Datastore, Key, KeyQuery, Pair, Query } from 'interface-datastore'
+import type { AbortOptions, AwaitIterable } from 'interface-store'
 
 const log = logger('datastore:core:tiered')
 
@@ -24,15 +24,16 @@ export class TieredDatastore extends BaseDatastore {
     this.stores = stores.slice()
   }
 
-  async put (key: Key, value: Uint8Array, options?: Options): Promise<void> {
+  async put (key: Key, value: Uint8Array, options?: AbortOptions): Promise<Key> {
     try {
       await Promise.all(this.stores.map(async store => { await store.put(key, value, options) }))
+      return key
     } catch (err: any) {
       throw Errors.dbWriteFailedError(err)
     }
   }
 
-  async get (key: Key, options?: Options): Promise<Uint8Array> {
+  async get (key: Key, options?: AbortOptions): Promise<Uint8Array> {
     for (const store of this.stores) {
       try {
         const res = await store.get(key, options)
@@ -44,7 +45,7 @@ export class TieredDatastore extends BaseDatastore {
     throw Errors.notFoundError()
   }
 
-  async has (key: Key, options?: Options): Promise<boolean> {
+  async has (key: Key, options?: AbortOptions): Promise<boolean> {
     for (const s of this.stores) {
       if (await s.has(key, options)) {
         return true
@@ -54,7 +55,7 @@ export class TieredDatastore extends BaseDatastore {
     return false
   }
 
-  async delete (key: Key, options?: Options): Promise<void> {
+  async delete (key: Key, options?: AbortOptions): Promise<void> {
     try {
       await Promise.all(this.stores.map(async store => { await store.delete(key, options) }))
     } catch (err: any) {
@@ -62,7 +63,7 @@ export class TieredDatastore extends BaseDatastore {
     }
   }
 
-  async * putMany (source: AwaitIterable<Pair>, options: Options = {}): AsyncIterable<Pair> {
+  async * putMany (source: AwaitIterable<Pair>, options: AbortOptions = {}): AsyncIterable<Key> {
     let error: Error | undefined
     const pushables = this.stores.map(store => {
       const source = pushable<Pair>({
@@ -86,14 +87,14 @@ export class TieredDatastore extends BaseDatastore {
 
         pushables.forEach(p => p.push(pair))
 
-        yield pair
+        yield pair.key
       }
     } finally {
       pushables.forEach(p => p.end())
     }
   }
 
-  async * deleteMany (source: AwaitIterable<Key>, options: Options = {}): AsyncIterable<Key> {
+  async * deleteMany (source: AwaitIterable<Key>, options: AbortOptions = {}): AsyncIterable<Key> {
     let error: Error | undefined
     const pushables = this.stores.map(store => {
       const source = pushable<Key>({
@@ -142,11 +143,11 @@ export class TieredDatastore extends BaseDatastore {
     }
   }
 
-  query (q: Query, options?: Options): AsyncIterable<Pair> {
+  query (q: Query, options?: AbortOptions): AwaitIterable<Pair> {
     return this.stores[this.stores.length - 1].query(q, options)
   }
 
-  queryKeys (q: KeyQuery, options?: Options): AsyncIterable<Key> {
+  queryKeys (q: KeyQuery, options?: AbortOptions): AwaitIterable<Key> {
     return this.stores[this.stores.length - 1].queryKeys(q, options)
   }
 }

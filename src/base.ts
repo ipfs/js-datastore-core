@@ -2,48 +2,43 @@ import sort from 'it-sort'
 import drain from 'it-drain'
 import filter from 'it-filter'
 import take from 'it-take'
-import type { Batch, Datastore, Key, KeyQuery, Options, Pair, Query } from 'interface-datastore'
-import type { AwaitIterable } from 'interface-store'
+import type { Batch, Datastore, Key, KeyQuery, Pair, Query } from 'interface-datastore'
+import type { AbortOptions, Await, AwaitIterable } from 'interface-store'
 
 export class BaseDatastore implements Datastore {
-  async open (): Promise<void> {
-
+  put (key: Key, val: Uint8Array, options?: AbortOptions): Await<Key> {
+    return Promise.reject(new Error('.put is not implemented'))
   }
 
-  async close (): Promise<void> {
-
+  get (key: Key, options?: AbortOptions): Await<Uint8Array> {
+    return Promise.reject(new Error('.get is not implemented'))
   }
 
-  async put (key: Key, val: Uint8Array, options?: Options): Promise<void> {
-    await Promise.reject(new Error('.put is not implemented'))
+  has (key: Key, options?: AbortOptions): Await<boolean> {
+    return Promise.reject(new Error('.has is not implemented'))
   }
 
-  async get (key: Key, options?: Options): Promise<Uint8Array> {
-    return await Promise.reject(new Error('.get is not implemented'))
+  delete (key: Key, options?: AbortOptions): Await<void> {
+    return Promise.reject(new Error('.delete is not implemented'))
   }
 
-  async has (key: Key, options?: Options): Promise<boolean> {
-    return await Promise.reject(new Error('.has is not implemented'))
-  }
-
-  async delete (key: Key, options?: Options): Promise<void> {
-    await Promise.reject(new Error('.delete is not implemented'))
-  }
-
-  async * putMany (source: AwaitIterable<Pair>, options: Options = {}): AsyncIterable<Pair> {
+  async * putMany (source: AwaitIterable<Pair>, options: AbortOptions = {}): AwaitIterable<Key> {
     for await (const { key, value } of source) {
       await this.put(key, value, options)
-      yield { key, value }
+      yield key
     }
   }
 
-  async * getMany (source: AwaitIterable<Key>, options: Options = {}): AsyncIterable<Uint8Array> {
+  async * getMany (source: AwaitIterable<Key>, options: AbortOptions = {}): AwaitIterable<Pair> {
     for await (const key of source) {
-      yield this.get(key, options)
+      yield {
+        key,
+        value: await this.get(key, options)
+      }
     }
   }
 
-  async * deleteMany (source: AwaitIterable<Key>, options: Options = {}): AsyncIterable<Key> {
+  async * deleteMany (source: AwaitIterable<Key>, options: AbortOptions = {}): AwaitIterable<Key> {
     for await (const key of source) {
       await this.delete(key, options)
       yield key
@@ -75,7 +70,7 @@ export class BaseDatastore implements Datastore {
    * Extending classes should override `query` or implement this method
    */
   // eslint-disable-next-line require-yield
-  async * _all (q: Query, options?: Options): AsyncIterable<Pair> {
+  async * _all (q: Query, options?: AbortOptions): AwaitIterable<Pair> {
     throw new Error('._all is not implemented')
   }
 
@@ -83,11 +78,11 @@ export class BaseDatastore implements Datastore {
    * Extending classes should override `queryKeys` or implement this method
    */
   // eslint-disable-next-line require-yield
-  async * _allKeys (q: KeyQuery, options?: Options): AsyncIterable<Key> {
+  async * _allKeys (q: KeyQuery, options?: AbortOptions): AwaitIterable<Key> {
     throw new Error('._allKeys is not implemented')
   }
 
-  query (q: Query, options?: Options): AsyncIterable<Pair> {
+  query (q: Query, options?: AbortOptions): AwaitIterable<Pair> {
     let it = this._all(q, options)
 
     if (q.prefix != null) {
@@ -116,7 +111,7 @@ export class BaseDatastore implements Datastore {
     return it
   }
 
-  queryKeys (q: KeyQuery, options?: Options): AsyncIterable<Key> {
+  queryKeys (q: KeyQuery, options?: AbortOptions): AwaitIterable<Key> {
     let it = this._allKeys(q, options)
 
     if (q.prefix != null) {
